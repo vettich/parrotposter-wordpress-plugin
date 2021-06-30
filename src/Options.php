@@ -16,24 +16,10 @@ class Options {
 		return $options['user_id'];
 	}
 
-	public static function set_user_id($userId)
-	{
-		$options = self::options();
-		$options['user_id'] = $userId;
-		update_option(self::KEY, $options);
-	}
-
 	public static function token()
 	{
 		$options = self::options();
 		return $options['token'];
-	}
-
-	public static function set_token($token)
-	{
-		$options = self::options();
-		$options['token'] = $token;
-		update_option(self::KEY, $options);
 	}
 
 	public static function set_user_data($userId, $token)
@@ -42,5 +28,11 @@ class Options {
 		$options['user_id'] = $userId;
 		$options['token'] = $token;
 		update_option(self::KEY, $options);
+	}
+
+	public static function log_enabled()
+	{
+		$options = self::options();
+		return $options['log_enabled'] ?: false;
 	}
 }

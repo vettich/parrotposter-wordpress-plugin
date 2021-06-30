@@ -20,25 +20,46 @@ define('PARROTPOSTER_PLUGIN_DIR', plugin_dir_path(__FILE__));
 // register autoloader
 require_once PARROTPOSTER_PLUGIN_DIR.'src/autoloader.php';
 
+if (!function_exists('parrotposter__')) {
+	function parrotposter__($msg, ...$values) {
+		return sprintf(esc_html__($msg, 'parrotposter'), ...$values);
+	}
+}
+
+if (!function_exists('parrotposter_e')) {
+	function parrotposter_e($msg, ...$values) {
+		printf(esc_html__($msg, 'parrotposter'), ...$values);
+	}
+}
+
 class ParrotPoster
 {
 	public function __construct()
 	{
 	}
 
-	public static function __($msg)
-	{
-		return esc_html__($msg, 'parrotposter');
-	}
-
-	public static function _e($msg)
-	{
-		esc_html_e($msg, 'parrotposter');
-	}
-
 	public static function asset($filename)
 	{
 		return plugins_url("/assets/$filename", PARROTPOSTER_PLUGIN_FILE);
+	}
+
+	public static function log($data)
+	{
+		if (!parrotposter\Options::log_enabled()) {
+			return;
+		}
+
+		$dtz = date_default_timezone_get();
+		date_default_timezone_set('Asia/Yekaterinburg');
+		$now = date(DATE_ATOM);
+		date_default_timezone_set($dtz);
+
+		$log = [
+			'datetime' => $now,
+			'data' => $data,
+		];
+		$s = print_r($log, true);
+		error_log($s, 3, PARROTPOSTER_PLUGIN_DIR.'var.log');
 	}
 
 	public function register()
@@ -66,8 +87,8 @@ class ParrotPoster
 
 	public function admin_menu()
 	{
-		add_menu_page(self::__('ParrotPoster settings page'), self::__('ParrotPoster'), 'manage_options', 'parrotposter', [$this, 'admin_page'], self::asset('images/icon.png'), 100);
-		// add_submenu_page('parrotposter', self::__('Authorization'), self::__('Authorization'), 'manage_options', 'parrotposter_auth', [$this, 'admin_page']);
+		add_menu_page(parrotposter__('ParrotPoster settings page'), parrotposter__('ParrotPoster'), 'manage_options', 'parrotposter', [$this, 'admin_page'], self::asset('images/icon.png'), 100);
+		// add_submenu_page('parrotposter', parrotposter__('Authorization'), parrotposter__('Authorization'), 'manage_options', 'parrotposter_auth', [$this, 'admin_page']);
 	}
 
 	public function admin_page()

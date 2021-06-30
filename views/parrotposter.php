@@ -1,29 +1,26 @@
 <?php
+
 use parrotposter\FormHelpers;
 use parrotposter\Options;
-
-$a = 1;
-$bbbb = 2;
 
 if (!current_user_can('manage_options')) {
 	return;
 }
 
-if (empty(Options::user_id())) {
-	ParrotPoster::include_view('auth');
+if ($_GET['subpage'] == 'reset_password') {
+	ParrotPoster::include_view('parrotposter-reset-password-part');
 	return;
 }
-?>
 
-<div class="wrap">
-	<h1><?php ParrotPoster::_e('ParrotPoster') ?></h1>
+if ($_GET['subpage'] == 'tariff_success_payed' || $_GET['subpage'] == 'tariff_fail_payed') {
+	ParrotPoster::include_view('parrotposter-tariff-payed');
+	return;
+}
 
-	<p>
-		<form action="<?php echo esc_url(admin_url('admin-post.php')) ?>" method="post">
-			<?php FormHelpers::the_nonce() ?>
-			<input type="hidden" name="action" value="parrotposter_logout">
-			<input class="button button-primary" type="submit" name="submit" value="Logout">
-		</form>
-	</p>
+if (empty(Options::user_id())) {
+	ParrotPoster::include_view('parrotposter-auth-parts');
+	return;
+}
 
-</div>
+ParrotPoster::include_view('parrotposter-user-parts');
+

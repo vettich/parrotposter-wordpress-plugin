@@ -31,7 +31,7 @@ class FormHelpers {
 		}
 		$args = [];
 		if (!empty($data)) {
-			$args['parrotposter_data'] = $data;
+			$args['parrotposter_success_data'] = $data;
 		}
 		wp_redirect(esc_url_raw(add_query_arg($args, $back_url)));
 		exit;
@@ -51,7 +51,7 @@ class FormHelpers {
 			$back_url = 'admin.php?page=parrotposter';
 		}
 		$args = [
-			'parrotposter_data' => ['error' => $msg],
+			'parrotposter_error_msg' => $msg,
 		];
 		wp_redirect(esc_url_raw(add_query_arg($args, $back_url)));
 		exit;
