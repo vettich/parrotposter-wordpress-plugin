@@ -1,0 +1,322 @@
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"POT-Creation-Date: 2021-08-10 11:43+0500\n"
+"PO-Revision-Date: 2021-08-05 07:14+0500\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 3.0\n"
+"X-Poedit-Basepath: ..\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Poedit-KeywordsList: __;_e;parrotposter__;parrotposter_e;esc_html_e;"
+"esc_html__\n"
+"X-Poedit-SearchPath-0: .\n"
+
+#: assets/js/post-meta-box.js:26
+msgid "Posts have not yet been created"
+msgstr ""
+
+#: assets/js/post-meta-box.js:33
+msgid "Post published at"
+msgstr ""
+
+#: assets/js/post-meta-box.js:34
+msgid "Status"
+msgstr ""
+
+#: assets/js/post-meta-box.js:36
+msgid "View details"
+msgstr ""
+
+#: assets/js/post-meta-box.js:84
+msgid "View post"
+msgstr ""
+
+#: assets/js/post-meta-box.js:114
+msgid "Remove post"
+msgstr ""
+
+#: assets/js/post-meta-box.js:155
+msgid "Remove post from ParrotPoster and social networks?"
+msgstr ""
+
+#: assets/js/post-meta-box.js:172
+msgid "Removed success"
+msgstr ""
+
+#: parrotposter.php:111
+msgid "ParrotPoster settings page"
+msgstr ""
+
+#: parrotposter.php:111 views/parrotposter-user-parts.php:70
+msgid "ParrotPoster"
+msgstr ""
+
+#: parrotposter.php:113 views/parrotposter-auth-parts.php:31
+#: views/parrotposter-auth-parts.php:46
+msgid "Authorization"
+msgstr ""
+
+#: parrotposter.php:115
+msgid "User"
+msgstr ""
+
+#: parrotposter.php:116
+msgid "Social media accounts"
+msgstr ""
+
+#: parrotposter.php:117
+msgid "Posts"
+msgstr ""
+
+#: src/AdminAjaxPost.php:52 src/AdminAjaxPost.php:78 src/AdminAjaxPost.php:104
+msgid "Username is empty"
+msgstr ""
+
+#: src/AdminAjaxPost.php:56 src/AdminAjaxPost.php:82 src/AdminAjaxPost.php:135
+msgid "Password is empty"
+msgstr ""
+
+#: src/AdminAjaxPost.php:85 src/AdminAjaxPost.php:138
+msgid "Passwords do not match"
+msgstr ""
+
+#: src/AdminAjaxPost.php:117
+msgid "An email with a link to recover your password was sent to your email."
+msgstr ""
+
+#: src/AdminAjaxPost.php:131
+msgid "Token is empty"
+msgstr ""
+
+#: views/accounts.php:4
+msgid "To view your accounst go to web app:"
+msgstr ""
+
+#: views/parrotposter-auth-parts.php:47 views/parrotposter-auth-parts.php:109
+msgid "Sign up"
+msgstr ""
+
+#: views/parrotposter-auth-parts.php:48
+msgid "Forgot password?"
+msgstr ""
+
+#: views/parrotposter-auth-parts.php:61 views/parrotposter-auth-parts.php:91
+#: views/parrotposter-auth-parts.php:121
+msgid "Email"
+msgstr ""
+
+#: views/parrotposter-auth-parts.php:67 views/parrotposter-auth-parts.php:97
+msgid "Password"
+msgstr ""
+
+#: views/parrotposter-auth-parts.php:73
+msgid "Login"
+msgstr ""
+
+#: views/parrotposter-auth-parts.php:85
+msgid "Your name"
+msgstr ""
+
+#: views/parrotposter-auth-parts.php:103
+#: views/parrotposter-reset-password-part.php:53
+msgid "Confirm password"
+msgstr ""
+
+#: views/parrotposter-auth-parts.php:127
+msgid "Send"
+msgstr ""
+
+#: views/parrotposter-publish-post-part.php:8
+msgid "Error post_id"
+msgstr ""
+
+#: views/parrotposter-publish-post-part.php:103
+msgid "Publish:"
+msgstr ""
+
+#: views/parrotposter-publish-post-part.php:112
+msgid "Available keys"
+msgstr ""
+
+#: views/parrotposter-publish-post-part.php:130
+msgid "Post text"
+msgstr ""
+
+#: views/parrotposter-publish-post-part.php:135
+msgid "Post link"
+msgstr ""
+
+#: views/parrotposter-publish-post-part.php:140
+msgid "Select post images"
+msgstr ""
+
+#: views/parrotposter-publish-post-part.php:152
+msgid "Select publication time"
+msgstr ""
+
+#: views/parrotposter-publish-post-part.php:155
+msgid "Now"
+msgstr ""
+
+#: views/parrotposter-publish-post-part.php:162
+msgid "Post time"
+msgstr ""
+
+#: views/parrotposter-publish-post-part.php:170
+msgid "Enter another time"
+msgstr ""
+
+#: views/parrotposter-publish-post-part.php:172
+msgid "Enter time"
+msgstr ""
+
+#: views/parrotposter-publish-post-part.php:177
+msgid "Select social networks"
+msgstr ""
+
+#: views/parrotposter-publish-post-part.php:199
+msgid "1. You need to fill in the text or choose pictures."
+msgstr ""
+
+#: views/parrotposter-publish-post-part.php:200
+msgid "2. Select at least one social network account"
+msgstr ""
+
+#: views/parrotposter-publish-post-part.php:202
+msgid "Publish"
+msgstr ""
+
+#: views/parrotposter-reset-password-part.php:32
+msgid "Reset password"
+msgstr ""
+
+#: views/parrotposter-reset-password-part.php:47
+msgid "New password"
+msgstr ""
+
+#: views/parrotposter-reset-password-part.php:59
+#: views/parrotposter-user-parts.php:142 views/parrotposter-user-parts.php:201
+#: views/parrotposter-user-parts.php:203
+msgid "Submit"
+msgstr ""
+
+#: views/parrotposter-tariff-payed.php:2
+msgid "Payment in ParrotPoster"
+msgstr ""
+
+#: views/parrotposter-tariff-payed.php:6
+msgid "You paid successfully. Thank you!"
+msgstr ""
+
+#: views/parrotposter-tariff-payed.php:12
+msgid ""
+"There was an error making the payment, try again! Or report it to tech "
+"support."
+msgstr ""
+
+#: views/parrotposter-tariff-payed.php:16
+msgid "Go back to plugin"
+msgstr ""
+
+#: views/parrotposter-user-parts.php:79
+msgid "Info"
+msgstr ""
+
+#: views/parrotposter-user-parts.php:80
+msgid "Tariffs"
+msgstr ""
+
+#: views/parrotposter-user-parts.php:88
+#, php-format
+msgid "Name: %s"
+msgstr ""
+
+#: views/parrotposter-user-parts.php:90
+#, php-format
+msgid "Username: %s"
+msgstr ""
+
+#: views/parrotposter-user-parts.php:91
+#, php-format
+msgid "Current tariff: %s (%s/%s accounts)"
+msgstr ""
+
+#: views/parrotposter-user-parts.php:92 views/parrotposter-user-parts.php:112
+#, php-format
+msgid "Expiry at %s"
+msgstr ""
+
+#: views/parrotposter-user-parts.php:99
+msgid "Logout"
+msgstr ""
+
+#: views/parrotposter-user-parts.php:107
+msgid "Prolong tariff"
+msgstr ""
+
+#: views/parrotposter-user-parts.php:116 views/parrotposter-user-parts.php:158
+msgid "Posts count:"
+msgstr ""
+
+#: views/parrotposter-user-parts.php:117 views/parrotposter-user-parts.php:159
+msgid "unlimited"
+msgstr ""
+
+#: views/parrotposter-user-parts.php:120 views/parrotposter-user-parts.php:162
+msgid "Accounts count:"
+msgstr ""
+
+#: views/parrotposter-user-parts.php:135 views/parrotposter-user-parts.php:192
+#, php-format
+msgid "%d month(s)"
+msgstr ""
+
+#: views/parrotposter-user-parts.php:136 views/parrotposter-user-parts.php:193
+#, php-format
+msgid "%d roubles"
+msgstr ""
+
+#: views/parrotposter-user-parts.php:137 views/parrotposter-user-parts.php:194
+#, php-format
+msgid "%d roubles (saving %d roubles)"
+msgstr ""
+
+#: views/parrotposter-user-parts.php:147
+msgid "Switch tariffs"
+msgstr ""
+
+#: views/parrotposter-user-parts.php:166
+msgid "ID:"
+msgstr ""
+
+#: views/parrotposter-user-parts.php:180
+#, php-format
+msgid "Free up to %s"
+msgstr ""
+
+#: views/parrotposter-user-parts.php:181
+msgid "Select tariff"
+msgstr ""
+
+#: views/post-meta-box.php:14
+msgid "Publish to socials network"
+msgstr ""
+
+#: views/post-meta-box.php:20
+msgid "Post details"
+msgstr ""
+
+#: views/post-meta-box.php:31
+msgid "Close"
+msgstr ""
+
+#: views/posts.php:4
+msgid "To view your posts go to web app:"
+msgstr ""

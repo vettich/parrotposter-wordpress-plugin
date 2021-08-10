@@ -6,7 +6,7 @@
  * Author: Selen
  * Version: 1.0.0
  * Author URI: http://selen.digital
- * Text Domain: selen-parrot-poster
+ * Text Domain: parrotposter
  * Domain Path: /languages
  */
 
@@ -21,13 +21,15 @@ define('PARROTPOSTER_PLUGIN_DIR', plugin_dir_path(__FILE__));
 require_once PARROTPOSTER_PLUGIN_DIR.'src/autoloader.php';
 
 if (!function_exists('parrotposter__')) {
-	function parrotposter__($msg, ...$values) {
+	function parrotposter__($msg, ...$values)
+	{
 		return sprintf(esc_html__($msg, 'parrotposter'), ...$values);
 	}
 }
 
 if (!function_exists('parrotposter_e')) {
-	function parrotposter_e($msg, ...$values) {
+	function parrotposter_e($msg, ...$values)
+	{
 		printf(esc_html__($msg, 'parrotposter'), ...$values);
 	}
 }
@@ -64,9 +66,14 @@ class ParrotPoster
 
 	public function register()
 	{
-		add_action('admin_enqueue_scripts', [$this, 'enqueue_admin']);
+		load_plugin_textdomain('parrotposter', false, dirname(plugin_basename(__FILE__)).'/languages');
+
+		add_action('admin_enqueue_scripts', [$this, 'register_scripts']);
+		add_action('admin_enqueue_scripts', [$this, 'enqueue_admin_translates'], 100);
 
 		add_action('admin_menu', [$this, 'admin_menu']);
+
+		add_action('add_meta_boxes', [$this, 'post_meta_box']);
 
 		parrotposter\AdminAjaxPost::get_instance();
 	}
@@ -79,16 +86,36 @@ class ParrotPoster
 	{
 	}
 
-	public function enqueue_admin()
+	public function register_scripts()
 	{
-		wp_enqueue_style('parrotPosterStyle', self::asset('css/style.css'));
-		wp_enqueue_script('parrotPosterScript', self::asset('js/script.js'));
+		// parrotposter css files
+		wp_enqueue_style('parrotposter-main-css', self::asset('css/style.css'));
+
+		// parrotposter js files
+		wp_register_script('parrotposter-main-script', self::asset('js/script.js'));
+		wp_register_script('parrotposter-post-meta-box', self::asset('js/post-meta-box.js'));
+
+		// jquery-ui
+		wp_register_style('parrotposter-jquery-ui-css', self::asset('lib/jquery-ui/jquery-ui.min.css'));
+		wp_register_script('parrotposter-jquery-ui-js', self::asset('lib/jquery-ui/jquery-ui.min.js'));
+	}
+
+	public function enqueue_admin_translates()
+	{
+		wp_set_script_translations('parrotposter-main-script', 'parrotposter', PARROTPOSTER_PLUGIN_DIR.'languages');
+		wp_set_script_translations('parrotposter-post-meta-box', 'parrotposter', PARROTPOSTER_PLUGIN_DIR.'languages');
 	}
 
 	public function admin_menu()
 	{
 		add_menu_page(parrotposter__('ParrotPoster settings page'), parrotposter__('ParrotPoster'), 'manage_options', 'parrotposter', [$this, 'admin_page'], self::asset('images/icon.png'), 100);
-		// add_submenu_page('parrotposter', parrotposter__('Authorization'), parrotposter__('Authorization'), 'manage_options', 'parrotposter_auth', [$this, 'admin_page']);
+		if (empty(parrotposter\Options::user_id())) {
+			add_submenu_page('parrotposter', parrotposter__('Authorization'), parrotposter__('Authorization'), 'manage_options', 'parrotposter', [$this, 'admin_page']);
+		} else {
+			add_submenu_page('parrotposter', parrotposter__('User'), parrotposter__('User'), 'manage_options', 'parrotposter', [$this, 'admin_page']);
+			add_submenu_page('parrotposter', parrotposter__('Social media accounts'), parrotposter__('Social media accounts'), 'manage_options', 'parrotposter_accounts', [$this, 'admin_page']);
+			add_submenu_page('parrotposter', parrotposter__('Posts'), parrotposter__('Posts'), 'manage_options', 'parrotposter_posts', [$this, 'admin_page']);
+		}
 	}
 
 	public function admin_page()
@@ -103,7 +130,20 @@ class ParrotPoster
 
 	public static function include_view($name)
 	{
+		wp_enqueue_script('parrotposter-main-script');
 		require_once PARROTPOSTER_PLUGIN_DIR."views/$name.php";
+	}
+
+	public function post_meta_box()
+	{
+		$post_types = get_post_types(['public' => true]);
+		$post_types = array_diff($post_types, ['attachment', 'nav_menu_item']);
+		add_meta_box('parrotposter-post-meta-box', 'ParrotPoster', [$this, 'post_meta_box_view'], $post_types, 'side', 'high');
+	}
+
+	public function post_meta_box_view()
+	{
+		self::include_view('post-meta-box');
 	}
 }
 

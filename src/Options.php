@@ -2,10 +2,12 @@
 
 namespace parrotposter;
 
-class Options {
+class Options
+{
 	const KEY = 'parrotposter_options';
 
-	public static function options() {
+	public static function options()
+	{
 		$options = get_option(self::KEY, []);
 		return $options;
 	}

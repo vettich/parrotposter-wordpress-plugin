@@ -1,0 +1,329 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2021-08-10 11:43+0500\n"
+"PO-Revision-Date: 2021-08-10 11:45+0500\n"
+"Last-Translator: Vettich <vetti.ch@mail.ru>\n"
+"Language-Team: \n"
+"Language: ru_RU\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 3.0\n"
+"X-Poedit-Basepath: ..\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
+"%10<=4 && (n%100<12 || n%100>14) ? 1 : 2);\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Poedit-KeywordsList: __;_e;parrotposter__;parrotposter_e\n"
+"X-Poedit-SearchPath-0: .\n"
+
+#: assets/js/post-meta-box.js:26
+msgid "Posts have not yet been created"
+msgstr "Посты еще не созданы"
+
+#: assets/js/post-meta-box.js:33
+msgid "Post published at"
+msgstr "Время публикации"
+
+#: assets/js/post-meta-box.js:34
+msgid "Status"
+msgstr "Статус"
+
+#: assets/js/post-meta-box.js:36
+msgid "View details"
+msgstr "Посмотреть подробнее"
+
+#: assets/js/post-meta-box.js:84
+msgid "View post"
+msgstr "Посмотреть пост"
+
+#: assets/js/post-meta-box.js:114
+msgid "Remove post"
+msgstr "Удалить пост"
+
+#: assets/js/post-meta-box.js:155
+msgid "Remove post from ParrotPoster and social networks?"
+msgstr "Удалить пост из ParrotPoster и из социальных сетей?"
+
+#: assets/js/post-meta-box.js:172
+msgid "Removed success"
+msgstr "Успешно удалено"
+
+#: parrotposter.php:111
+msgid "ParrotPoster settings page"
+msgstr "Страница настройки ParrotPoster"
+
+#: parrotposter.php:111 views/parrotposter-user-parts.php:70
+msgid "ParrotPoster"
+msgstr ""
+
+#: parrotposter.php:113 views/parrotposter-auth-parts.php:31
+#: views/parrotposter-auth-parts.php:46
+msgid "Authorization"
+msgstr "Авторизация"
+
+#: parrotposter.php:115
+msgid "User"
+msgstr "Пользователь"
+
+#: parrotposter.php:116
+msgid "Social media accounts"
+msgstr "Аккаунты соц. сетей"
+
+#: parrotposter.php:117
+msgid "Posts"
+msgstr "Посты"
+
+#: src/AdminAjaxPost.php:52 src/AdminAjaxPost.php:78 src/AdminAjaxPost.php:104
+msgid "Username is empty"
+msgstr "Username пуст"
+
+#: src/AdminAjaxPost.php:56 src/AdminAjaxPost.php:82 src/AdminAjaxPost.php:135
+msgid "Password is empty"
+msgstr "Пароль пуст"
+
+#: src/AdminAjaxPost.php:85 src/AdminAjaxPost.php:138
+msgid "Passwords do not match"
+msgstr "Пароли не совпадают"
+
+#: src/AdminAjaxPost.php:117
+msgid "An email with a link to recover your password was sent to your email."
+msgstr ""
+"На вашу электронную почту было отправлено письмо со ссылкой для "
+"восстановления пароля."
+
+#: src/AdminAjaxPost.php:131
+msgid "Token is empty"
+msgstr "Токен пустой"
+
+#: views/accounts.php:4
+msgid "To view your accounst go to web app:"
+msgstr "Чтобы просмотреть свои аккаунты, перейдите в веб-приложение:"
+
+#: views/parrotposter-auth-parts.php:47 views/parrotposter-auth-parts.php:109
+msgid "Sign up"
+msgstr "Регистрация"
+
+#: views/parrotposter-auth-parts.php:48
+msgid "Forgot password?"
+msgstr "Забыли пароль?"
+
+#: views/parrotposter-auth-parts.php:61 views/parrotposter-auth-parts.php:91
+#: views/parrotposter-auth-parts.php:121
+msgid "Email"
+msgstr ""
+
+#: views/parrotposter-auth-parts.php:67 views/parrotposter-auth-parts.php:97
+msgid "Password"
+msgstr "Пароль"
+
+#: views/parrotposter-auth-parts.php:73
+msgid "Login"
+msgstr "Логин"
+
+#: views/parrotposter-auth-parts.php:85
+msgid "Your name"
+msgstr "Ваше имя"
+
+#: views/parrotposter-auth-parts.php:103
+#: views/parrotposter-reset-password-part.php:53
+msgid "Confirm password"
+msgstr "Подтвердите пароль"
+
+#: views/parrotposter-auth-parts.php:127
+msgid "Send"
+msgstr "Отправить"
+
+#: views/parrotposter-publish-post-part.php:8
+msgid "Error post_id"
+msgstr "Ошибка post_id"
+
+#: views/parrotposter-publish-post-part.php:103
+msgid "Publish:"
+msgstr "Опубликовать:"
+
+#: views/parrotposter-publish-post-part.php:112
+msgid "Available keys"
+msgstr "Доступные ключи"
+
+#: views/parrotposter-publish-post-part.php:130
+msgid "Post text"
+msgstr "Текст поста"
+
+#: views/parrotposter-publish-post-part.php:135
+msgid "Post link"
+msgstr "Ссылка поста"
+
+#: views/parrotposter-publish-post-part.php:140
+msgid "Select post images"
+msgstr "Выберите изображения поста"
+
+#: views/parrotposter-publish-post-part.php:152
+msgid "Select publication time"
+msgstr "Выберите время публикации"
+
+#: views/parrotposter-publish-post-part.php:155
+msgid "Now"
+msgstr "Сейчас"
+
+#: views/parrotposter-publish-post-part.php:162
+msgid "Post time"
+msgstr "Время поста"
+
+#: views/parrotposter-publish-post-part.php:170
+msgid "Enter another time"
+msgstr "Ввести другое время"
+
+#: views/parrotposter-publish-post-part.php:172
+msgid "Enter time"
+msgstr "Введите время"
+
+#: views/parrotposter-publish-post-part.php:177
+msgid "Select social networks"
+msgstr "Выберите соц. сети"
+
+#: views/parrotposter-publish-post-part.php:199
+msgid "1. You need to fill in the text or choose pictures."
+msgstr "1. Вам нужно заполнить текст или выбрать картинки."
+
+#: views/parrotposter-publish-post-part.php:200
+msgid "2. Select at least one social network account"
+msgstr "2. Выберите хотя бы один аккаунт в социальной сети"
+
+#: views/parrotposter-publish-post-part.php:202
+msgid "Publish"
+msgstr "Опубликовать"
+
+#: views/parrotposter-reset-password-part.php:32
+msgid "Reset password"
+msgstr "Сброс пароля"
+
+#: views/parrotposter-reset-password-part.php:47
+msgid "New password"
+msgstr "Новый пароль"
+
+#: views/parrotposter-reset-password-part.php:59
+#: views/parrotposter-user-parts.php:142 views/parrotposter-user-parts.php:201
+#: views/parrotposter-user-parts.php:203
+msgid "Submit"
+msgstr "Отправить"
+
+#: views/parrotposter-tariff-payed.php:2
+msgid "Payment in ParrotPoster"
+msgstr "Оплата в ParrotPoster"
+
+#: views/parrotposter-tariff-payed.php:6
+msgid "You paid successfully. Thank you!"
+msgstr "Вы успешно оплатили. Спасибо!"
+
+#: views/parrotposter-tariff-payed.php:12
+msgid ""
+"There was an error making the payment, try again! Or report it to tech "
+"support."
+msgstr ""
+"Произошла ошибка при проведении платежа, попробуйте еще раз! Или сообщите об "
+"этом в службу технической поддержки."
+
+#: views/parrotposter-tariff-payed.php:16
+msgid "Go back to plugin"
+msgstr "Вернуться к плагину"
+
+#: views/parrotposter-user-parts.php:79
+msgid "Info"
+msgstr "Информация"
+
+#: views/parrotposter-user-parts.php:80
+msgid "Tariffs"
+msgstr "Тарифы"
+
+#: views/parrotposter-user-parts.php:88
+#, php-format
+msgid "Name: %s"
+msgstr "Имя: %s"
+
+#: views/parrotposter-user-parts.php:90
+#, php-format
+msgid "Username: %s"
+msgstr "Username: %s"
+
+#: views/parrotposter-user-parts.php:91
+#, php-format
+msgid "Current tariff: %s (%s/%s accounts)"
+msgstr "Текущий тариф: %s (%s/%s аккаунтов)"
+
+#: views/parrotposter-user-parts.php:92 views/parrotposter-user-parts.php:112
+#, php-format
+msgid "Expiry at %s"
+msgstr "Истекает в %s"
+
+#: views/parrotposter-user-parts.php:99
+msgid "Logout"
+msgstr "Выйти"
+
+#: views/parrotposter-user-parts.php:107
+msgid "Prolong tariff"
+msgstr "Продлить тариф"
+
+#: views/parrotposter-user-parts.php:116 views/parrotposter-user-parts.php:158
+msgid "Posts count:"
+msgstr "Количество постов:"
+
+#: views/parrotposter-user-parts.php:117 views/parrotposter-user-parts.php:159
+msgid "unlimited"
+msgstr "неограниченно"
+
+#: views/parrotposter-user-parts.php:120 views/parrotposter-user-parts.php:162
+msgid "Accounts count:"
+msgstr "Количество аккаунтов:"
+
+#: views/parrotposter-user-parts.php:135 views/parrotposter-user-parts.php:192
+#, php-format
+msgid "%d month(s)"
+msgstr "%d месяц(ев)"
+
+#: views/parrotposter-user-parts.php:136 views/parrotposter-user-parts.php:193
+#, php-format
+msgid "%d roubles"
+msgstr "%d рублей"
+
+#: views/parrotposter-user-parts.php:137 views/parrotposter-user-parts.php:194
+#, php-format
+msgid "%d roubles (saving %d roubles)"
+msgstr "%d рублелй (экономия %d рублей)"
+
+#: views/parrotposter-user-parts.php:147
+msgid "Switch tariffs"
+msgstr "Перейти на другой тариф"
+
+#: views/parrotposter-user-parts.php:166
+msgid "ID:"
+msgstr ""
+
+#: views/parrotposter-user-parts.php:180
+#, php-format
+msgid "Free up to %s"
+msgstr "Бесплатно до %s"
+
+#: views/parrotposter-user-parts.php:181
+msgid "Select tariff"
+msgstr "Выберите тариф"
+
+#: views/post-meta-box.php:14
+msgid "Publish to socials network"
+msgstr "Опубликовать в социальные сети"
+
+#: views/post-meta-box.php:20
+msgid "Post details"
+msgstr "Подробности поста"
+
+#: views/post-meta-box.php:31
+msgid "Close"
+msgstr "Закрыть"
+
+#: views/posts.php:4
+msgid "To view your posts go to web app:"
+msgstr "Чтобы просмотреть свои посты, перейдите в веб-приложение:"
+
+#~ msgid "Translate"
+#~ msgstr "Перевод"

@@ -1,3 +1,4 @@
+
 <?php
 
 use parrotposter\FormHelpers;
@@ -53,7 +54,7 @@ if ($tab == 'tariffs') {
 
 function parrotposter_calc_amount($period, $price)
 {
-	$percent = ($period-1) * 2;
+	$percent = ($period - 1) * 2;
 	if ($percent > 30) {
 		$percent = 30;
 	}
@@ -83,7 +84,9 @@ function parrotposter_calc_amount($period, $price)
 		<br>
 
 		<?php if ($tab == 'user'): ?>
-			<p><?php if (!empty($user['name'])) parrotposter_e('Name: %s', $user['name']) ?></p>
+			<?php if (!empty($user['name'])): ?>
+				<p><?php parrotposter_e('Name: %s', $user['name']) ?></p>
+			<?php endif ?>
 			<p><?php parrotposter_e('Username: %s', $user['username']) ?></p>
 			<p><?php parrotposter_e('Current tariff: %s (%s/%s accounts)', $tariff['name'], $user['tariff_limits']['accounts_current_cnt'], $user['tariff_limits']['accounts_cnt']) ?></p>
 			<p><?php parrotposter_e('Expiry at %s', wp_date(get_option('date_format'), strtotime($user['tariff']['expiry_at']))) ?></p>
@@ -97,9 +100,6 @@ function parrotposter_calc_amount($period, $price)
 				</form>
 			</p>
 		<?php endif ?>
-
-
-
 
 		<?php if ($tab == 'tariffs'): ?>
 

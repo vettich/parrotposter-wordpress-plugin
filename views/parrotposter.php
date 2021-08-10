@@ -7,13 +7,23 @@ if (!current_user_can('manage_options')) {
 	return;
 }
 
-if ($_GET['subpage'] == 'reset_password') {
-	ParrotPoster::include_view('parrotposter-reset-password-part');
-	return;
+$subpage = '';
+if (isset($_GET['subpage'])) {
+	$subpage = $_GET['subpage'];
 }
 
-if ($_GET['subpage'] == 'tariff_success_payed' || $_GET['subpage'] == 'tariff_fail_payed') {
+switch ($subpage) {
+case 'reset_password':
+	ParrotPoster::include_view('parrotposter-reset-password-part');
+	return;
+
+case 'tariff_success_payed':
+case 'tariff_fail_payed':
 	ParrotPoster::include_view('parrotposter-tariff-payed');
+	return;
+
+case 'publish_post':
+	ParrotPoster::include_view('parrotposter-publish-post-part');
 	return;
 }
 
@@ -23,4 +33,3 @@ if (empty(Options::user_id())) {
 }
 
 ParrotPoster::include_view('parrotposter-user-parts');
-
