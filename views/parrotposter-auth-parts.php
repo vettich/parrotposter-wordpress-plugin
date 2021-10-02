@@ -28,11 +28,19 @@ if (isset($_GET['parrotposter_success_data'])) {
 ?>
 
 <div class="wrap">
-	<h1><?php parrotposter_e('Authorization') ?></h1>
+	<?php if ($tab == 'auth'): ?>
+		<h1><?php parrotposter_e('Authorization') ?></h1>
+	<?php elseif ($tab == 'signup'): ?>
+		<h1><?php parrotposter_e('Registration') ?></h1>
+	<?php elseif ($tab == 'forgot_password'): ?>
+		<h1><?php parrotposter_e('Reset password') ?></h1>
+	<?php endif ?>
 
 	<?php if (!empty($error_msg)): ?>
 		<div class="notice notice-error">
-			<p><?php echo $error_msg ?></p>
+			<p>
+				<?php echo is_array($error_msg) ? $error_msg['msg'] : $error_msg ?>
+			</p>
 		</div>
 	<?php endif ?>
 
@@ -44,7 +52,7 @@ if (isset($_GET['parrotposter_success_data'])) {
 
 	<nav class="nav-tab-wrapper">
 		<a href="?page=parrotposter" class="nav-tab <?php $active_tab($tab, 'auth')?>"><?php parrotposter_e('Authorization') ?></a>
-		<a href="?page=parrotposter&tab=signup" class="nav-tab <?php $active_tab($tab, 'signup')?>"><?php parrotposter_e('Sign up') ?></a>
+		<a href="?page=parrotposter&tab=signup" class="nav-tab <?php $active_tab($tab, 'signup')?>"><?php parrotposter_e('Registration') ?></a>
 		<a href="?page=parrotposter&tab=forgot_password" class="nav-tab <?php $active_tab($tab, 'forgot_password')?>"><?php parrotposter_e('Forgot password?') ?></a>
 	</nav>
 

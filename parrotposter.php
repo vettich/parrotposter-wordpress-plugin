@@ -66,7 +66,7 @@ class ParrotPoster
 
 	public function register()
 	{
-		load_plugin_textdomain('parrotposter', false, dirname(plugin_basename(__FILE__)).'/languages');
+		add_action('init', [$this, 'load_textdomain']);
 
 		add_action('admin_enqueue_scripts', [$this, 'register_scripts']);
 		add_action('admin_enqueue_scripts', [$this, 'enqueue_admin_translates'], 100);
@@ -84,6 +84,11 @@ class ParrotPoster
 
 	public static function deactivation()
 	{
+	}
+
+	public function load_textdomain()
+	{
+		load_plugin_textdomain('parrotposter', false, dirname(plugin_basename(__FILE__)).'/languages');
 	}
 
 	public function register_scripts()

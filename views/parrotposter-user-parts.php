@@ -1,15 +1,20 @@
-
 <?php
 
 use parrotposter\FormHelpers;
 use parrotposter\Options;
 use parrotposter\Api;
+use parrotposter\Tools;
 
 if (!current_user_can('manage_options')) {
 	return;
 }
 
 $tab = isset($_GET['tab']) ? $_GET['tab'] : 'user';
+if (!in_array($tab, ['user', 'tariffs'])) {
+	wp_redirect(esc_url_raw('admin.php?page=parrotposter'));
+	exit;
+}
+
 $active_tab = function ($tab, $cond) {
 	echo $tab == $cond ? 'nav-tab-active' : '';
 };
@@ -26,6 +31,10 @@ if (!empty($user)) {
 	if (isset($res['error'])) {
 		$error_msg = $res['error']['msg'];
 	}
+	$lang = Tools::get_current_lang();
+	if (isset($tariff['translates'][$lang])) {
+		$tariff['name'] = $tariff['translates'][$lang]['name'];
+	}
 }
 
 if ($tab == 'tariffs') {
@@ -34,7 +43,11 @@ if ($tab == 'tariffs') {
 	$currentTariff = null;
 	$otherTariffs = [];
 	$balans = 0;
+	$lang = Tools::get_current_lang();
 	foreach ($tariffs as $t) {
+		if (isset($t['translates'][$lang])) {
+			$t['name'] = $t['translates'][$lang]['name'];
+		}
 		if ($user['tariff']['id'] == $t['id']) {
 			$currentTariff = $t;
 			$expiry_at = strtotime($user['tariff']['expiry_at']);
@@ -76,7 +89,7 @@ function parrotposter_calc_amount($period, $price)
 	<?php endif ?>
 
 	<nav class="nav-tab-wrapper">
-		<a href="?page=parrotposter" class="nav-tab <?php $active_tab($tab, 'user')?>"><?php parrotposter_e('Info') ?></a>
+		<a href="?page=parrotposter" class="nav-tab <?php $active_tab($tab, 'user')?>"><?php parrotposter_e('Profile') ?></a>
 		<a href="?page=parrotposter&tab=tariffs" class="nav-tab <?php $active_tab($tab, 'tariffs')?>"><?php parrotposter_e('Tariffs') ?></a>
 	</nav>
 
@@ -87,7 +100,7 @@ function parrotposter_calc_amount($period, $price)
 			<?php if (!empty($user['name'])): ?>
 				<p><?php parrotposter_e('Name: %s', $user['name']) ?></p>
 			<?php endif ?>
-			<p><?php parrotposter_e('Username: %s', $user['username']) ?></p>
+			<p><?php parrotposter_e('Email: %s', $user['username']) ?></p>
 			<p><?php parrotposter_e('Current tariff: %s (%s/%s accounts)', $tariff['name'], $user['tariff_limits']['accounts_current_cnt'], $user['tariff_limits']['accounts_cnt']) ?></p>
 			<p><?php parrotposter_e('Expiry at %s', wp_date(get_option('date_format'), strtotime($user['tariff']['expiry_at']))) ?></p>
 
@@ -103,6 +116,12 @@ function parrotposter_calc_amount($period, $price)
 
 		<?php if ($tab == 'tariffs'): ?>
 
+			<p>
+				<?php parrotposter_e('You can change the tariff and pay through the web-application by following the link') ?>:
+				<a href="https://parrotposter.com/app/#/tariffs">parrotposter.com/app/#/tariffs</a>
+			</p>
+
+			<?php /*
 			<?php if (!empty($currentTariff)): ?>
 			<h2><?php parrotposter_e('Prolong tariff') ?></h2>
 			<div class="parrotposter_tariffs_list">
@@ -123,7 +142,7 @@ function parrotposter_calc_amount($period, $price)
 
 					<form action="<?php echo esc_url(admin_url('admin-post.php')) ?>" method="post">
 						<?php FormHelpers::the_nonce() ?>
-						<input type="hidden" name="parrotposter[tariff_id]" value="<?=$currentTariff['id']?>" />
+						<input type="hidden" name="parrotposter[tariff_id]" value="<?php echo $currentTariff['id']?>" />
 						<input type="hidden" name="action" value="parrotposter_create_transaction" />
 						<input type="hidden" name="back_url" value="admin.php?page=parrotposter&tab=tariffs">
 						<?php foreach ([1, 3, 6, 12] as $period): ?>
@@ -170,7 +189,7 @@ function parrotposter_calc_amount($period, $price)
 					<form action="<?php echo esc_url(admin_url('admin-post.php')) ?>" method="post">
 						<?php FormHelpers::the_nonce() ?>
 						<input type="hidden" name="back_url" value="admin.php?page=parrotposter&tab=tariffs">
-						<input type="hidden" name="parrotposter[tariff_id]" value="<?=$tariff['id']?>" />
+						<input type="hidden" name="parrotposter[tariff_id]" value="<?php echo $tariff['id'] ?>" />
 
 						<?php if ($balans > 0): ?>
 							<?php $diff = strtotime('now +1 month') - strtotime('now') ?>
@@ -224,6 +243,7 @@ function parrotposter_calc_amount($period, $price)
 					margin: 0 auto;
 				}
 			</style>
+		*/ ?>
 
 		<?php endif ?>
 

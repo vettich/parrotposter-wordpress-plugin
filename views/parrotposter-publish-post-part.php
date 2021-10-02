@@ -29,7 +29,9 @@ $keys = [
 ];
 
 $images = [];
-
+if (!empty($featuredImage)) {
+	$images[get_post_thumbnail_id($post_id)] = $featuredImage;
+}
 if (function_exists('wc_get_product')) {
 	$p = wc_get_product($post_id);
 	if (!empty($p)) {
@@ -93,7 +95,9 @@ $post_link = urldecode(get_permalink($post_id));
 
 $accounts_res = parrotposter\Api::list_accounts();
 $accounts = parrotposter\ApiHelpers::retrieve_response($accounts_res, 'accounts');
+$accounts = $accounts ?: [];
 $accounts = parrotposter\ApiHelpers::fix_accounts_photos($accounts);
+
 ?>
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
@@ -192,6 +196,9 @@ $accounts = parrotposter\ApiHelpers::fix_accounts_photos($accounts);
 				</div>
 			</label>
 		<?php endforeach ?>
+		<?php if (empty($accounts)): ?>
+			<p><?php parrotposter_e('You don\'t have social media accounts. To create a post, first connect the social media accounts you want.') ?></p>
+		<?php endif ?>
 		</div>
 
 		<br>
@@ -209,6 +216,7 @@ $accounts = parrotposter\ApiHelpers::fix_accounts_photos($accounts);
 		enableTime: true,
 		time_24hr: true,
 		minDate: new Date(),
+		dateFormat: 'Z',
 	})
 
 	jQuery(function($) {
@@ -242,10 +250,3 @@ $accounts = parrotposter\ApiHelpers::fix_accounts_photos($accounts);
 
 </script>
 
-<!--
-<pre>
-	<?php print_r([
-		'$accounts' => $accounts,
-	]) ?>
-</pre>
- -->

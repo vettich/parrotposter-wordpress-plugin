@@ -15,12 +15,18 @@ class Options
 	public static function user_id()
 	{
 		$options = self::options();
+		if (!isset($options['user_id'])) {
+			return '';
+		}
 		return $options['user_id'];
 	}
 
 	public static function token()
 	{
 		$options = self::options();
+		if (!isset($options['token'])) {
+			return '';
+		}
 		return $options['token'];
 	}
 
@@ -35,6 +41,9 @@ class Options
 	public static function log_enabled()
 	{
 		$options = self::options();
-		return $options['log_enabled'] ?: false;
+		if (!isset($options['log_enabled'])) {
+			return false;
+		}
+		return $options['log_enabled'];
 	}
 }

@@ -37,4 +37,3 @@ wp_enqueue_script('parrotposter-post-meta-box');
 	const parrotposter_post_id = <?php echo json_encode($post_id) ?>;
 	const parrotposter_user_id = <?php echo json_encode(Options::user_id()) ?>;
 </script>
-<script src="<?php echo ParrotPoster::asset('js/post-meta-box.js') ?>"></script>

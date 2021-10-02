@@ -14,8 +14,8 @@ class ApiHelpers
 			return false;
 		}
 
-		if (!empty($field) && !empty($resp['response'][$field])) {
-			return $resp['response'][$field];
+		if (!empty($field)) {
+			return isset($resp['response'][$field]) ? $resp['response'][$field] : null;
 		}
 
 		return $resp['response'];

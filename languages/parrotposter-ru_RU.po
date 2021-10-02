@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-08-10 11:43+0500\n"
-"PO-Revision-Date: 2021-08-10 11:45+0500\n"
+"POT-Creation-Date: 2021-09-28 22:54+0500\n"
+"PO-Revision-Date: 2021-09-28 22:57+0500\n"
 "Last-Translator: Vettich <vetti.ch@mail.ru>\n"
 "Language-Team: \n"
 "Language: ru_RU\n"
@@ -50,50 +50,50 @@ msgstr "Удалить пост из ParrotPoster и из социальных �
 msgid "Removed success"
 msgstr "Успешно удалено"
 
-#: parrotposter.php:111
+#: parrotposter.php:116
 msgid "ParrotPoster settings page"
 msgstr "Страница настройки ParrotPoster"
 
-#: parrotposter.php:111 views/parrotposter-user-parts.php:70
+#: parrotposter.php:116 views/parrotposter-user-parts.php:75
 msgid "ParrotPoster"
 msgstr ""
 
-#: parrotposter.php:113 views/parrotposter-auth-parts.php:31
-#: views/parrotposter-auth-parts.php:46
+#: parrotposter.php:118 views/parrotposter-auth-parts.php:32
+#: views/parrotposter-auth-parts.php:54
 msgid "Authorization"
 msgstr "Авторизация"
 
-#: parrotposter.php:115
+#: parrotposter.php:120
 msgid "User"
 msgstr "Пользователь"
 
-#: parrotposter.php:116
+#: parrotposter.php:121 views/accounts.php:1
 msgid "Social media accounts"
 msgstr "Аккаунты соц. сетей"
 
-#: parrotposter.php:117
+#: parrotposter.php:122 views/posts.php:1
 msgid "Posts"
 msgstr "Посты"
 
-#: src/AdminAjaxPost.php:52 src/AdminAjaxPost.php:78 src/AdminAjaxPost.php:104
-msgid "Username is empty"
-msgstr "Username пуст"
+#: src/AdminAjaxPost.php:58 src/AdminAjaxPost.php:85 src/AdminAjaxPost.php:112
+msgid "Email is empty"
+msgstr "Email пустой"
 
-#: src/AdminAjaxPost.php:56 src/AdminAjaxPost.php:82 src/AdminAjaxPost.php:135
+#: src/AdminAjaxPost.php:62 src/AdminAjaxPost.php:89 src/AdminAjaxPost.php:144
 msgid "Password is empty"
 msgstr "Пароль пуст"
 
-#: src/AdminAjaxPost.php:85 src/AdminAjaxPost.php:138
+#: src/AdminAjaxPost.php:92 src/AdminAjaxPost.php:147
 msgid "Passwords do not match"
 msgstr "Пароли не совпадают"
 
-#: src/AdminAjaxPost.php:117
+#: src/AdminAjaxPost.php:125
 msgid "An email with a link to recover your password was sent to your email."
 msgstr ""
 "На вашу электронную почту было отправлено письмо со ссылкой для "
 "восстановления пароля."
 
-#: src/AdminAjaxPost.php:131
+#: src/AdminAjaxPost.php:140
 msgid "Token is empty"
 msgstr "Токен пустой"
 
@@ -101,37 +101,46 @@ msgstr "Токен пустой"
 msgid "To view your accounst go to web app:"
 msgstr "Чтобы просмотреть свои аккаунты, перейдите в веб-приложение:"
 
-#: views/parrotposter-auth-parts.php:47 views/parrotposter-auth-parts.php:109
-msgid "Sign up"
+#: views/parrotposter-auth-parts.php:34 views/parrotposter-auth-parts.php:55
+msgid "Registration"
 msgstr "Регистрация"
 
-#: views/parrotposter-auth-parts.php:48
+#: views/parrotposter-auth-parts.php:36
+#: views/parrotposter-reset-password-part.php:32
+msgid "Reset password"
+msgstr "Сброс пароля"
+
+#: views/parrotposter-auth-parts.php:56
 msgid "Forgot password?"
 msgstr "Забыли пароль?"
 
-#: views/parrotposter-auth-parts.php:61 views/parrotposter-auth-parts.php:91
-#: views/parrotposter-auth-parts.php:121
+#: views/parrotposter-auth-parts.php:69 views/parrotposter-auth-parts.php:99
+#: views/parrotposter-auth-parts.php:129
 msgid "Email"
 msgstr ""
 
-#: views/parrotposter-auth-parts.php:67 views/parrotposter-auth-parts.php:97
+#: views/parrotposter-auth-parts.php:75 views/parrotposter-auth-parts.php:105
 msgid "Password"
 msgstr "Пароль"
 
-#: views/parrotposter-auth-parts.php:73
+#: views/parrotposter-auth-parts.php:81
 msgid "Login"
-msgstr "Логин"
+msgstr "Войти"
 
-#: views/parrotposter-auth-parts.php:85
+#: views/parrotposter-auth-parts.php:93
 msgid "Your name"
 msgstr "Ваше имя"
 
-#: views/parrotposter-auth-parts.php:103
+#: views/parrotposter-auth-parts.php:111
 #: views/parrotposter-reset-password-part.php:53
 msgid "Confirm password"
 msgstr "Подтвердите пароль"
 
-#: views/parrotposter-auth-parts.php:127
+#: views/parrotposter-auth-parts.php:117
+msgid "Sign up"
+msgstr "Зарегистрироваться"
+
+#: views/parrotposter-auth-parts.php:135
 msgid "Send"
 msgstr "Отправить"
 
@@ -139,73 +148,75 @@ msgstr "Отправить"
 msgid "Error post_id"
 msgstr "Ошибка post_id"
 
-#: views/parrotposter-publish-post-part.php:103
+#: views/parrotposter-publish-post-part.php:106
 msgid "Publish:"
 msgstr "Опубликовать:"
 
-#: views/parrotposter-publish-post-part.php:112
+#: views/parrotposter-publish-post-part.php:115
 msgid "Available keys"
 msgstr "Доступные ключи"
 
-#: views/parrotposter-publish-post-part.php:130
+#: views/parrotposter-publish-post-part.php:133
 msgid "Post text"
 msgstr "Текст поста"
 
-#: views/parrotposter-publish-post-part.php:135
+#: views/parrotposter-publish-post-part.php:138
 msgid "Post link"
 msgstr "Ссылка поста"
 
-#: views/parrotposter-publish-post-part.php:140
+#: views/parrotposter-publish-post-part.php:143
 msgid "Select post images"
 msgstr "Выберите изображения поста"
 
-#: views/parrotposter-publish-post-part.php:152
+#: views/parrotposter-publish-post-part.php:155
 msgid "Select publication time"
 msgstr "Выберите время публикации"
 
-#: views/parrotposter-publish-post-part.php:155
+#: views/parrotposter-publish-post-part.php:158
 msgid "Now"
 msgstr "Сейчас"
 
-#: views/parrotposter-publish-post-part.php:162
+#: views/parrotposter-publish-post-part.php:165
 msgid "Post time"
 msgstr "Время поста"
 
-#: views/parrotposter-publish-post-part.php:170
+#: views/parrotposter-publish-post-part.php:173
 msgid "Enter another time"
 msgstr "Ввести другое время"
 
-#: views/parrotposter-publish-post-part.php:172
+#: views/parrotposter-publish-post-part.php:175
 msgid "Enter time"
 msgstr "Введите время"
 
-#: views/parrotposter-publish-post-part.php:177
+#: views/parrotposter-publish-post-part.php:180
 msgid "Select social networks"
 msgstr "Выберите соц. сети"
 
 #: views/parrotposter-publish-post-part.php:199
+msgid ""
+"You don't have social media accounts. To create a post, first connect the "
+"social media accounts you want."
+msgstr ""
+"У вас нет аккаунтов социальных сетей. Чтобы создать пост, сначала подключите "
+"нужные вам аккаунты социальных сетей."
+
+#: views/parrotposter-publish-post-part.php:205
 msgid "1. You need to fill in the text or choose pictures."
 msgstr "1. Вам нужно заполнить текст или выбрать картинки."
 
-#: views/parrotposter-publish-post-part.php:200
+#: views/parrotposter-publish-post-part.php:206
 msgid "2. Select at least one social network account"
 msgstr "2. Выберите хотя бы один аккаунт в социальной сети"
 
-#: views/parrotposter-publish-post-part.php:202
+#: views/parrotposter-publish-post-part.php:208
 msgid "Publish"
 msgstr "Опубликовать"
-
-#: views/parrotposter-reset-password-part.php:32
-msgid "Reset password"
-msgstr "Сброс пароля"
 
 #: views/parrotposter-reset-password-part.php:47
 msgid "New password"
 msgstr "Новый пароль"
 
 #: views/parrotposter-reset-password-part.php:59
-#: views/parrotposter-user-parts.php:142 views/parrotposter-user-parts.php:201
-#: views/parrotposter-user-parts.php:203
 msgid "Submit"
 msgstr "Отправить"
 
@@ -229,85 +240,43 @@ msgstr ""
 msgid "Go back to plugin"
 msgstr "Вернуться к плагину"
 
-#: views/parrotposter-user-parts.php:79
-msgid "Info"
-msgstr "Информация"
+#: views/parrotposter-user-parts.php:84
+msgid "Profile"
+msgstr "Профиль"
 
-#: views/parrotposter-user-parts.php:80
+#: views/parrotposter-user-parts.php:85
 msgid "Tariffs"
 msgstr "Тарифы"
 
-#: views/parrotposter-user-parts.php:88
+#: views/parrotposter-user-parts.php:93
 #, php-format
 msgid "Name: %s"
 msgstr "Имя: %s"
 
-#: views/parrotposter-user-parts.php:90
+#: views/parrotposter-user-parts.php:95
 #, php-format
-msgid "Username: %s"
-msgstr "Username: %s"
+msgid "Email: %s"
+msgstr ""
 
-#: views/parrotposter-user-parts.php:91
+#: views/parrotposter-user-parts.php:96
 #, php-format
 msgid "Current tariff: %s (%s/%s accounts)"
 msgstr "Текущий тариф: %s (%s/%s аккаунтов)"
 
-#: views/parrotposter-user-parts.php:92 views/parrotposter-user-parts.php:112
+#: views/parrotposter-user-parts.php:97
 #, php-format
 msgid "Expiry at %s"
-msgstr "Истекает в %s"
+msgstr "Истекает %s"
 
-#: views/parrotposter-user-parts.php:99
+#: views/parrotposter-user-parts.php:104
 msgid "Logout"
 msgstr "Выйти"
 
-#: views/parrotposter-user-parts.php:107
-msgid "Prolong tariff"
-msgstr "Продлить тариф"
-
-#: views/parrotposter-user-parts.php:116 views/parrotposter-user-parts.php:158
-msgid "Posts count:"
-msgstr "Количество постов:"
-
-#: views/parrotposter-user-parts.php:117 views/parrotposter-user-parts.php:159
-msgid "unlimited"
-msgstr "неограниченно"
-
-#: views/parrotposter-user-parts.php:120 views/parrotposter-user-parts.php:162
-msgid "Accounts count:"
-msgstr "Количество аккаунтов:"
-
-#: views/parrotposter-user-parts.php:135 views/parrotposter-user-parts.php:192
-#, php-format
-msgid "%d month(s)"
-msgstr "%d месяц(ев)"
-
-#: views/parrotposter-user-parts.php:136 views/parrotposter-user-parts.php:193
-#, php-format
-msgid "%d roubles"
-msgstr "%d рублей"
-
-#: views/parrotposter-user-parts.php:137 views/parrotposter-user-parts.php:194
-#, php-format
-msgid "%d roubles (saving %d roubles)"
-msgstr "%d рублелй (экономия %d рублей)"
-
-#: views/parrotposter-user-parts.php:147
-msgid "Switch tariffs"
-msgstr "Перейти на другой тариф"
-
-#: views/parrotposter-user-parts.php:166
-msgid "ID:"
-msgstr ""
-
-#: views/parrotposter-user-parts.php:180
-#, php-format
-msgid "Free up to %s"
-msgstr "Бесплатно до %s"
-
-#: views/parrotposter-user-parts.php:181
-msgid "Select tariff"
-msgstr "Выберите тариф"
+#: views/parrotposter-user-parts.php:112
+msgid ""
+"You can change the tariff and pay through the web-application by following "
+"the link"
+msgstr "Изменить тариф и оплатить вы можете через веб-приложение по ссылке"
 
 #: views/post-meta-box.php:14
 msgid "Publish to socials network"
@@ -324,6 +293,50 @@ msgstr "Закрыть"
 #: views/posts.php:4
 msgid "To view your posts go to web app:"
 msgstr "Чтобы просмотреть свои посты, перейдите в веб-приложение:"
+
+#~ msgid "Prolong tariff"
+#~ msgstr "Продлить тариф"
+
+#~ msgid "Posts count:"
+#~ msgstr "Количество постов:"
+
+#~ msgid "unlimited"
+#~ msgstr "неограниченно"
+
+#~ msgid "Accounts count:"
+#~ msgstr "Количество аккаунтов:"
+
+#, php-format
+#~ msgid "%d month(s)"
+#~ msgstr "%d месяц(ев)"
+
+#, php-format
+#~ msgid "%d roubles"
+#~ msgstr "%d рублей"
+
+#, php-format
+#~ msgid "%d roubles (saving %d roubles)"
+#~ msgstr "%d рублелй (экономия %d рублей)"
+
+#~ msgid "Switch tariffs"
+#~ msgstr "Перейти на другой тариф"
+
+#, php-format
+#~ msgid "Free up to %s"
+#~ msgstr "Бесплатно до %s"
+
+#~ msgid "Select tariff"
+#~ msgstr "Выберите тариф"
+
+#~ msgid "Info"
+#~ msgstr "Информация"
+
+#, php-format
+#~ msgid "Username: %s"
+#~ msgstr "Username: %s"
+
+#~ msgid "Username is empty"
+#~ msgstr "Username пуст"
 
 #~ msgid "Translate"
 #~ msgstr "Перевод"

@@ -32,4 +32,14 @@ class Tools
 	{
 		return trim(html_entity_decode(strip_tags($text)));
 	}
+
+	public static function get_current_lang()
+	{
+		$locale = get_user_locale();
+		$locale_parsed = explode('_', $locale);
+		if (count($locale_parsed) > 0) {
+			return $locale_parsed[0];
+		}
+		return 'en';
+	}
 }

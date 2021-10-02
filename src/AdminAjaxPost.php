@@ -39,8 +39,14 @@ class AdminAjaxPost
 		add_action('wp_ajax_parrotposter_api_list_accounts', [$this, 'api_list_accounts']);
 	}
 
+	public function init()
+	{
+		ParrotPoster::load_textdomain();
+	}
+
 	public function auth()
 	{
+		self::init();
 		if (!FormHelpers::check_post_nonce()) {
 			FormHelpers::post_error('nonce');
 		}
@@ -49,7 +55,7 @@ class AdminAjaxPost
 		$password = trim($_POST['parrotposter']['password']);
 
 		if (empty($username)) {
-			FormHelpers::post_error(parrotposter__('Username is empty'));
+			FormHelpers::post_error(parrotposter__('Email is empty'));
 		}
 
 		if (empty($password)) {
@@ -65,6 +71,7 @@ class AdminAjaxPost
 
 	public function signup()
 	{
+		self::init();
 		if (!FormHelpers::check_post_nonce()) {
 			FormHelpers::post_error('nonce');
 		}
@@ -75,7 +82,7 @@ class AdminAjaxPost
 		$confirm_password = trim($_POST['parrotposter']['confirm_password']);
 
 		if (empty($username)) {
-			FormHelpers::post_error(parrotposter__('Username is empty'));
+			FormHelpers::post_error(parrotposter__('Email is empty'));
 		}
 
 		if (empty($password)) {
@@ -94,6 +101,7 @@ class AdminAjaxPost
 
 	public function forgot_password()
 	{
+		self::init();
 		if (!FormHelpers::check_post_nonce()) {
 			FormHelpers::post_error('nonce');
 		}
@@ -101,7 +109,7 @@ class AdminAjaxPost
 		$username = trim($_POST['parrotposter']['username']);
 
 		if (empty($username)) {
-			FormHelpers::post_error(parrotposter__('Username is empty'));
+			FormHelpers::post_error(parrotposter__('Email is empty'));
 		}
 
 		$callback_url = add_query_arg([
@@ -119,6 +127,7 @@ class AdminAjaxPost
 
 	public function reset_password()
 	{
+		self::init();
 		if (!FormHelpers::check_post_nonce()) {
 			FormHelpers::post_error('nonce');
 		}
