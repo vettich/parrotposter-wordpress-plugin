@@ -9,7 +9,7 @@ if (!current_user_can('manage_options')) {
 	return;
 }
 
-$tab = isset($_GET['tab']) ? $_GET['tab'] : 'user';
+$tab = isset($_GET['tab']) ? sanitize_text_field($_GET['tab']) : 'user';
 if (!in_array($tab, ['user', 'tariffs'])) {
 	wp_redirect(esc_url_raw('admin.php?page=parrotposter'));
 	exit;
@@ -84,7 +84,7 @@ function parrotposter_calc_amount($period, $price)
 
 	<?php if (!empty($error_msg)): ?>
 		<div class="notice notice-error">
-			<p><?php echo $error_msg ?></p>
+			<p><?php echo esc_attr($error_msg) ?></p>
 		</div>
 	<?php endif ?>
 
@@ -127,7 +127,7 @@ function parrotposter_calc_amount($period, $price)
 			<div class="parrotposter_tariffs_list">
 				<div class="parrotposter_tariffs_item">
 					<h3 class="parrotposter_tariff_title">
-						<?php echo $currentTariff['name'] ?>
+						<?php echo esc_attr($currentTariff['name']) ?>
 						(<?php parrotposter_e('Expiry at %s', wp_date(get_option('date_format'), strtotime($user['tariff']['expiry_at']))) ?>)
 					</h3>
 
@@ -137,12 +137,12 @@ function parrotposter_calc_amount($period, $price)
 					</p>
 					<p>
 						<b><?php parrotposter_e('Accounts count:') ?></b>
-						<?php echo $currentTariff['limits']['accounts_cnt'] ?>
+						<?php echo esc_attr($currentTariff['limits']['accounts_cnt']) ?>
 					</p>
 
 					<form action="<?php echo esc_url(admin_url('admin-post.php')) ?>" method="post">
 						<?php FormHelpers::the_nonce() ?>
-						<input type="hidden" name="parrotposter[tariff_id]" value="<?php echo $currentTariff['id']?>" />
+						<input type="hidden" name="parrotposter[tariff_id]" value="<?php echo esc_attr($currentTariff['id']) ?>" />
 						<input type="hidden" name="action" value="parrotposter_create_transaction" />
 						<input type="hidden" name="back_url" value="admin.php?page=parrotposter&tab=tariffs">
 						<?php foreach ([1, 3, 6, 12] as $period): ?>
@@ -150,7 +150,7 @@ function parrotposter_calc_amount($period, $price)
 								<label>
 									<?php $amount = parrotposter_calc_amount($period, $currentTariff['price']) ?>
 									<?php $checked = $period == 1 ? 'checked="checked"' : '' ?>
-									<input name="period" value="<?php echo $period?>" type="radio" <?php echo $checked ?> />
+									<input name="period" value="<?php echo esc_attr($period) ?>" type="radio" <?php echo esc_attr($checked) ?> />
 									<?php parrotposter_e('%d month(s)', $period) ?>:
 									<?php if ($period == 1): parrotposter_e('%d roubles', $amount['value']) ?>
 									<?php else: parrotposter_e('%d roubles (saving %d roubles)', $amount['value'], $amount['saving']) ?>
@@ -170,7 +170,7 @@ function parrotposter_calc_amount($period, $price)
 				<?php foreach ($otherTariffs as $tariff): ?>
 				<div class="parrotposter_tariffs_item">
 					<h3 class="parrotposter_tariff_title">
-						<?php echo $tariff['name']?>
+						<?php echo esc_attr($tariff['name']) ?>
 					</h3>
 
 					<p>
@@ -179,17 +179,17 @@ function parrotposter_calc_amount($period, $price)
 					</p>
 					<p>
 						<b><?php parrotposter_e('Accounts count:') ?></b>
-						<?php echo $tariff['limits']['accounts_cnt'] ?>
+						<?php echo esc_attr($tariff['limits']['accounts_cnt']) ?>
 					</p>
 					<p>
 						<b><?php parrotposter_e('ID:') ?></b>
-						<?php echo $tariff['id'] ?>
+						<?php echo esc_attr($tariff['id']) ?>
 					</p>
 
 					<form action="<?php echo esc_url(admin_url('admin-post.php')) ?>" method="post">
 						<?php FormHelpers::the_nonce() ?>
 						<input type="hidden" name="back_url" value="admin.php?page=parrotposter&tab=tariffs">
-						<input type="hidden" name="parrotposter[tariff_id]" value="<?php echo $tariff['id'] ?>" />
+						<input type="hidden" name="parrotposter[tariff_id]" value="<?php echo esc_attr($tariff['id']) ?>" />
 
 						<?php if ($balans > 0): ?>
 							<?php $diff = strtotime('now +1 month') - strtotime('now') ?>
@@ -207,7 +207,7 @@ function parrotposter_calc_amount($period, $price)
 								<label>
 									<?php $amount = parrotposter_calc_amount($period, $tariff['price']) ?>
 									<?php $checked = $period == 1 ? 'checked="checked"' : '' ?>
-									<input name="period" value="<?php echo $period?>" type="radio" <?php echo $checked ?> />
+									<input name="period" value="<?php echo esc_attr($period) ?>" type="radio" <?php echo esc_attr($checked) ?> />
 									<?php parrotposter_e('%d month(s)', $period) ?>:
 									<?php if ($period == 1): parrotposter_e('%d roubles', $amount['value']) ?>
 									<?php else: parrotposter_e('%d roubles (saving %d roubles)', $amount['value'], $amount['saving']) ?>

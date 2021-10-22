@@ -25,6 +25,7 @@ class ApiHelpers
 	{
 		foreach ($accounts as $key => $account) {
 			if (!isset($account['photo'])) {
+				$accounts[$key]['photo'] = ParrotPoster::asset('images/no-photo.png');
 				continue;
 			}
 			$res = wp_remote_get($account['photo']);

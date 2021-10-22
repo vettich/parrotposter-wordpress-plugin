@@ -41,18 +41,16 @@ class AdminAjaxPost
 
 	public function init()
 	{
-		ParrotPoster::load_textdomain();
+		ParrotPoster::get_instance()->load_textdomain();
 	}
 
 	public function auth()
 	{
+		FormHelpers::must_be_post_nonce();
 		self::init();
-		if (!FormHelpers::check_post_nonce()) {
-			FormHelpers::post_error('nonce');
-		}
 
-		$username = trim($_POST['parrotposter']['username']);
-		$password = trim($_POST['parrotposter']['password']);
+		$username = sanitize_text_field($_POST['parrotposter']['username']);
+		$password = sanitize_text_field($_POST['parrotposter']['password']);
 
 		if (empty($username)) {
 			FormHelpers::post_error(parrotposter__('Email is empty'));
@@ -71,15 +69,13 @@ class AdminAjaxPost
 
 	public function signup()
 	{
+		FormHelpers::must_be_post_nonce();
 		self::init();
-		if (!FormHelpers::check_post_nonce()) {
-			FormHelpers::post_error('nonce');
-		}
 
-		$name = trim($_POST['parrotposter']['name']);
-		$username = trim($_POST['parrotposter']['username']);
-		$password = trim($_POST['parrotposter']['password']);
-		$confirm_password = trim($_POST['parrotposter']['confirm_password']);
+		$name = sanitize_text_field($_POST['parrotposter']['name']);
+		$username = sanitize_text_field($_POST['parrotposter']['username']);
+		$password = sanitize_text_field($_POST['parrotposter']['password']);
+		$confirm_password = sanitize_text_field($_POST['parrotposter']['confirm_password']);
 
 		if (empty($username)) {
 			FormHelpers::post_error(parrotposter__('Email is empty'));
@@ -101,12 +97,10 @@ class AdminAjaxPost
 
 	public function forgot_password()
 	{
+		FormHelpers::must_be_post_nonce();
 		self::init();
-		if (!FormHelpers::check_post_nonce()) {
-			FormHelpers::post_error('nonce');
-		}
 
-		$username = trim($_POST['parrotposter']['username']);
+		$username = sanitize_text_field($_POST['parrotposter']['username']);
 
 		if (empty($username)) {
 			FormHelpers::post_error(parrotposter__('Email is empty'));
@@ -127,14 +121,12 @@ class AdminAjaxPost
 
 	public function reset_password()
 	{
+		FormHelpers::must_be_post_nonce();
 		self::init();
-		if (!FormHelpers::check_post_nonce()) {
-			FormHelpers::post_error('nonce');
-		}
 
-		$token = trim($_POST['parrotposter']['token']);
-		$password = trim($_POST['parrotposter']['password']);
-		$confirm_password = trim($_POST['parrotposter']['confirm_password']);
+		$token = sanitize_text_field($_POST['parrotposter']['token']);
+		$password = sanitize_text_field($_POST['parrotposter']['password']);
+		$confirm_password = sanitize_text_field($_POST['parrotposter']['confirm_password']);
 
 		if (empty($token)) {
 			FormHelpers::post_error(parrotposter__('Token is empty'));
@@ -156,20 +148,16 @@ class AdminAjaxPost
 
 	public function logout()
 	{
-		if (!FormHelpers::check_post_nonce()) {
-			FormHelpers::post_error('nonce');
-		}
+		FormHelpers::must_be_post_nonce();
 		Api::logout();
 		FormHelpers::post_success();
 	}
 
 	public function set_tariff()
 	{
-		if (!FormHelpers::check_post_nonce()) {
-			FormHelpers::post_error('nonce');
-		}
+		FormHelpers::must_be_post_nonce();
 
-		$tariff_id = trim($_POST['parrotposter']['tariff_id']);
+		$tariff_id = sanitize_text_field($_POST['parrotposter']['tariff_id']);
 
 		$res = Api::set_user_tariff($tariff_id);
 		if (!empty($res['error'])) {
@@ -180,12 +168,10 @@ class AdminAjaxPost
 
 	public function create_transaction()
 	{
-		if (!FormHelpers::check_post_nonce()) {
-			FormHelpers::post_error('nonce');
-		}
+		FormHelpers::must_be_post_nonce();
 
-		$tariff_id = trim($_POST['parrotposter']['tariff_id']);
-		$period = trim($_POST['parrotposter']['period']);
+		$tariff_id = sanitize_text_field($_POST['parrotposter']['tariff_id']);
+		$period = sanitize_text_field($_POST['parrotposter']['period']);
 
 		$success_url = add_query_arg([
 			'page' => 'parrotposter',
@@ -210,21 +196,23 @@ class AdminAjaxPost
 
 	public function publish_post()
 	{
-		if (!FormHelpers::check_post_nonce()) {
-			FormHelpers::post_error('nonce');
-		}
+		FormHelpers::must_be_post_nonce();
 
-		$post_id = trim($_POST['parrotposter']['post_id']);
-		$text = trim($_POST['parrotposter']['text']);
-		$link = trim($_POST['parrotposter']['link']);
-		$images_ids = $_POST['parrotposter']['images_ids'];
-		$publish_at = trim($_POST['parrotposter']['publish_at']);
-		$publish_at_2 = trim($_POST['parrotposter']['publish_at_2']);
-		$accounts = $_POST['parrotposter']['accounts'];
+		$post_id = sanitize_text_field($_POST['parrotposter']['post_id']);
+		$text = sanitize_textarea_field($_POST['parrotposter']['text']);
+		$link = sanitize_url($_POST['parrotposter']['link']);
+		$images_ids = $_POST['parrotposter']['images_ids']; // it is array, sanitizing below
+		$publish_at = sanitize_text_field($_POST['parrotposter']['publish_at']);
+		$publish_at_2 = sanitize_text_field($_POST['parrotposter']['publish_at_2']);
+		$accounts = $_POST['parrotposter']['accounts']; // it is array, sanitizing below
 
 		$images = [];
 		foreach ($images_ids as $id) {
+			$id = sanitize_text_field($id);
 			$attached_file = get_attached_file($id);
+			if (empty($attached_file)) {
+				continue;
+			}
 			$res = Api::upload_file($attached_file);
 			ParrotPoster::log($res);
 			$file_id = ApiHelpers::retrieve_response($res, 'file_id');
@@ -239,6 +227,10 @@ class AdminAjaxPost
 			$publish_at = $publish_at_2;
 		}
 		$publish_at = ApiHelpers::datetimeFormat($publish_at);
+
+		foreach ($accounts as $k => $id) {
+			$accounts[$k] = sanitize_text_field($id);
+		}
 
 		$post = [
 			'fields' => [
@@ -264,9 +256,30 @@ class AdminAjaxPost
 
 	public function api_list_posts()
 	{
-		$filter = $_POST['parrotposter']['filter'];
-		$sort = $_POST['parrotposter']['sort'];
-		$paging = $_POST['parrotposter']['paging'];
+		if (isset($_POST['parrotposter']) && !is_array($_POST['parrotposter'])) {
+			FormHelpers::post_error('wrong input data');
+		}
+		$filter = [];
+		if (is_array($_POST['parrotposter']['filter'])) {
+			foreach ($_POST['parrotposter']['filter'] as $k => $v) {
+				$filter[$k] = sanitize_text_field($v);
+			}
+		}
+
+		$sort = [];
+		if (is_array($_POST['parrotposter']['sort'])) {
+			foreach ($_POST['parrotposter']['sort'] as $k => $v) {
+				$sort[$k] = sanitize_text_field($v);
+			}
+		}
+
+		$paging = [];
+		if (is_array($_POST['parrotposter']['paging'])) {
+			foreach ($_POST['parrotposter']['paging'] as $k => $v) {
+				$paging[$k] = sanitize_text_field($v);
+			}
+		}
+
 		$res = Api::list_posts($filter, $sort, $paging);
 		echo json_encode($res);
 		exit;
@@ -274,7 +287,8 @@ class AdminAjaxPost
 
 	public function api_get_post()
 	{
-		$post_id = $_POST['parrotposter']['post_id'];
+		FormHelpers::must_be_right_input_data();
+		$post_id = sanitize_text_field($_POST['parrotposter']['post_id']);
 		$res = Api::get_post($post_id);
 		echo json_encode($res);
 		exit;
@@ -282,7 +296,8 @@ class AdminAjaxPost
 
 	public function api_remove_post()
 	{
-		$post_id = $_POST['parrotposter']['post_id'];
+		FormHelpers::must_be_right_input_data();
+		$post_id = sanitize_text_field($_POST['parrotposter']['post_id']);
 		$res = Api::remove_post($post_id);
 		echo json_encode($res);
 		exit;

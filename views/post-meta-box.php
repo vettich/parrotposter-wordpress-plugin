@@ -2,7 +2,10 @@
 
 use parrotposter\Options;
 
-$post_id = (isset($_GET['post']) && (int) $_GET['post'] > 0) ? (int) $_GET['post'] : 0;
+$post_id = isset($_GET['post']) ? (int) $_GET['post'] : 0;
+if (empty($post_id)) {
+	return;
+}
 
 wp_enqueue_script('parrotposter-post-meta-box');
 ?>
@@ -10,7 +13,7 @@ wp_enqueue_script('parrotposter-post-meta-box');
 <p class="parrotposter-meta-box-post-items parrotposter-loading-spinner">
 </p>
 
-<a class="button button-primary" href="admin.php?page=parrotposter&subpage=publish_post&post_id=<?php echo $post_id ?>">
+<a class="button button-primary" href="admin.php?page=parrotposter&subpage=publish_post&post_id=<?php echo esc_attr($post_id) ?>">
 	<?php parrotposter_e('Publish to socials network') ?>
 </a>
 
@@ -34,6 +37,6 @@ wp_enqueue_script('parrotposter-post-meta-box');
 </div>
 
 <script>
-	const parrotposter_post_id = <?php echo json_encode($post_id) ?>;
-	const parrotposter_user_id = <?php echo json_encode(Options::user_id()) ?>;
+	const parrotposter_post_id = <?php echo json_encode(esc_attr($post_id)) ?>;
+	const parrotposter_user_id = <?php echo json_encode(esc_attr(Options::user_id())) ?>;
 </script>

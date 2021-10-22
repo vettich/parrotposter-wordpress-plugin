@@ -1,7 +1,9 @@
 <?php
 
-wp_enqueue_style('parrotposter-jquery-ui-css');
-wp_enqueue_script('parrotposter-jquery-ui-js');
+wp_enqueue_script('jquery-ui-core');
+wp_enqueue_script('jquery-ui-sortable');
+wp_enqueue_script('parrotposter-flatpickr-js');
+wp_enqueue_style('parrotposter-flatpickr-css');
 
 $post_id = (int) $_GET['post_id'];
 if (empty($post_id)) {
@@ -19,8 +21,8 @@ $post_type = get_post_type($post_id);
 $post_meta = get_post_meta($post_id);
 $post_status = get_post_status($post_id);
 $featuredImage = wp_get_attachment_url(get_post_thumbnail_id($post_id));
-$tags = wp_get_post_tags((int) $post_id);
-$terms = wp_get_post_terms((int) $post_id, $post_type . '_tag');
+$tags = wp_get_post_tags($post_id);
+$terms = wp_get_post_terms($post_id, $post_type . '_tag');
 
 $keys = [
 	'title' => $post_title,
@@ -100,15 +102,12 @@ $accounts = parrotposter\ApiHelpers::fix_accounts_photos($accounts);
 
 ?>
 
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-
 <div class="wrap parrotposter-wrap">
-	<h1><?php parrotposter_e('Publish:') ?> <?php echo $post_title ?></h1>
+	<h1><?php parrotposter_e('Publish:') ?> <?php echo esc_attr($post_title) ?></h1>
 
 	<?php if (isset($_GET['parrotposter_error_msg'])): ?>
 		<div class="notice notice-error">
-			<p><?php echo $_GET['parrotposter_error_msg'] ?></p>
+			<p><?php echo esc_attr($_GET['parrotposter_error_msg']) ?></p>
 		</div>
 	<?php endif ?>
 
@@ -117,8 +116,8 @@ $accounts = parrotposter\ApiHelpers::fix_accounts_photos($accounts);
 		<ul>
 		<?php foreach ($availableKeys as $key => $value): ?>
 			<?php $title = strlen($value) > 200 ? esc_html($value) : '' ?>
-			<li title="<?php echo $title ?>">
-				<?php echo $key.': '.substr($value, 0, 200) ?>
+			<li title="<?php echo esc_attr($title) ?>">
+				<?php echo esc_attr($key.': '.substr($value, 0, 200)) ?>
 			</li>
 		<?php endforeach ?>
 		</ul>
@@ -127,17 +126,17 @@ $accounts = parrotposter\ApiHelpers::fix_accounts_photos($accounts);
 	<form action="<?php echo esc_url(admin_url('admin-post.php')) ?>" method="post">
 		<?php parrotposter\FormHelpers::the_nonce() ?>
 		<input type="hidden" name="action" value="parrotposter_publish_post">
-		<input type="hidden" name="back_url" value="<?php echo "post.php?post=$post_id&action=edit" ?>">
-		<input type="hidden" name="parrotposter[post_id]" value="<?php echo $post_id ?>">
+		<input type="hidden" name="back_url" value="<?php echo esc_attr("post.php?post=$post_id&action=edit") ?>">
+		<input type="hidden" name="parrotposter[post_id]" value="<?php echo esc_attr($post_id) ?>">
 
 		<label>
 			<h2><?php parrotposter_e('Post text') ?></h2>
-			<textarea class="parrotposter-post-textarea" name="parrotposter[text]"><?php echo $defaultPostText ?></textarea>
+			<textarea class="parrotposter-post-textarea" name="parrotposter[text]"><?php echo esc_attr($defaultPostText) ?></textarea>
 		</label>
 
 		<label>
 			<h2><?php parrotposter_e('Post link') ?></h2>
-			<input class="parrotposter-post-input" type="text" name="parrotposter[link]" value="<?php echo $post_link ?>">
+			<input class="parrotposter-post-input" type="text" name="parrotposter[link]" value="<?php echo esc_url($post_link) ?>">
 		</label>
 
 		<?php if (!empty($images)): ?>
@@ -145,8 +144,8 @@ $accounts = parrotposter\ApiHelpers::fix_accounts_photos($accounts);
 		<div class="parrotposter-post-select-images-list">
 		<?php foreach ($images as $attachment_id => $img_url): ?>
 			<label class="parrotposter-post-select-images-item">
-				<input type="checkbox" name="parrotposter[images_ids][]" value="<?php echo $attachment_id ?>" checked>
-				<img src="<?php echo $img_url ?>" alt="">
+				<input type="checkbox" name="parrotposter[images_ids][]" value="<?php echo esc_attr($attachment_id) ?>" checked>
+				<img src="<?php echo esc_url($img_url) ?>" alt="">
 				<span class="parrotposter-post-select-images-label"></span>
 			</label>
 		<?php endforeach ?>
@@ -182,16 +181,16 @@ $accounts = parrotposter\ApiHelpers::fix_accounts_photos($accounts);
 		<div class="parrotposter-accounts-list">
 		<?php foreach ($accounts as $account): ?>
 			<label class="parrotposter-accounts-item">
-				<input type="checkbox" name="parrotposter[accounts][]" value="<?php echo $account['id'] ?>">
+				<input type="checkbox" name="parrotposter[accounts][]" value="<?php echo esc_attr($account['id']) ?>">
 				<div class="parrotposter-accounts-content">
 					<div class="parrotposter-accounts-photo">
-						<img src="<?php echo $account['photo'] ?>" alt="">
+						<img src="<?php echo esc_url($account['photo']) ?>" alt="">
 						<div class="parrotposter-accounts-type">
-							<img src="<?php echo ParrotPoster::asset('images/'.$account['type'].'.png') ?>" alt="">
+							<img src="<?php echo esc_url(ParrotPoster::asset('images/'.$account['type'].'.png')) ?>" alt="">
 						</div>
 					</div>
 					<div class="parrotposter-accounts-name">
-						<?php echo $account['name'] ?>
+						<?php echo esc_attr($account['name']) ?>
 					</div>
 				</div>
 			</label>
@@ -212,25 +211,12 @@ $accounts = parrotposter\ApiHelpers::fix_accounts_photos($accounts);
 </div>
 
 <script>
-	flatpickr('#pick-publication-time', {
-		enableTime: true,
-		time_24hr: true,
-		minDate: new Date(),
-		dateFormat: 'Z',
-	})
-
 	jQuery(function($) {
-		$('textarea.parrotposter-post-textarea').change(function () {
-			checkPublishBtn()
-		})
-		$('textarea.parrotposter-post-textarea').keyup(function () {
-			checkPublishBtn()
-		})
-		$('.parrotposter-post-select-images-list input[type=checkbox]').change(function () {
-			checkPublishBtn()
-		})
-		$('.parrotposter-accounts-item input[type=checkbox]').change(function () {
-			checkPublishBtn()
+		flatpickr('#pick-publication-time', {
+			enableTime: true,
+			time_24hr: true,
+			minDate: new Date(),
+			dateFormat: 'Z',
 		})
 
 		function checkPublishBtn() {
@@ -244,6 +230,11 @@ $accounts = parrotposter\ApiHelpers::fix_accounts_photos($accounts);
 		}
 
 		checkPublishBtn()
+
+		$('textarea.parrotposter-post-textarea').change(checkPublishBtn)
+		$('textarea.parrotposter-post-textarea').keyup(checkPublishBtn)
+		$('.parrotposter-post-select-images-list input[type=checkbox]').change(checkPublishBtn)
+		$('.parrotposter-accounts-item input[type=checkbox]').change(checkPublishBtn)
 
 		$('.parrotposter-post-select-images-list').sortable()
 	})

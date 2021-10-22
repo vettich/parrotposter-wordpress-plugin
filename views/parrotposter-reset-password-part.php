@@ -13,7 +13,7 @@ if (empty($_GET['parrotposter_token'])) {
 }
 
 if (isset($_GET['parrotposter_error_msg'])) {
-	$error_msg = $_GET['parrotposter_error_msg'];
+	$error_msg = sanitize_text_field($_GET['parrotposter_error_msg']);
 }
 
 if (isset($_GET['parrotposter_success_data'])) {
@@ -21,10 +21,11 @@ if (isset($_GET['parrotposter_success_data'])) {
 	exit;
 }
 
+$token = sanitize_text_field($_GET['parrotposter_token']);
 $back_url = add_query_arg([
 	'page' => 'parrotposter',
 	'subpage' => 'reset_password',
-	'parrotposter_token' => $_GET['parrotposter_token'],
+	'parrotposter_token' => $token,
 ], 'admin.php');
 ?>
 
@@ -33,15 +34,15 @@ $back_url = add_query_arg([
 
 	<?php if (!empty($error_msg)): ?>
 		<div class="notice notice-error">
-			<p><?php echo $error_msg ?></p>
+			<p><?php echo esc_attr($error_msg) ?></p>
 		</div>
 	<?php endif ?>
 
 	<form action="<?php echo esc_url(admin_url('admin-post.php')) ?>" method="post">
 		<?php FormHelpers::the_nonce() ?>
 		<input type="hidden" name="action" value="parrotposter_reset_password">
-		<input type="hidden" name="back_url" value="<?php echo $back_url ?>">
-		<input type="hidden" name="parrotposter[token]" value="<?php echo $_GET['parrotposter_token'] ?>">
+		<input type="hidden" name="back_url" value="<?php echo esc_url($back_url) ?>">
+		<input type="hidden" name="parrotposter[token]" value="<?php echo esc_attr($token) ?>">
 
 		<p>
 			<label for="parrotposter_password"><?php parrotposter_e('New password') ?></label>

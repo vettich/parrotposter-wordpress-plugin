@@ -9,7 +9,7 @@ if (!current_user_can('manage_options')) {
 
 $subpage = '';
 if (isset($_GET['subpage'])) {
-	$subpage = $_GET['subpage'];
+	$subpage = sanitize_text_field($_GET['subpage']);
 }
 
 switch ($subpage) {

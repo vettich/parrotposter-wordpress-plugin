@@ -1,4 +1,4 @@
-jQuery(function ($) {
+(function($) {
 	let accounts = null;
 
 	function __ (msg) {
@@ -6,45 +6,50 @@ jQuery(function ($) {
 	}
 
 	// get exists posts by wp_post_id
-	if (parrotposter_user_id) $.post(ajaxurl, {
-		'action': 'parrotposter_api_list_posts',
-		'parrotposter': {
-			'filter': {
-				'user_id': parrotposter_user_id,
-				'fields.extra.wp_post_id': parrotposter_post_id,
+	if (parrotposter_user_id) {
+		$.post(ajaxurl, {
+			'action': 'parrotposter_api_list_posts',
+			'parrotposter': {
+				'filter': {
+					'user_id': parrotposter_user_id,
+					'fields.extra.wp_post_id': parrotposter_post_id,
+				}
 			}
-		}
-	}, function (data) {
+		}, function (data) {
+			$('.parrotposter-meta-box-post-items').removeClass('parrotposter-loading-spinner')
+
+			data = JSON.parse(data);
+			if (!data.response || !data.response.posts) {
+				return
+			}
+
+			if (!data.response.posts.length) {
+				$('.parrotposter-meta-box-post-items').append('<p>'+__('Posts have not yet been created')+'</p>')
+				return
+			}
+
+			$('.parrotposter-meta-box-post-items').empty();
+			data.response.posts.forEach(function(elem) {
+				const template = `<p class="parrotposter-meta-box-post-item" data-post-id="{post_id}">
+					<b>`+__('Post published at')+`:</b> {publish_at}<br>
+					<b>`+__('Status')+`:<b> {status}<br>
+					<a class="parrotposter-meta-box-post-view-detail-link" href="#" data-post-id="{post_id}">
+						`+__('View details')+`
+					</a>
+				</p>`
+				const publish_at = (new Date(elem['publish_at'])).toLocaleString()
+				const html = template
+					.split('{publish_at}').join(publish_at)
+					.split('{status}').join(elem['status'])
+					.split('{post_id}').join(elem['id'])
+				$('.parrotposter-meta-box-post-items').append(html)
+			})
+			$('.parrotposter-meta-box-post-view-detail-link').click(loadPostDetailHandler)
+		});
+	} else {
 		$('.parrotposter-meta-box-post-items').removeClass('parrotposter-loading-spinner')
-
-		data = JSON.parse(data);
-		if (!data.response || !data.response.posts) {
-			return
-		}
-
-		if (!data.response.posts.length) {
-			$('.parrotposter-meta-box-post-items').append('<p>'+__('Posts have not yet been created')+'</p>')
-			return
-		}
-
-		$('.parrotposter-meta-box-post-items').empty();
-		data.response.posts.forEach(function(elem) {
-			const template = `<p class="parrotposter-meta-box-post-item" data-post-id="{post_id}">
-				<b>`+__('Post published at')+`:</b> {publish_at}<br>
-				<b>`+__('Status')+`:<b> {status}<br>
-				<a class="parrotposter-meta-box-post-view-detail-link" href="#" data-post-id="{post_id}">
-					`+__('View details')+`
-				</a>
-			</p>`
-			const publish_at = (new Date(elem['publish_at'])).toLocaleString()
-			const html = template
-				.split('{publish_at}').join(publish_at)
-				.split('{status}').join(elem['status'])
-				.split('{post_id}').join(elem['id'])
-			$('.parrotposter-meta-box-post-items').append(html)
-		})
-		$('.parrotposter-meta-box-post-view-detail-link').click(loadPostDetailHandler)
-	});
+		$('.parrotposter-meta-box-post-items').append('<p>'+__('Posts have not yet been created')+'</p>')
+	}
 
 	// load and display post by id
 	function loadPostDetailHandler(event) {
@@ -173,5 +178,5 @@ jQuery(function ($) {
 			$('.parrotposter-meta-box-post-items .parrotposter-meta-box-post-item[data-post-id='+post_id+']').remove()
 		})
 	}
-})
+})(jQuery);
 

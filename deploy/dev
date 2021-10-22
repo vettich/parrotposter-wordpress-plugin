@@ -1,0 +1,5 @@
+#!/bin/bash
+
+shopt -s extglob
+scp -q -r !(.git) www@selen-dev:/var/www/wp.dev.selen.digital/wp-content/plugins/parrotposter/
+

@@ -1,13 +1,15 @@
 <?php
 /**
- * Plugin Name: ParrotPoster - Автопубликации в соц. сети
+ * Plugin Name: ParrotPoster
  * Plugin URI: https://parrotposter.com
- * Description: Плагин сервиса автопубликаций в соц. сети ParrotPoster. Специально для WordPress!
+ * Description: Plugin of service posting in the social networks ParrotPoster.
  * Author: Selen
  * Version: 1.0.0
  * Author URI: http://selen.digital
  * Text Domain: parrotposter
  * Domain Path: /languages
+ * License: GPLv3
+ * License URI: https://www.gnu.org/licenses/gpl-3.0.html
  */
 
 if (!defined('ABSPATH')) {
@@ -36,6 +38,15 @@ if (!function_exists('parrotposter_e')) {
 
 class ParrotPoster
 {
+	private static $_instance = null;
+	public static function get_instance()
+	{
+		if (self::$_instance == null) {
+			self::$_instance = new self;
+		}
+		return self::$_instance;
+	}
+
 	public function __construct()
 	{
 	}
@@ -51,13 +62,8 @@ class ParrotPoster
 			return;
 		}
 
-		$dtz = date_default_timezone_get();
-		date_default_timezone_set('Asia/Yekaterinburg');
-		$now = date(DATE_ATOM);
-		date_default_timezone_set($dtz);
-
 		$log = [
-			'datetime' => $now,
+			'at' => date(DATE_ATOM),
 			'data' => $data,
 		];
 		$s = print_r($log, true);
@@ -100,9 +106,9 @@ class ParrotPoster
 		wp_register_script('parrotposter-main-script', self::asset('js/script.js'));
 		wp_register_script('parrotposter-post-meta-box', self::asset('js/post-meta-box.js'));
 
-		// jquery-ui
-		wp_register_style('parrotposter-jquery-ui-css', self::asset('lib/jquery-ui/jquery-ui.min.css'));
-		wp_register_script('parrotposter-jquery-ui-js', self::asset('lib/jquery-ui/jquery-ui.min.js'));
+		// flatpickr
+		wp_register_style('parrotposter-flatpickr-css', self::asset('lib/flatpickr/flatpickr.min.css'));
+		wp_register_script('parrotposter-flatpickr-js', self::asset('lib/flatpickr/flatpickr.js'));
 	}
 
 	public function enqueue_admin_translates()
@@ -125,7 +131,7 @@ class ParrotPoster
 
 	public function admin_page()
 	{
-		$page = $_GET['page'] ?: 'parrotposter';
+		$page = isset($_GET['page']) ? sanitize_text_field($_GET['page']): 'parrotposter';
 		$prefix = 'parrotposter_';
 		if (substr($page, 0, strlen($prefix)) == $prefix) {
 			$page = substr($page, strlen($prefix));
@@ -141,6 +147,10 @@ class ParrotPoster
 
 	public function post_meta_box()
 	{
+		$post_id = (isset($_GET['post']) && (int) $_GET['post'] > 0) ? (int) $_GET['post'] : 0;
+		if (empty($post_id)) {
+			return;
+		}
 		$post_types = get_post_types(['public' => true]);
 		$post_types = array_diff($post_types, ['attachment', 'nav_menu_item']);
 		add_meta_box('parrotposter-post-meta-box', 'ParrotPoster', [$this, 'post_meta_box_view'], $post_types, 'side', 'high');
@@ -153,9 +163,7 @@ class ParrotPoster
 }
 
 if (class_exists('ParrotPoster')) {
-	$parrotPoster = new ParrotPoster();
-	$parrotPoster->register();
+	ParrotPoster::get_instance()->register();
+	register_activation_hook(__FILE__, [ParrotPoster::get_instance(), 'activation']);
+	register_deactivation_hook(__FILE__, [ParrotPoster::get_instance(), 'deactivation']);
 }
-
-register_activation_hook(__FILE__, [$parrotPoster, 'activation']);
-register_deactivation_hook(__FILE__, [$parrotPoster, 'deactivation']);

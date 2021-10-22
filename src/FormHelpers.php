@@ -2,11 +2,18 @@
 
 namespace parrotposter;
 
-class FormHelpers {
-
+class FormHelpers
+{
 	public static function the_nonce()
 	{
 		?><input type="hidden" name="parrotposter_nonce" value="<?php echo wp_create_nonce('parrotposter_nonce') ?>"><?php
+	}
+
+	public static function must_be_right_input_data()
+	{
+		if (!is_array($_POST['parrotposter'])) {
+			self::post_error('wrong input data');
+		}
 	}
 
 	public static function check_post_nonce()
@@ -14,6 +21,14 @@ class FormHelpers {
 		$issetNonce = isset($_POST['parrotposter_nonce']);
 		$correctNonce = $issetNonce && (int) wp_verify_nonce($_POST['parrotposter_nonce'], 'parrotposter_nonce') > 0;
 		return $correctNonce;
+	}
+
+	public static function must_be_post_nonce()
+	{
+		self::must_be_right_input_data();
+		if (!self::check_post_nonce()) {
+			self::post_error('nonce');
+		}
 	}
 
 	public static function post_success($data = '')
@@ -25,7 +40,7 @@ class FormHelpers {
 			exit;
 		}
 
-		$back_url = trim($_POST['back_url']);
+		$back_url = sanitize_url($_POST['back_url']);
 		if (empty($back_url)) {
 			$back_url = 'admin.php?page=parrotposter';
 		}
@@ -46,7 +61,7 @@ class FormHelpers {
 			exit;
 		}
 
-		$back_url = trim($_POST['back_url']);
+		$back_url = sanitize_url($_POST['back_url']);
 		if (empty($back_url)) {
 			$back_url = 'admin.php?page=parrotposter';
 		}
