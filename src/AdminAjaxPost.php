@@ -108,7 +108,7 @@ class AdminAjaxPost
 
 		$callback_url = add_query_arg([
 			'page' => 'parrotposter',
-			'subpage' => 'reset_password',
+			'view' => 'reset_password',
 			'parrotposter_token' => '{{token}}',
 		], admin_url('admin.php'));
 

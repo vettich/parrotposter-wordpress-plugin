@@ -1,4 +1,5 @@
-#adminmenu .toplevel_page_parrotposter img {
+#adminmenu .toplevel_page_parrotposter img,
+#adminmenu .toplevel_page_parrotposter_posts img {
 	max-width: 24px;
 	padding-top: 6px;
 }
@@ -233,4 +234,108 @@
 	max-width: 4em;
 	margin-right: 1em;
 	box-shadow: 0px 0px 8px -2px #575757;
+}
+
+
+
+.parrotposter-block {
+	display: inline-block;
+	padding: 24px;
+	margin: 24px 0;
+	background-color: #FFFFFF;
+}
+.parrotposter-block.mw300 {
+	min-width: 300px;
+	max-width: 100%;
+}
+.parrotposter-block h2 {
+	margin-top: 16px;
+	margin-bottom: 30px;
+	font-size: 16px;
+	font-weight: 600;
+}
+
+
+.parrotposter-header {
+	margin-left: -20px;
+	padding: 12px 20px;
+	background-color: #FFFFFF;
+	display: flex;
+}
+.parrotposter-header__logo {
+	width: 100%;
+}
+.parrotposter-header__menu {
+	width: 100%;
+	display: flex;
+	margin: 0;
+}
+.parrotposter-header__menu li {
+	display: flex;
+	align-items: center;
+	padding: 0;
+	margin: 0;
+	margin-right: 24px;
+}
+.parrotposter-header__menu li:last-child {
+	margin-right: 0;
+}
+.parrotposter-header__menu li a {
+	display: inline-block;
+	color: #787C82;
+	font-weight: 600;
+	text-decoration: none;
+}
+.parrotposter-header__menu li.active a {
+	display: inline-block;
+	color: #007CBA;
+}
+
+
+.parrotposter-profile__label {
+	font-size: 13px;
+	line-height: 16px;
+}
+.parrotposter-profile__value {
+	font-size: 16px;
+	font-weight: 600;
+	line-height: 24px;
+}
+
+
+.parrotposter-nav-tab__wrapper {
+	background-color: #FFFFFF;
+	display: flex;
+	margin-top: 24px;
+	width: calc(100% - 20px);
+}
+.parrotposter-nav-tab__item {
+	padding: 1em;
+	font-size: 13px;
+	font-weight: 600;
+	line-height: 16px;
+	text-decoration: none;
+	color: #787C82;
+}
+.parrotposter-nav-tab__item.active {
+	border-bottom: 4px solid #007CBA;
+	color: #007CBA;
+}
+
+
+.parrotposter-input {
+	display: flex;
+	flex-direction: column;
+	padding-bottom: 16px;
+}
+.parrotposter-input--footer {
+	padding-top: 10px;
+	padding-bottom: 0;
+}
+.parrotposter-input span {
+	color: #000000;
+	margin-bottom: 8px;
+}
+.parrotposter-input input {
+	width: 100%;
 }
