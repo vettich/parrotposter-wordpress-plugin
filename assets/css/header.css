@@ -4,7 +4,8 @@
 	background-color: #FFFFFF;
 	display: flex;
 }
-.parrotposter-header__logo {
+.parrotposter-header__logo img {
+	max-height: 32px;
 }
 .parrotposter-header__menu {
 	width: 100%;
