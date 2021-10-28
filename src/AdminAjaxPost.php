@@ -35,8 +35,12 @@ class AdminAjaxPost
 		// api access
 		add_action('wp_ajax_parrotposter_api_list_posts', [$this, 'api_list_posts']);
 		add_action('wp_ajax_parrotposter_api_get_post', [$this, 'api_get_post']);
-		add_action('wp_ajax_parrotposter_api_remove_post', [$this, 'api_remove_post']);
+		add_action('wp_ajax_parrotposter_api_delete_post', [$this, 'api_delete_post']);
 		add_action('wp_ajax_parrotposter_api_list_accounts', [$this, 'api_list_accounts']);
+		add_action('wp_ajax_parrotposter_api_get_connect_url', [$this, 'api_get_connect_url']);
+		add_action('wp_ajax_parrotposter_api_connect', [$this, 'api_connect']);
+		add_action('wp_ajax_parrotposter_api_delete_account', [$this, 'api_delete_account']);
+		add_action('wp_ajax_parrotposter_api_get_me', [$this, 'api_get_me']);
 	}
 
 	public function init()
@@ -294,11 +298,11 @@ class AdminAjaxPost
 		exit;
 	}
 
-	public function api_remove_post()
+	public function api_delete_post()
 	{
 		FormHelpers::must_be_right_input_data();
 		$post_id = sanitize_text_field($_POST['parrotposter']['post_id']);
-		$res = Api::remove_post($post_id);
+		$res = Api::delete_post($post_id);
 		echo json_encode($res);
 		exit;
 	}
@@ -307,6 +311,74 @@ class AdminAjaxPost
 	{
 		$res = Api::list_accounts();
 		echo json_encode($res);
+		exit;
+	}
+
+	public function api_get_connect_url()
+	{
+		$type = sanitize_text_field($_POST['parrotposter']['type']);
+		$callback_url = sanitize_url($_POST['parrotposter']['callback_url']);
+		$res = Api::get_connect_url($type, $callback_url);
+		echo json_encode($res);
+		exit;
+	}
+
+	public function api_connect()
+	{
+		$type = sanitize_text_field($_POST['parrotposter']['type']);
+		$fields = [];
+		if (isset($_POST['parrotposter']['username'])) {
+			$fields['username'] = sanitize_text_field($_POST['parrotposter']['username']);
+		}
+		if (isset($_POST['parrotposter']['password'])) {
+			$fields['password'] = sanitize_text_field($_POST['parrotposter']['password']);
+		}
+		if (isset($_POST['parrotposter']['proxy'])) {
+			$fields['proxy'] = sanitize_text_field($_POST['parrotposter']['proxy']);
+		}
+		if (isset($_POST['parrotposter']['code'])) {
+			$fields['code'] = sanitize_text_field($_POST['parrotposter']['code']);
+		}
+		if (isset($_POST['parrotposter']['bot_token'])) {
+			$fields['bot_token'] = sanitize_text_field($_POST['parrotposter']['bot_token']);
+		}
+		$res = Api::connect($type, $fields);
+		$res['need_challenge_txt'] = parrotposter__('Need enter a code from SMS or email');
+		echo json_encode($res);
+		exit;
+	}
+
+	public function api_delete_account()
+	{
+		FormHelpers::must_be_right_input_data();
+		$id = sanitize_text_field($_POST['parrotposter']['account_id']);
+		$res = Api::delete_account($id);
+		echo json_encode($res, JSON_FORCE_OBJECT);
+		exit;
+	}
+
+	public function api_get_me()
+	{
+		$res = Api::me();
+		$user = $res['response'] ?: [];
+		if (isset($res['error'])) {
+			echo json_encode($res);
+			exit;
+		}
+
+		$accounts_cur_cnt = $user['tariff_limits']['accounts_current_cnt'];
+		$accounts_cnt = $user['tariff_limits']['accounts_cnt'];
+
+		$connect_disabled = false;
+		if ($accounts_cur_cnt >= $accounts_cnt) {
+			$connect_disabled = true;
+		}
+
+		echo json_encode([
+			'user' => $user,
+			'connect_btn_disabled' => $connect_disabled,
+			'accounts_badge_txt' => parrotposter__('Added %s of %s.', $accounts_cur_cnt, $accounts_cnt),
+		]);
 		exit;
 	}
 }

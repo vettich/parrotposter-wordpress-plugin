@@ -29,6 +29,7 @@ require_once PARROTPOSTER_PLUGIN_DIR.'src/autoloader.php';
 use parrotposter\Menu;
 use parrotposter\Options;
 use parrotposter\AdminAjaxPost;
+use parrotposter\AssetModules;
 
 class ParrotPoster
 {
@@ -48,6 +49,11 @@ class ParrotPoster
 	public static function asset($filename)
 	{
 		return plugins_url("/assets/$filename", PARROTPOSTER_PLUGIN_FILE);
+	}
+
+	public static function isset_asset($filename)
+	{
+		return file_exists(PARROTPOSTER_PLUGIN_DIR."/assets/$filename");
 	}
 
 	public static function log($data)
@@ -94,15 +100,12 @@ class ParrotPoster
 	public function register_scripts()
 	{
 		// parrotposter css files
-		wp_enqueue_style('parrotposter-main-css', self::asset('css/style.css'));
+		wp_enqueue_style('parrotposter-admin-menu', self::asset('css/admin-menu.css'));
 
 		// parrotposter js files
-		wp_register_script('parrotposter-main-script', self::asset('js/script.js'));
 		wp_register_script('parrotposter-post-meta-box', self::asset('js/post-meta-box.js'));
 
-		// flatpickr
-		wp_register_style('parrotposter-flatpickr-css', self::asset('lib/flatpickr/flatpickr.min.css'));
-		wp_register_script('parrotposter-flatpickr-js', self::asset('lib/flatpickr/flatpickr.js'));
+		AssetModules::register();
 	}
 
 	public function enqueue_admin_translates()
@@ -142,7 +145,7 @@ class ParrotPoster
 		self::include_view("$page/$view");
 	}
 
-	public static function include_view($name)
+	public static function include_view($name, $view_args = [])
 	{
 		wp_enqueue_script('parrotposter-main-script');
 		require_once PARROTPOSTER_PLUGIN_DIR."views/$name.php";

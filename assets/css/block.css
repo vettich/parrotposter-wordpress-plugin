@@ -1,0 +1,51 @@
+/******************************
+ * empty block
+ *****************************/
+.parrotposter-empty-block {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	padding-top: 70px;
+}
+.parrotposter-empty-block:before {
+	content: "";
+	background-image: url(../images/stuff-zero-items.png);
+	background-size: auto 100%;
+	background-position: center;
+	background-repeat: no-repeat;
+	height: 260px;
+	width: 100%;
+	display: block;
+}
+.parrotposter-empty-block__label {
+	font-size: 24px;
+	line-height: 32px;
+	font-weight: 600;
+	color: #101517;
+	margin-top: 30px;
+	margin-bottom: 40px;
+}
+
+
+/******************************
+ * block
+ *****************************/
+.parrotposter-block {
+	display: inline-block;
+	padding: 24px;
+	margin: 24px 0;
+	background-color: #FFFFFF;
+}
+.parrotposter-block.mw300 {
+	min-width: 300px;
+	max-width: 100%;
+}
+.parrotposter-block h2 {
+	margin-top: 16px;
+	margin-bottom: 30px;
+	font-size: 16px;
+	font-weight: 600;
+}
+
+

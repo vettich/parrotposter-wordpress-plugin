@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2021-10-26 17:49+0500\n"
+"POT-Creation-Date: 2021-10-28 12:25+0500\n"
 "PO-Revision-Date: 2021-08-05 07:14+0500\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -14,144 +14,152 @@ msgstr ""
 "X-Poedit-Basepath: ..\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Poedit-SourceCharset: UTF-8\n"
-"X-Poedit-KeywordsList: __;_e;parrotposter__;parrotposter_e;esc_html_e;"
-"esc_html__;_n:1,2;parrotposter_n:1,2\n"
+"X-Poedit-KeywordsList: parrotposter__;parrotposter_e;parrotposter_n:1,2;"
+"parrotposter_x:1,2c\n"
 "X-Poedit-SearchPath-0: .\n"
 
-#: assets/js/post-meta-box.js:27 assets/js/post-meta-box.js:51
-msgid "Posts have not yet been created"
-msgstr ""
-
-#: assets/js/post-meta-box.js:34
-msgid "Post published at"
-msgstr ""
-
-#: assets/js/post-meta-box.js:35
-msgid "Status"
-msgstr ""
-
-#: assets/js/post-meta-box.js:37
-msgid "View details"
-msgstr ""
-
-#: assets/js/post-meta-box.js:89
-msgid "View post"
-msgstr ""
-
-#: assets/js/post-meta-box.js:119
-msgid "Remove post"
-msgstr ""
-
-#: assets/js/post-meta-box.js:160
-msgid "Remove post from ParrotPoster and social networks?"
-msgstr ""
-
-#: assets/js/post-meta-box.js:177
-msgid "Removed success"
-msgstr ""
-
-#: parrotposter.php:117
+#: parrotposter.php:123
 msgid "ParrotPoster settings page"
 msgstr ""
 
-#: parrotposter.php:117 views/parrotposter-user-parts.php:83
+#: parrotposter.php:123 views/parrotposter-user-parts.php:83
 msgid "ParrotPoster"
 msgstr ""
 
-#: parrotposter.php:118 views/parrotposter-auth-parts.php:32
+#: parrotposter.php:124 views/parrotposter-auth-parts.php:32
 #: views/parrotposter-auth-parts.php:54
+#: views/parrotposter/forgot_password.php:19 views/parrotposter/index.php:19
+#: views/parrotposter/index.php:25 views/parrotposter/signup.php:19
 msgid "Authorization"
 msgstr ""
 
-#: src/AdminAjaxPost.php:56 src/AdminAjaxPost.php:81 src/AdminAjaxPost.php:106
+#: src/AdminAjaxPost.php:59 src/AdminAjaxPost.php:84 src/AdminAjaxPost.php:109
 msgid "Email is empty"
 msgstr ""
 
-#: src/AdminAjaxPost.php:60 src/AdminAjaxPost.php:85 src/AdminAjaxPost.php:136
+#: src/AdminAjaxPost.php:63 src/AdminAjaxPost.php:88 src/AdminAjaxPost.php:139
 msgid "Password is empty"
 msgstr ""
 
-#: src/AdminAjaxPost.php:88 src/AdminAjaxPost.php:139
+#: src/AdminAjaxPost.php:91 src/AdminAjaxPost.php:142
 msgid "Passwords do not match"
 msgstr ""
 
-#: src/AdminAjaxPost.php:119
+#: src/AdminAjaxPost.php:122
 msgid "An email with a link to recover your password was sent to your email."
 msgstr ""
 
-#: src/AdminAjaxPost.php:132
+#: src/AdminAjaxPost.php:135
 msgid "Token is empty"
 msgstr ""
 
-#: src/Menu.php:16 views/posts.php:1
+#: src/AdminAjaxPost.php:356 views/accounts/index.php:41
+#, php-format
+msgid "Added %s of %s."
+msgstr ""
+
+#: src/Menu.php:20 views/posts.php:1
 msgid "Posts"
 msgstr ""
 
-#: src/Menu.php:20 views/profile/index.php:75
+#: src/Menu.php:24 views/profile/index.php:77
 msgid "Accounts"
 msgstr ""
 
-#: src/Menu.php:24
+#: src/Menu.php:28
 msgid "Scheduler"
 msgstr ""
 
-#: src/Menu.php:28 views/parrotposter-user-parts.php:93
+#: src/Menu.php:32 views/parrotposter-user-parts.php:93
 msgid "Tariffs"
 msgstr ""
 
-#: src/Menu.php:32 views/parrotposter-user-parts.php:92
-#: views/profile/index.php:46
+#: src/Menu.php:36 views/parrotposter-user-parts.php:92
+#: views/profile/index.php:48
 msgid "Profile"
 msgstr ""
 
-#: views/accounts/index.php:9
-msgid "Social media accounts"
+#: views/accounts/connect.php:16 views/accounts/connect.php:17
+#: views/accounts/connect.php:18 views/accounts/connect.php:19
+#: views/accounts/connect.php:20 views/accounts/connect.php:31
+msgid "Connect"
 msgstr ""
 
-#: views/accounts/index.php:14
-msgid "To view your accounst go to web app:"
+#: views/accounts/connect.php:24
+msgid "Connect Instagram"
+msgstr ""
+
+#: views/accounts/connect.php:27
+msgctxt "connect-insta"
+msgid "Login"
+msgstr ""
+
+#: views/accounts/index.php:37
+msgid "Social networks accounts"
+msgstr ""
+
+#: views/accounts/index.php:43
+msgid "Change tariff"
+msgstr ""
+
+#: views/accounts/index.php:53
+msgid "You haven't connected your social networks accounts yet"
 msgstr ""
 
 #: views/parrotposter-auth-parts.php:34 views/parrotposter-auth-parts.php:55
+#: views/parrotposter/forgot_password.php:20 views/parrotposter/index.php:20
+#: views/parrotposter/signup.php:20 views/parrotposter/signup.php:25
 msgid "Registration"
 msgstr ""
 
 #: views/parrotposter-auth-parts.php:36
 #: views/parrotposter-reset-password-part.php:33
+#: views/parrotposter/reset_password.php:35
 msgid "Reset password"
 msgstr ""
 
 #: views/parrotposter-auth-parts.php:56
+#: views/parrotposter/forgot_password.php:21
+#: views/parrotposter/forgot_password.php:25 views/parrotposter/index.php:21
+#: views/parrotposter/signup.php:21
 msgid "Forgot password?"
 msgstr ""
 
 #: views/parrotposter-auth-parts.php:69 views/parrotposter-auth-parts.php:99
-#: views/parrotposter-auth-parts.php:129 views/profile/index.php:65
+#: views/parrotposter-auth-parts.php:129
+#: views/parrotposter/forgot_password.php:33 views/parrotposter/index.php:34
+#: views/parrotposter/signup.php:39 views/profile/index.php:67
 msgid "Email"
 msgstr ""
 
 #: views/parrotposter-auth-parts.php:75 views/parrotposter-auth-parts.php:105
+#: views/parrotposter/index.php:39 views/parrotposter/reset_password.php:44
+#: views/parrotposter/signup.php:44
 msgid "Password"
 msgstr ""
 
-#: views/parrotposter-auth-parts.php:81
+#: views/parrotposter-auth-parts.php:81 views/parrotposter/index.php:44
 msgid "Login"
 msgstr ""
 
-#: views/parrotposter-auth-parts.php:93 views/profile/index.php:59
+#: views/parrotposter-auth-parts.php:93 views/parrotposter/signup.php:34
+#: views/profile/index.php:61
 msgid "Your name"
 msgstr ""
 
 #: views/parrotposter-auth-parts.php:111
 #: views/parrotposter-reset-password-part.php:54
+#: views/parrotposter/reset_password.php:49 views/parrotposter/signup.php:49
 msgid "Confirm password"
 msgstr ""
 
-#: views/parrotposter-auth-parts.php:117
+#: views/parrotposter-auth-parts.php:117 views/parrotposter/signup.php:54
 msgid "Sign up"
 msgstr ""
 
 #: views/parrotposter-auth-parts.php:135
+#: views/parrotposter/forgot_password.php:38
+#: views/parrotposter/reset_password.php:54
 msgid "Send"
 msgstr ""
 
@@ -267,7 +275,7 @@ msgstr ""
 msgid "Expiry at %s"
 msgstr ""
 
-#: views/parrotposter-user-parts.php:112 views/profile/index.php:92
+#: views/parrotposter-user-parts.php:112 views/profile/index.php:94
 msgid "Logout"
 msgstr ""
 
@@ -293,40 +301,40 @@ msgstr ""
 msgid "To view your posts go to web app:"
 msgstr ""
 
-#: views/profile/index.php:32
+#: views/profile/index.php:34
 msgid "(expired)"
 msgstr ""
 
-#: views/profile/index.php:34
+#: views/profile/index.php:36
 #, php-format
 msgid "(left %s year)"
 msgid_plural "(left %s years)"
 msgstr[0] ""
 msgstr[1] ""
 
-#: views/profile/index.php:36
+#: views/profile/index.php:38
 #, php-format
 msgid "(left %s month)"
 msgid_plural "(left %s months)"
 msgstr[0] ""
 msgstr[1] ""
 
-#: views/profile/index.php:38
+#: views/profile/index.php:40
 #, php-format
 msgid "(left %s day)"
 msgid_plural "(left %s days)"
 msgstr[0] ""
 msgstr[1] ""
 
-#: views/profile/index.php:70
+#: views/profile/index.php:72
 msgid "Tariff"
 msgstr ""
 
-#: views/profile/index.php:76
+#: views/profile/index.php:78
 #, php-format
 msgid "%s of %s"
 msgstr ""
 
-#: views/profile/index.php:80
+#: views/profile/index.php:82
 msgid "Expiry at"
 msgstr ""

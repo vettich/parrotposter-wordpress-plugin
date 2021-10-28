@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-10-26 17:49+0500\n"
-"PO-Revision-Date: 2021-10-26 17:52+0500\n"
+"POT-Creation-Date: 2021-10-28 12:25+0500\n"
+"PO-Revision-Date: 2021-10-28 12:25+0500\n"
 "Last-Translator: Vettich <vetti.ch@mail.ru>\n"
 "Language-Team: \n"
 "Language: ru_RU\n"
@@ -18,142 +18,150 @@ msgstr ""
 "X-Poedit-KeywordsList: __;_e;parrotposter__;parrotposter_e\n"
 "X-Poedit-SearchPath-0: .\n"
 
-#: assets/js/post-meta-box.js:27 assets/js/post-meta-box.js:51
-msgid "Posts have not yet been created"
-msgstr "Посты еще не созданы"
-
-#: assets/js/post-meta-box.js:34
-msgid "Post published at"
-msgstr "Время публикации"
-
-#: assets/js/post-meta-box.js:35
-msgid "Status"
-msgstr "Статус"
-
-#: assets/js/post-meta-box.js:37
-msgid "View details"
-msgstr "Посмотреть подробнее"
-
-#: assets/js/post-meta-box.js:89
-msgid "View post"
-msgstr "Посмотреть пост"
-
-#: assets/js/post-meta-box.js:119
-msgid "Remove post"
-msgstr "Удалить пост"
-
-#: assets/js/post-meta-box.js:160
-msgid "Remove post from ParrotPoster and social networks?"
-msgstr "Удалить пост из ParrotPoster и из социальных сетей?"
-
-#: assets/js/post-meta-box.js:177
-msgid "Removed success"
-msgstr "Успешно удалено"
-
-#: parrotposter.php:117
+#: parrotposter.php:123
 msgid "ParrotPoster settings page"
 msgstr "Страница настройки ParrotPoster"
 
-#: parrotposter.php:117 views/parrotposter-user-parts.php:83
+#: parrotposter.php:123 views/parrotposter-user-parts.php:83
 msgid "ParrotPoster"
 msgstr ""
 
-#: parrotposter.php:118 views/parrotposter-auth-parts.php:32
+#: parrotposter.php:124 views/parrotposter-auth-parts.php:32
 #: views/parrotposter-auth-parts.php:54
+#: views/parrotposter/forgot_password.php:19 views/parrotposter/index.php:19
+#: views/parrotposter/index.php:25 views/parrotposter/signup.php:19
 msgid "Authorization"
 msgstr "Авторизация"
 
-#: src/AdminAjaxPost.php:56 src/AdminAjaxPost.php:81 src/AdminAjaxPost.php:106
+#: src/AdminAjaxPost.php:59 src/AdminAjaxPost.php:84 src/AdminAjaxPost.php:109
 msgid "Email is empty"
 msgstr "Email пустой"
 
-#: src/AdminAjaxPost.php:60 src/AdminAjaxPost.php:85 src/AdminAjaxPost.php:136
+#: src/AdminAjaxPost.php:63 src/AdminAjaxPost.php:88 src/AdminAjaxPost.php:139
 msgid "Password is empty"
 msgstr "Пароль пуст"
 
-#: src/AdminAjaxPost.php:88 src/AdminAjaxPost.php:139
+#: src/AdminAjaxPost.php:91 src/AdminAjaxPost.php:142
 msgid "Passwords do not match"
 msgstr "Пароли не совпадают"
 
-#: src/AdminAjaxPost.php:119
+#: src/AdminAjaxPost.php:122
 msgid "An email with a link to recover your password was sent to your email."
 msgstr ""
 "На вашу электронную почту было отправлено письмо со ссылкой для "
 "восстановления пароля."
 
-#: src/AdminAjaxPost.php:132
+#: src/AdminAjaxPost.php:135
 msgid "Token is empty"
 msgstr "Токен пустой"
 
-#: src/Menu.php:16 views/posts.php:1
+#: src/AdminAjaxPost.php:356 views/accounts/index.php:41
+#, php-format
+msgid "Added %s of %s."
+msgstr "Добавлено %s из %s."
+
+#: src/Menu.php:20 views/posts.php:1
 msgid "Posts"
 msgstr "Посты"
 
-#: src/Menu.php:20 views/profile/index.php:75
+#: src/Menu.php:24 views/profile/index.php:77
 msgid "Accounts"
 msgstr "Аккаунты"
 
-#: src/Menu.php:24
+#: src/Menu.php:28
 msgid "Scheduler"
 msgstr "Планировщик"
 
-#: src/Menu.php:28 views/parrotposter-user-parts.php:93
+#: src/Menu.php:32 views/parrotposter-user-parts.php:93
 msgid "Tariffs"
 msgstr "Тарифы"
 
-#: src/Menu.php:32 views/parrotposter-user-parts.php:92
-#: views/profile/index.php:46
+#: src/Menu.php:36 views/parrotposter-user-parts.php:92
+#: views/profile/index.php:48
 msgid "Profile"
 msgstr "Профиль"
 
-#: views/accounts/index.php:9
-msgid "Social media accounts"
-msgstr "Аккаунты соц. сетей"
+#: views/accounts/connect.php:16 views/accounts/connect.php:17
+#: views/accounts/connect.php:18 views/accounts/connect.php:19
+#: views/accounts/connect.php:20 views/accounts/connect.php:31
+msgid "Connect"
+msgstr "Подключить"
 
-#: views/accounts/index.php:14
-msgid "To view your accounst go to web app:"
-msgstr "Чтобы просмотреть свои аккаунты, перейдите в веб-приложение:"
+#: views/accounts/connect.php:24
+msgid "Connect Instagram"
+msgstr "Подключить Instagram"
+
+#: views/accounts/connect.php:27
+msgctxt "connect-insta"
+msgid "Login"
+msgstr "Логин"
+
+#: views/accounts/index.php:37
+msgid "Social networks accounts"
+msgstr "Аккаунты социальных сетей"
+
+#: views/accounts/index.php:43
+msgid "Change tariff"
+msgstr "Сменить тариф"
+
+#: views/accounts/index.php:53
+msgid "You haven't connected your social networks accounts yet"
+msgstr "У вас еще нет подключенных аккаунтов социальных сетей"
 
 #: views/parrotposter-auth-parts.php:34 views/parrotposter-auth-parts.php:55
+#: views/parrotposter/forgot_password.php:20 views/parrotposter/index.php:20
+#: views/parrotposter/signup.php:20 views/parrotposter/signup.php:25
 msgid "Registration"
 msgstr "Регистрация"
 
 #: views/parrotposter-auth-parts.php:36
 #: views/parrotposter-reset-password-part.php:33
+#: views/parrotposter/reset_password.php:35
 msgid "Reset password"
 msgstr "Сброс пароля"
 
 #: views/parrotposter-auth-parts.php:56
+#: views/parrotposter/forgot_password.php:21
+#: views/parrotposter/forgot_password.php:25 views/parrotposter/index.php:21
+#: views/parrotposter/signup.php:21
 msgid "Forgot password?"
 msgstr "Забыли пароль?"
 
 #: views/parrotposter-auth-parts.php:69 views/parrotposter-auth-parts.php:99
-#: views/parrotposter-auth-parts.php:129 views/profile/index.php:65
+#: views/parrotposter-auth-parts.php:129
+#: views/parrotposter/forgot_password.php:33 views/parrotposter/index.php:34
+#: views/parrotposter/signup.php:39 views/profile/index.php:67
 msgid "Email"
 msgstr ""
 
 #: views/parrotposter-auth-parts.php:75 views/parrotposter-auth-parts.php:105
+#: views/parrotposter/index.php:39 views/parrotposter/reset_password.php:44
+#: views/parrotposter/signup.php:44
 msgid "Password"
 msgstr "Пароль"
 
-#: views/parrotposter-auth-parts.php:81
+#: views/parrotposter-auth-parts.php:81 views/parrotposter/index.php:44
 msgid "Login"
 msgstr "Войти"
 
-#: views/parrotposter-auth-parts.php:93 views/profile/index.php:59
+#: views/parrotposter-auth-parts.php:93 views/parrotposter/signup.php:34
+#: views/profile/index.php:61
 msgid "Your name"
 msgstr "Ваше имя"
 
 #: views/parrotposter-auth-parts.php:111
 #: views/parrotposter-reset-password-part.php:54
+#: views/parrotposter/reset_password.php:49 views/parrotposter/signup.php:49
 msgid "Confirm password"
 msgstr "Подтвердите пароль"
 
-#: views/parrotposter-auth-parts.php:117
+#: views/parrotposter-auth-parts.php:117 views/parrotposter/signup.php:54
 msgid "Sign up"
 msgstr "Зарегистрироваться"
 
 #: views/parrotposter-auth-parts.php:135
+#: views/parrotposter/forgot_password.php:38
+#: views/parrotposter/reset_password.php:54
 msgid "Send"
 msgstr "Отправить"
 
@@ -273,7 +281,7 @@ msgstr "Текущий тариф: %s (%s/%s аккаунтов)"
 msgid "Expiry at %s"
 msgstr "Истекает %s"
 
-#: views/parrotposter-user-parts.php:112 views/profile/index.php:92
+#: views/parrotposter-user-parts.php:112 views/profile/index.php:94
 msgid "Logout"
 msgstr "Выйти"
 
@@ -299,11 +307,11 @@ msgstr "Закрыть"
 msgid "To view your posts go to web app:"
 msgstr "Чтобы просмотреть свои посты, перейдите в веб-приложение:"
 
-#: views/profile/index.php:32
+#: views/profile/index.php:34
 msgid "(expired)"
 msgstr "(истек)"
 
-#: views/profile/index.php:34
+#: views/profile/index.php:36
 #, php-format
 msgid "(left %s year)"
 msgid_plural "(left %s years)"
@@ -311,7 +319,7 @@ msgstr[0] "(остался %s год)"
 msgstr[1] "(осталось %s года)"
 msgstr[2] "(осталось %s лет)"
 
-#: views/profile/index.php:36
+#: views/profile/index.php:38
 #, php-format
 msgid "(left %s month)"
 msgid_plural "(left %s months)"
@@ -319,7 +327,7 @@ msgstr[0] "(остался %s месяц)"
 msgstr[1] "(осталось %s месяца)"
 msgstr[2] "(осталось %s месяцев)"
 
-#: views/profile/index.php:38
+#: views/profile/index.php:40
 #, php-format
 msgid "(left %s day)"
 msgid_plural "(left %s days)"
@@ -327,18 +335,48 @@ msgstr[0] "(остался %s день)"
 msgstr[1] "(осталось %s дня)"
 msgstr[2] "(осталось %s дней)"
 
-#: views/profile/index.php:70
+#: views/profile/index.php:72
 msgid "Tariff"
 msgstr "Тариф"
 
-#: views/profile/index.php:76
+#: views/profile/index.php:78
 #, php-format
 msgid "%s of %s"
 msgstr "%s из %s"
 
-#: views/profile/index.php:80
+#: views/profile/index.php:82
 msgid "Expiry at"
 msgstr "Срок действия"
+
+#~ msgid "Posts have not yet been created"
+#~ msgstr "Посты еще не созданы"
+
+#~ msgid "Post published at"
+#~ msgstr "Время публикации"
+
+#~ msgid "Status"
+#~ msgstr "Статус"
+
+#~ msgid "View details"
+#~ msgstr "Посмотреть подробнее"
+
+#~ msgid "View post"
+#~ msgstr "Посмотреть пост"
+
+#~ msgid "Remove post"
+#~ msgstr "Удалить пост"
+
+#~ msgid "Remove post from ParrotPoster and social networks?"
+#~ msgstr "Удалить пост из ParrotPoster и из социальных сетей?"
+
+#~ msgid "Removed success"
+#~ msgstr "Успешно удалено"
+
+#~ msgid "Social media accounts"
+#~ msgstr "Аккаунты соц. сетей"
+
+#~ msgid "To view your accounst go to web app:"
+#~ msgstr "Чтобы просмотреть свои аккаунты, перейдите в веб-приложение:"
 
 #, php-format
 #~ msgid "(left %s years)"

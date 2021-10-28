@@ -2,8 +2,8 @@
 
 wp_enqueue_script('jquery-ui-core');
 wp_enqueue_script('jquery-ui-sortable');
-wp_enqueue_script('parrotposter-flatpickr-js');
-wp_enqueue_style('parrotposter-flatpickr-css');
+wp_enqueue_script('parrotposter-flatpickr');
+wp_enqueue_style('parrotposter-flatpickr');
 
 $post_id = (int) $_GET['post_id'];
 if (empty($post_id)) {

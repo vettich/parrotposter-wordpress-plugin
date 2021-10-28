@@ -3,10 +3,13 @@
 use parrotposter\Api;
 use parrotposter\Tools;
 use parrotposter\FormHelpers;
+use parrotposter\AssetModules;
 
 if (!defined('ABSPATH')) {
 	die;
 }
+
+AssetModules::enqueue(['block', 'input']);
 
 if (empty($_GET['parrotposter_token'])) {
 	wp_redirect(esc_url_raw('admin.php?page=parrotposter'));

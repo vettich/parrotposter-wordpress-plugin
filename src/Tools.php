@@ -42,4 +42,16 @@ class Tools
 		}
 		return 'en';
 	}
+
+	public static function clear_account_link($link)
+	{
+		$replaces = [
+			'http://' => '',
+			'https://' => '',
+			'instagram.com/' => '@',
+			'facebook.com/' => 'fb.com/',
+			'telegram.com/' => 't.me/',
+		];
+		return str_replace(array_keys($replaces), array_values($replaces), $link);
+	}
 }

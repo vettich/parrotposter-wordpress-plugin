@@ -5,6 +5,9 @@ if (!defined('ABSPATH')) {
 }
 
 use parrotposter\Menu;
+use parrotposter\AssetModules;
+
+AssetModules::enqueue(['header']);
 
 $menu = Menu::get_items();
 

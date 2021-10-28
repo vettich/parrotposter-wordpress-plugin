@@ -24,3 +24,10 @@ if (!function_exists('parrotposter_n')) {
 		return esc_html(sprintf(_n($single, $plural, $cnt, 'parrotposter'), ...$values));
 	}
 }
+
+if (!function_exists('parrotposter_x')) {
+	function parrotposter_x($msg, $context, ...$values)
+	{
+		return esc_html(sprintf(_x($msg, $context, 'parrotposter'), ...$values));
+	}
+}

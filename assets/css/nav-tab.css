@@ -1,0 +1,19 @@
+.parrotposter-nav-tab__wrapper {
+	background-color: #FFFFFF;
+	display: flex;
+	margin-top: 24px;
+	width: calc(100% - 20px);
+}
+.parrotposter-nav-tab__item {
+	padding: 1em;
+	font-size: 13px;
+	font-weight: 600;
+	line-height: 16px;
+	text-decoration: none;
+	color: #787C82;
+}
+.parrotposter-nav-tab__item.active {
+	border-bottom: 4px solid #007CBA;
+	color: #007CBA;
+}
+

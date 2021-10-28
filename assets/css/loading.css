@@ -1,0 +1,47 @@
+@keyframes parrotposter-loading {
+	to {transform: rotate(360deg);}
+}
+
+.parrotposter-loading {
+	/* width: 100%; */
+	/* text-align: center; */
+	position: relative;
+}
+
+.parrotposter-loading:before {
+	content: '';
+	display: block;
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background-color: rgba(0, 0, 0, 0.4);
+}
+
+.parrotposter-loading::after {
+	content: '';
+	box-sizing: border-box;
+	display: inline-block;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	/* transform: translate(-50%, -50%); */
+	width: 20px;
+	height: 20px;
+	margin-top: -10px;
+	margin-left: -10px;
+	border-radius: 50%;
+	border-top: 2px solid #07d;
+	border-right: 2px solid transparent;
+	animation: parrotposter-loading .6s linear infinite;
+}
+
+.parrotposter-loading-block {
+	display: inline-block;
+	width: 1em;
+	height: 1em;
+	padding: 0 1em;
+}
+
+

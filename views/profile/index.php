@@ -4,6 +4,8 @@ use parrotposter\Api;
 use parrotposter\Tools;
 use parrotposter\FormHelpers;
 
+wp_enqueue_style('parrotposter-profile');
+
 if (!defined('ABSPATH')) {
 	die;
 }

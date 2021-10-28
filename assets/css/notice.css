@@ -1,0 +1,11 @@
+.parrotposter-notice {
+	background-color: #FFFFFF;
+	border: 1px solid #C3C4C7;
+	border-left-width: 4px;
+	margin: 1em 0;
+	padding: 1px 12px;
+}
+
+.parrotposter-notice__error {
+	border-left-color: #D63638;
+}

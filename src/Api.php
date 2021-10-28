@@ -133,6 +133,32 @@ class Api
 		return $res;
 	}
 
+	public static function get_connect_url($account_type, $callback_url)
+	{
+		$data = [
+			'type' => $account_type,
+			'callback' => $callback_url,
+		];
+		$res = self::get('connect_url', $data);
+		return $res;
+	}
+
+	public static function connect($account_type, $fields)
+	{
+		$data = [
+			'type' => $account_type,
+			'fields' => $fields,
+		];
+		$res = self::post('connect', $data);
+		return $res;
+	}
+
+	public static function delete_account($account_id)
+	{
+		$res = self::delete("accounts/$account_id");
+		return $res;
+	}
+
 	public static function list_posts($filter = [], $sort = [], $paging = [])
 	{
 		$data = [];
@@ -154,7 +180,7 @@ class Api
 		return $res;
 	}
 
-	public static function remove_post($post_id = '')
+	public static function delete_post($post_id = '')
 	{
 		$res = self::delete("posts/$post_id");
 		return $res;

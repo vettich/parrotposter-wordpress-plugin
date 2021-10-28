@@ -165,7 +165,7 @@
 		const post_id = el.data('post-id')
 		el.append(`<div class="parrotposter-loading-spinner parrotposter-loading-spinner-block"></div>`)
 		$.post(ajaxurl, {
-			'action': 'parrotposter_api_remove_post',
+			'action': 'parrotposter_api_delete_post',
 			'parrotposter': {'post_id': post_id}
 		}, function (data) {
 			data = JSON.parse(data);

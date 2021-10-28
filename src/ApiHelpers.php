@@ -25,19 +25,19 @@ class ApiHelpers
 	{
 		foreach ($accounts as $key => $account) {
 			if (!isset($account['photo'])) {
-				$accounts[$key]['photo'] = ParrotPoster::asset('images/no-photo.png');
+				$accounts[$key]['photo'] = ParrotPoster::asset('images/no-photo.svg');
 				continue;
 			}
 			$res = wp_remote_get($account['photo']);
 
 			$res_code = wp_remote_retrieve_response_code($res);
 			if ($res_code != "200") {
-				$accounts[$key]['photo'] = ParrotPoster::asset('images/no-photo.png');
+				$accounts[$key]['photo'] = ParrotPoster::asset('images/no-photo.svg');
 			}
 
 			$corp_header = wp_remote_retrieve_header($res, 'cross-origin-resource-policy');
 			if ($corp_header == 'same-origin') {
-				$accounts[$key]['photo'] = ParrotPoster::asset('images/no-photo.png');
+				$accounts[$key]['photo'] = ParrotPoster::asset('images/no-photo.svg');
 			}
 		}
 		return $accounts;
