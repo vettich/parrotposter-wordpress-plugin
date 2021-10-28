@@ -7,7 +7,7 @@ use parrotposter\Api;
 use parrotposter\Tools;
 use parrotposter\AssetModules;
 
-AssetModules::enqueue(['accounts']);
+AssetModules::enqueue(['accounts', 'block']);
 
 $res = Api::me();
 $user = $res['response'] ?: [];
