@@ -16,7 +16,8 @@
 	left: 0;
 	right: 0;
 	bottom: 0;
-	background-color: rgba(0, 0, 0, 0.4);
+	background-color: rgba(255, 255, 255, 0.4);
+	z-index: 99;
 }
 
 .parrotposter-loading::after {
@@ -35,6 +36,7 @@
 	border-top: 2px solid #07d;
 	border-right: 2px solid transparent;
 	animation: parrotposter-loading .6s linear infinite;
+	z-index: 100;
 }
 
 .parrotposter-loading-block {

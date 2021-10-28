@@ -40,25 +40,6 @@
 	position: relative;
 	transition: opacity 0.3s;
 }
-.parrotposter-accounts__item.loading {
-	opacity: 0.5;
-}
-.parrotposter-accounts__item.loading:after {
-	content: '';
-	box-sizing: border-box;
-	position: absolute;
-	display: inline-block;
-	top: 50%;
-	left: 50%;
-	width: 20px;
-	height: 20px;
-	margin-top: -10px;
-	margin-left: -10px;
-	border-radius: 50%;
-	border-top: 2px solid #000;
-	border-right: 2px solid transparent;
-	animation: parrotposter-loading-spinner .6s linear infinite;
-}
 .parrotposter-accounts__delete {
 	position: absolute;
 	right: 1em;

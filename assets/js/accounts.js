@@ -3,18 +3,22 @@ jQuery(function($) {
 		const elem = event.target
 		const rootItem = $(elem).closest('.parrotposter-accounts__item')
 		const id = rootItem.data('id')
-		rootItem.addClass('loading');
+		rootItem.addClass('parrotposter-loading');
 		$.post(ajaxurl, {
 			'action': 'parrotposter_api_delete_account',
 			'parrotposter': {
 				'account_id': id,
 			}
 		}, function (data) {
-			rootItem.removeClass('loading');
 			data = JSON.parse(data)
 			if (!data.error) {
-				rootItem.remove()
-				update()
+				if ($('.parrotposter-accounts__item').length <= 1) {
+					location.reload()
+				} else {
+					rootItem.removeClass('parrotposter-loading');
+					rootItem.remove()
+					update()
+				}
 			}
 		})
 	})
