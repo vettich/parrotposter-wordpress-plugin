@@ -7,6 +7,7 @@ use ParrotPoster;
 class Api
 {
 	const API_URL = 'https://parrotposter.com/api/v1/';
+	// const API_URL = 'http://188.225.45.58:8010/api/v1/';
 	const FROM = 'wordpress';
 	const USER_AGENT = 'ParrotPoster WP Plugin';
 
@@ -104,7 +105,7 @@ class Api
 
 	public static function list_tariffs()
 	{
-		$res = self::get('tariffs');
+		$res = self::get('tariffs/all');
 		return $res;
 	}
 
@@ -119,7 +120,7 @@ class Api
 	{
 		$data = [
 			'tariff_id' => $tariff_id,
-			'period' => $period,
+			'period' => intval($period),
 			'success_url' => $success_url,
 			'fail_url' => $fail_url,
 		];
@@ -189,6 +190,12 @@ class Api
 	public static function create_post($post = [])
 	{
 		$res = self::post('posts', $post);
+		return $res;
+	}
+
+	public static function get_exchange_rate_usd()
+	{
+		$res = self::get("exchange-rate/usd");
 		return $res;
 	}
 

@@ -14,9 +14,9 @@ class AssetModules
 		'notice',
 		'input',
 		'loading',
-		'profile',
 		'accounts',
 		'accounts-connect',
+		'tariffs',
 	];
 	private static $libs = [
 		'flatpickr' => [

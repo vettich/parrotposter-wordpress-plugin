@@ -32,15 +32,45 @@
  * block
  *****************************/
 .parrotposter-block {
-	display: inline-block;
+	position: relative;
+	display: inline-flex;
+	flex-direction: column;
+	gap: 12px;
 	padding: 24px;
 	margin: 24px 0;
 	background-color: #FFFFFF;
 }
-.parrotposter-block.mw300 {
+
+.parrotposter-block--horizontal {
+	flex-direction: row;
+	gap: 24px;
+}
+
+.parrotposter-block--min {
 	min-width: 300px;
 	max-width: 100%;
 }
+
+.parrotposter-block--success:before,
+.parrotposter-block--fail:before {
+	content: "";
+	display: block;
+	position: absolute;
+	left: -5px;
+	right: -5px;
+	top: -5px;
+	bottom: -5px;
+	border: 1px solid #20E2AC;
+	border-radius: 2px;
+	z-index: -1;
+}
+.parrotposter-block--fail:before {
+	border: 1px solid #FF52A1;
+}
+
+.parrotposter-block__group {
+}
+
 .parrotposter-block h2 {
 	margin-top: 16px;
 	margin-bottom: 30px;
@@ -48,4 +78,14 @@
 	font-weight: 600;
 }
 
+.parrotposter-block__label {
+	font-size: 13px;
+	line-height: 16px;
+}
+
+.parrotposter-block__value {
+	font-size: 16px;
+	font-weight: 600;
+	line-height: 24px;
+}
 

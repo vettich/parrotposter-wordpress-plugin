@@ -1,0 +1,148 @@
+.parrotposter-tariffs-period__wrap {
+	display: flex;
+	background-color: #FFFFFF;
+	width: max-content;
+}
+
+.parrotposter-tariffs-period__wrap input {
+	display: none;
+}
+
+.parrotposter-tariffs-period__label {
+	position: relative;
+	display: flex;
+	gap: 12px;
+	align-items: center;
+	padding: 10px 12px;
+	border: 1px solid #BBBBBB;
+	margin-right: -1px;
+	height: calc(100% - 22px);
+}
+
+.parrotposter-tariffs-period__wrap input:checked + .parrotposter-tariffs-period__label {
+	border-color: #007CBA;
+	background-color: rgba(0, 124, 186, 0.12);
+	z-index: 100;
+}
+
+.parrotposter-tariffs-period__wrap label:first-child .parrotposter-tariffs-period__label {
+	border-radius: 2px 0 0 2px;
+}
+
+.parrotposter-tariffs-period__wrap label:last-child .parrotposter-tariffs-period__label {
+	border-radius: 0 2px 2px 0;
+}
+
+.parrotposter-tariffs-period__name {
+	color: #757575;
+}
+
+.parrotposter-tariffs-period__wrap input:checked + .parrotposter-tariffs-period__label .parrotposter-tariffs-period__name {
+	color: #007CBA;
+}
+
+.parrotposter-tariffs-period__badge {
+	display: inline-block;
+	background-color: #007CBA;
+	color: #FFFFFF;
+	padding: 3px 6px;
+	border-radius: 16px;
+}
+
+.parrotposter-tariffs__wrap {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 20px;
+}
+
+.parrotposter-tariffs__item {
+	display: flex;
+	flex-direction: column;
+	background-color: #FFFFFF;
+	padding: 24px;
+	min-width: 350px;
+	position: relative;
+}
+
+.parrotposter-tariffs__item--current:before {
+	content: "";
+	display: block;
+	position: absolute;
+	left: -5px;
+	right: -5px;
+	top: -5px;
+	bottom: -5px;
+	border: 1px solid #20E2AC;
+	border-radius: 2px;
+	z-index: -1;
+}
+
+.parrotposter-tariffs__name {
+	font-size: 24px;
+	line-height: 32px;
+	color: #101517;
+	margin-bottom: 24px;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+}
+
+.parrotposter-tariffs__current {
+	display: none;
+	font-weight: 600;
+	font-size: 13px;
+	line-height: 16px;
+	color: #FFF;
+	border-radius: 16px;
+	background-color: #20E2AC;
+	padding: 4px 16px;
+}
+
+.parrotposter-tariffs__item--current .parrotposter-tariffs__current {
+	display: block;
+}
+
+.parrotposter-tariffs__price {
+	font-size: 48px;
+	line-height: 40px;
+	color: #101517;
+	margin-bottom: 12px;
+}
+
+.parrotposter-tariffs__period {
+	display: inline-block;
+	font-size: 24px;
+	line-height: 32px;
+	color: #A7AAAD;
+}
+
+.parrotposter-tariffs__price-usd {
+	font-size: 24px;
+	line-height: 32px;
+	color: #101517;
+	margin-bottom: 34px;
+}
+
+.parrotposter-tariffs__limit {
+	font-size: 14px;
+	line-height: 20px;
+	font-weight: 600;
+}
+
+.parrotposter-tariffs__limit:before {
+	content: "";
+	display: inline-block;
+	width: 20px;
+	height: 20px;
+	background-image: url(../images/check.svg);
+	background-repeat: no-repeat;
+	background-size: 100%;
+	margin-right: 8px;
+	margin-bottom: 16px;
+	vertical-align: top;
+}
+
+.parrotposter-tariffs__ps {
+	color: #787C82;
+	margin-top: 1em;
+}

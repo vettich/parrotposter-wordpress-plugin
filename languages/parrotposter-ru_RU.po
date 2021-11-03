@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-10-28 12:25+0500\n"
-"PO-Revision-Date: 2021-10-28 12:25+0500\n"
+"POT-Creation-Date: 2021-11-01 08:58+0500\n"
+"PO-Revision-Date: 2021-11-01 09:00+0500\n"
 "Last-Translator: Vettich <vetti.ch@mail.ru>\n"
 "Language-Team: \n"
 "Language: ru_RU\n"
@@ -18,44 +18,48 @@ msgstr ""
 "X-Poedit-KeywordsList: __;_e;parrotposter__;parrotposter_e\n"
 "X-Poedit-SearchPath-0: .\n"
 
-#: parrotposter.php:123
+#: parrotposter.php:120
 msgid "ParrotPoster settings page"
 msgstr "Страница настройки ParrotPoster"
 
-#: parrotposter.php:123 views/parrotposter-user-parts.php:83
+#: parrotposter.php:120 views/parrotposter-user-parts.php:83
 msgid "ParrotPoster"
 msgstr ""
 
-#: parrotposter.php:124 views/parrotposter-auth-parts.php:32
+#: parrotposter.php:121 views/parrotposter-auth-parts.php:32
 #: views/parrotposter-auth-parts.php:54
-#: views/parrotposter/forgot_password.php:19 views/parrotposter/index.php:19
-#: views/parrotposter/index.php:25 views/parrotposter/signup.php:19
+#: views/parrotposter/forgot_password.php:22 views/parrotposter/index.php:22
+#: views/parrotposter/index.php:28 views/parrotposter/signup.php:22
 msgid "Authorization"
 msgstr "Авторизация"
 
-#: src/AdminAjaxPost.php:59 src/AdminAjaxPost.php:84 src/AdminAjaxPost.php:109
+#: src/AdminAjaxPost.php:60 src/AdminAjaxPost.php:85 src/AdminAjaxPost.php:110
 msgid "Email is empty"
 msgstr "Email пустой"
 
-#: src/AdminAjaxPost.php:63 src/AdminAjaxPost.php:88 src/AdminAjaxPost.php:139
+#: src/AdminAjaxPost.php:64 src/AdminAjaxPost.php:89 src/AdminAjaxPost.php:140
 msgid "Password is empty"
 msgstr "Пароль пуст"
 
-#: src/AdminAjaxPost.php:91 src/AdminAjaxPost.php:142
+#: src/AdminAjaxPost.php:92 src/AdminAjaxPost.php:143
 msgid "Passwords do not match"
 msgstr "Пароли не совпадают"
 
-#: src/AdminAjaxPost.php:122
+#: src/AdminAjaxPost.php:123
 msgid "An email with a link to recover your password was sent to your email."
 msgstr ""
 "На вашу электронную почту было отправлено письмо со ссылкой для "
 "восстановления пароля."
 
-#: src/AdminAjaxPost.php:135
+#: src/AdminAjaxPost.php:136
 msgid "Token is empty"
 msgstr "Токен пустой"
 
-#: src/AdminAjaxPost.php:356 views/accounts/index.php:41
+#: src/AdminAjaxPost.php:346
+msgid "Need enter a code from SMS or email"
+msgstr "Нужно ввести код из СМС или почты"
+
+#: src/AdminAjaxPost.php:380 views/accounts/index.php:41
 #, php-format
 msgid "Added %s of %s."
 msgstr "Добавлено %s из %s."
@@ -64,7 +68,7 @@ msgstr "Добавлено %s из %s."
 msgid "Posts"
 msgstr "Посты"
 
-#: src/Menu.php:24 views/profile/index.php:77
+#: src/Menu.php:24 views/profile/index.php:52
 msgid "Accounts"
 msgstr "Аккаунты"
 
@@ -73,28 +77,146 @@ msgid "Scheduler"
 msgstr "Планировщик"
 
 #: src/Menu.php:32 views/parrotposter-user-parts.php:93
+#: views/tariffs/index.php:34
 msgid "Tariffs"
 msgstr "Тарифы"
 
 #: src/Menu.php:36 views/parrotposter-user-parts.php:92
-#: views/profile/index.php:48
+#: views/profile/index.php:23
 msgid "Profile"
 msgstr "Профиль"
 
-#: views/accounts/connect.php:16 views/accounts/connect.php:17
-#: views/accounts/connect.php:18 views/accounts/connect.php:19
-#: views/accounts/connect.php:20 views/accounts/connect.php:31
+#: src/Profile.php:28
+msgid "(expired)"
+msgstr "(истек)"
+
+#: src/Profile.php:30
+#, php-format
+msgid "(left %s year)"
+msgid_plural "(left %s years)"
+msgstr[0] "(остался %s год)"
+msgstr[1] "(осталось %s года)"
+msgstr[2] "(осталось %s лет)"
+
+#: src/Profile.php:32
+#, php-format
+msgid "(left %s month)"
+msgid_plural "(left %s months)"
+msgstr[0] "(остался %s месяц)"
+msgstr[1] "(осталось %s месяца)"
+msgstr[2] "(осталось %s месяцев)"
+
+#: src/Profile.php:34
+#, php-format
+msgid "(left %s day)"
+msgid_plural "(left %s days)"
+msgstr[0] "(остался %s день)"
+msgstr[1] "(осталось %s дня)"
+msgstr[2] "(осталось %s дней)"
+
+#: src/Tariffs.php:12
+msgid "1 month"
+msgstr "1 месяц"
+
+#: src/Tariffs.php:17
+msgid "3 month"
+msgstr "3 месяца"
+
+#: src/Tariffs.php:22
+msgid "6 month"
+msgstr "6 месяцев"
+
+#: src/Tariffs.php:27
+msgid "1 year"
+msgstr "1 год"
+
+#: views/accounts/connect.php:17 views/accounts/connect.php:18
+#: views/accounts/connect.php:19 views/accounts/connect.php:20
+#: views/accounts/connect.php:21 views/accounts/connect.php:56
+#: views/accounts/connect.php:91
 msgid "Connect"
 msgstr "Подключить"
 
-#: views/accounts/connect.php:24
+#: views/accounts/connect.php:27
 msgid "Connect Instagram"
 msgstr "Подключить Instagram"
 
-#: views/accounts/connect.php:27
-msgctxt "connect-insta"
-msgid "Login"
-msgstr "Логин"
+#: views/accounts/connect.php:31
+msgctxt "Connect Instagram"
+msgid "Username"
+msgstr "Имя пользователя"
+
+#: views/accounts/connect.php:33
+msgid "Your Instagram username: @example or example"
+msgstr "Ваше имя пользователя в Instagram: @example или example"
+
+#: views/accounts/connect.php:38 views/parrotposter-auth-parts.php:75
+#: views/parrotposter-auth-parts.php:105 views/parrotposter/index.php:42
+#: views/parrotposter/reset_password.php:47 views/parrotposter/signup.php:47
+msgid "Password"
+msgstr "Пароль"
+
+#: views/accounts/connect.php:40
+msgid "We do not store passwords anywhere"
+msgstr "Мы нигде не сохраняем пароли"
+
+#: views/accounts/connect.php:45
+msgid "Proxy"
+msgstr "Прокси"
+
+#: views/accounts/connect.php:47
+msgid ""
+"You can enter a proxy for Instagram connection. Proxy format: user:"
+"password@domain_or_ip"
+msgstr ""
+"Вы можете ввести прокси для подключения к Instagram. Формат прокси: user:"
+"password@domain_or_ip"
+
+#: views/accounts/connect.php:52
+msgid "Code"
+msgstr "Код"
+
+#: views/accounts/connect.php:63
+msgid "Connect Telegram"
+msgstr "Подключить Telegram"
+
+#: views/accounts/connect.php:67
+msgid "Telegram bot token"
+msgstr "Токен бота Telegram"
+
+#: views/accounts/connect.php:69
+msgid "1. Create your telegram bot"
+msgstr "1. Создайте вашего телеграм бота"
+
+#: views/accounts/connect.php:71
+msgid "1.1. Start chat with @BotFather"
+msgstr ""
+
+#: views/accounts/connect.php:73
+msgid "1.2. Send the command /newbot and follow @BotFather's instructions"
+msgstr ""
+
+#: views/accounts/connect.php:75
+msgid "2. Send the command /token to bot @BotFather"
+msgstr ""
+
+#: views/accounts/connect.php:77
+msgid "3. Copy your bot's token here"
+msgstr ""
+
+#: views/accounts/connect.php:82
+msgid "Channel or group link"
+msgstr "Ссылка на канал или группу"
+
+#: views/accounts/connect.php:84
+msgid ""
+"1. Copy to here your channel or group link. Example: https://t.me/"
+"your_channel"
+msgstr ""
+
+#: views/accounts/connect.php:86
+msgid "2. Make sure you add the created bot to your channel or group"
+msgstr ""
 
 #: views/accounts/index.php:37
 msgid "Social networks accounts"
@@ -108,60 +230,65 @@ msgstr "Сменить тариф"
 msgid "You haven't connected your social networks accounts yet"
 msgstr "У вас еще нет подключенных аккаунтов социальных сетей"
 
+#: views/accounts/index.php:87
+msgid "Are you sure you want to delete \"#account_name#\""
+msgstr "Вы действительно хотите удалить \"#account_name#\""
+
+#: views/accounts/index.php:90
+msgid "Delete"
+msgstr "Удалить"
+
+#: views/accounts/index.php:91
+msgid "Cancel"
+msgstr "Отмена"
+
 #: views/parrotposter-auth-parts.php:34 views/parrotposter-auth-parts.php:55
-#: views/parrotposter/forgot_password.php:20 views/parrotposter/index.php:20
-#: views/parrotposter/signup.php:20 views/parrotposter/signup.php:25
+#: views/parrotposter/forgot_password.php:23 views/parrotposter/index.php:23
+#: views/parrotposter/signup.php:23 views/parrotposter/signup.php:28
 msgid "Registration"
 msgstr "Регистрация"
 
 #: views/parrotposter-auth-parts.php:36
 #: views/parrotposter-reset-password-part.php:33
-#: views/parrotposter/reset_password.php:35
+#: views/parrotposter/reset_password.php:38
 msgid "Reset password"
 msgstr "Сброс пароля"
 
 #: views/parrotposter-auth-parts.php:56
-#: views/parrotposter/forgot_password.php:21
-#: views/parrotposter/forgot_password.php:25 views/parrotposter/index.php:21
-#: views/parrotposter/signup.php:21
+#: views/parrotposter/forgot_password.php:24
+#: views/parrotposter/forgot_password.php:28 views/parrotposter/index.php:24
+#: views/parrotposter/signup.php:24
 msgid "Forgot password?"
 msgstr "Забыли пароль?"
 
 #: views/parrotposter-auth-parts.php:69 views/parrotposter-auth-parts.php:99
 #: views/parrotposter-auth-parts.php:129
-#: views/parrotposter/forgot_password.php:33 views/parrotposter/index.php:34
-#: views/parrotposter/signup.php:39 views/profile/index.php:67
+#: views/parrotposter/forgot_password.php:36 views/parrotposter/index.php:37
+#: views/parrotposter/signup.php:42 views/profile/index.php:42
 msgid "Email"
 msgstr ""
 
-#: views/parrotposter-auth-parts.php:75 views/parrotposter-auth-parts.php:105
-#: views/parrotposter/index.php:39 views/parrotposter/reset_password.php:44
-#: views/parrotposter/signup.php:44
-msgid "Password"
-msgstr "Пароль"
-
-#: views/parrotposter-auth-parts.php:81 views/parrotposter/index.php:44
+#: views/parrotposter-auth-parts.php:81 views/parrotposter/index.php:47
 msgid "Login"
 msgstr "Войти"
 
-#: views/parrotposter-auth-parts.php:93 views/parrotposter/signup.php:34
-#: views/profile/index.php:61
+#: views/parrotposter-auth-parts.php:93 views/parrotposter/signup.php:37
+#: views/profile/index.php:36
 msgid "Your name"
 msgstr "Ваше имя"
 
 #: views/parrotposter-auth-parts.php:111
 #: views/parrotposter-reset-password-part.php:54
-#: views/parrotposter/reset_password.php:49 views/parrotposter/signup.php:49
+#: views/parrotposter/reset_password.php:52 views/parrotposter/signup.php:52
 msgid "Confirm password"
 msgstr "Подтвердите пароль"
 
-#: views/parrotposter-auth-parts.php:117 views/parrotposter/signup.php:54
+#: views/parrotposter-auth-parts.php:117 views/parrotposter/signup.php:57
 msgid "Sign up"
 msgstr "Зарегистрироваться"
 
 #: views/parrotposter-auth-parts.php:135
-#: views/parrotposter/forgot_password.php:38
-#: views/parrotposter/reset_password.php:54
+#: views/parrotposter/forgot_password.php:41
 msgid "Send"
 msgstr "Отправить"
 
@@ -281,7 +408,7 @@ msgstr "Текущий тариф: %s (%s/%s аккаунтов)"
 msgid "Expiry at %s"
 msgstr "Истекает %s"
 
-#: views/parrotposter-user-parts.php:112 views/profile/index.php:94
+#: views/parrotposter-user-parts.php:112 views/profile/index.php:69
 msgid "Logout"
 msgstr "Выйти"
 
@@ -290,6 +417,10 @@ msgid ""
 "You can change the tariff and pay through the web-application by following "
 "the link"
 msgstr "Изменить тариф и оплатить вы можете через веб-приложение по ссылке"
+
+#: views/parrotposter/reset_password.php:57
+msgid "Save"
+msgstr "Сохранить"
 
 #: views/post-meta-box.php:17
 msgid "Publish to socials network"
@@ -307,46 +438,78 @@ msgstr "Закрыть"
 msgid "To view your posts go to web app:"
 msgstr "Чтобы просмотреть свои посты, перейдите в веб-приложение:"
 
-#: views/profile/index.php:34
-msgid "(expired)"
-msgstr "(истек)"
-
-#: views/profile/index.php:36
-#, php-format
-msgid "(left %s year)"
-msgid_plural "(left %s years)"
-msgstr[0] "(остался %s год)"
-msgstr[1] "(осталось %s года)"
-msgstr[2] "(осталось %s лет)"
-
-#: views/profile/index.php:38
-#, php-format
-msgid "(left %s month)"
-msgid_plural "(left %s months)"
-msgstr[0] "(остался %s месяц)"
-msgstr[1] "(осталось %s месяца)"
-msgstr[2] "(осталось %s месяцев)"
-
-#: views/profile/index.php:40
-#, php-format
-msgid "(left %s day)"
-msgid_plural "(left %s days)"
-msgstr[0] "(остался %s день)"
-msgstr[1] "(осталось %s дня)"
-msgstr[2] "(осталось %s дней)"
-
-#: views/profile/index.php:72
+#: views/profile/index.php:47
 msgid "Tariff"
 msgstr "Тариф"
 
-#: views/profile/index.php:78
+#: views/profile/index.php:53 views/tariffs/index.php:45
 #, php-format
 msgid "%s of %s"
 msgstr "%s из %s"
 
-#: views/profile/index.php:82
+#: views/profile/index.php:57
 msgid "Expiry at"
 msgstr "Срок действия"
+
+#: views/tariffs/index.php:40
+msgid "Your tariff"
+msgstr "Ваш тариф"
+
+#: views/tariffs/index.php:44
+msgid "Added accounts"
+msgstr "Добавлено аккаунтов"
+
+#: views/tariffs/index.php:48
+msgid "Tariff expired at"
+msgstr "Срок тарифа"
+
+#: views/tariffs/index.php:81
+msgid "Current"
+msgstr "Текущий"
+
+#: views/tariffs/index.php:86
+msgid "per month"
+msgstr "в месяц"
+
+#: views/tariffs/index.php:93
+msgid "Unlimited posts"
+msgstr "Неограниченное количество постов"
+
+#: views/tariffs/index.php:96
+#, php-format
+msgid "%s accounts of social networks"
+msgstr "%s аккаунтов соц. сетей"
+
+#: views/tariffs/index.php:102 views/tariffs/index.php:110
+msgid "Select and pay"
+msgstr "Выбрать и оплатить"
+
+#: views/tariffs/index.php:106
+msgid "Prolong"
+msgstr "Продлить"
+
+#: views/tariffs/index.php:121
+msgid ""
+"The price in dollars is calculated on the basis of the Bank of Russia "
+"exchange rate"
+msgstr "Цена в долларах подсчитана на основе курса Банка России"
+
+#: views/tariffs/index.php:126
+msgid ""
+"If you select a new tariff, the remaining days at the current tariff will be "
+"recalculated and transferred to the new tariff"
+msgstr ""
+"При выборе нового тарифа остатки дней по текущему тарифу пересчитаются и "
+"перейдут на новый тариф"
+
+#~ msgid ""
+#~ "The price in dollars is calculated on the basis of the Bank of Russia "
+#~ "exchange rate."
+#~ msgstr "Цена в долларах подсчитана на основе курса Банка России."
+
+#~ msgctxt "connect-insta"
+#~ msgid "Login"
+#~ msgstr "Логин"
 
 #~ msgid "Posts have not yet been created"
 #~ msgstr "Посты еще не созданы"

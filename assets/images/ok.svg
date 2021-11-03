@@ -24,22 +24,28 @@
    borderopacity="1.0"
    inkscape:pageshadow="2"
    inkscape:pageopacity="0.0"
-   inkscape:pagecheckerboard="0"
+   inkscape:pagecheckerboard="true"
    showgrid="false"
    inkscape:zoom="6.9769821"
-   inkscape:cx="17.271078"
+   inkscape:cx="35.760447"
    inkscape:cy="48.875"
    inkscape:window-width="2517"
    inkscape:window-height="1080"
    inkscape:window-x="1123"
    inkscape:window-y="257"
    inkscape:window-maximized="1"
-   inkscape:current-layer="g6" />
+   inkscape:current-layer="g6"
+   inkscape:showpageshadow="false" />
 <g
    id="g8">
 	<g
    id="g6">
-		<path
+		<circle
+   style="fill:#ffffff"
+   id="path861"
+   cx="49.50008"
+   cy="48.360214"
+   r="42.960751" /><path
    d="M48.921,40.507c4.667-0.017,8.384-3.766,8.367-8.443c-0.017-4.679-3.742-8.402-8.411-8.406    c-4.708-0.005-8.468,3.787-8.432,8.508C40.48,36.826,44.239,40.524,48.921,40.507z"
    id="path2"
    style="fill:#f68634;fill-opacity:1" />

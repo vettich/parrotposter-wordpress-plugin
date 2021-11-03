@@ -35,7 +35,7 @@ AssetModules::enqueue(['block', 'input', 'nav-tab']);
 
 		<label class="parrotposter-input">
 			<span><?php parrotposter_e('Your name') ?></span>
-			<input type="email" name="parrotposter[name]">
+			<input type="text" name="parrotposter[name]">
 		</label>
 
 		<label class="parrotposter-input">

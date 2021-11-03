@@ -54,7 +54,7 @@ $back_url = add_query_arg([
 		</label>
 
 		<div class="parrotposter-input parrotposter-input--footer">
-			<input class="button button-primary" type="submit" name="submit" value="<?php parrotposter_e('Send') ?>">
+			<input class="button button-primary" type="submit" name="submit" value="<?php parrotposter_e('Save') ?>">
 		</div>
 	</form>
 </div>

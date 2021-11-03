@@ -1,20 +1,58 @@
 .parrotposter-input {
 	display: flex;
+	position: relative;
 	flex-direction: column;
 	padding-bottom: 16px;
 }
+
 .parrotposter-input:last-child {
 	padding-bottom: 0px;
 }
+
 .parrotposter-input--footer {
 	padding-top: 10px;
 	padding-bottom: 0;
 }
+
 .parrotposter-input span {
 	color: #000000;
 	margin-bottom: 8px;
 }
+
 .parrotposter-input input {
 	width: 100%;
+}
+
+.parrotposter-input__help {
+	position: absolute;
+	left: calc(100% + 18px);
+	top: 1em;
+	width: max-content;
+	max-width: 200px;
+	padding: 16px;
+	font-size: 14px;
+	line-height: 20px;
+	background-color: rgba(0, 0, 0, 0.9);
+	color: #FFFFFF;
+	transition: opacity 0.3s;
+	opacity: 0;
+	visibility: hidden;
+}
+.parrotposter-input:hover .parrotposter-input__help,
+.parrotposter-input:focus-within .parrotposter-input__help {
+	width: max-content;
+	opacity: 1;
+	visibility: visible;
+}
+
+.parrotposter-input__help:before {
+	content: "";
+	display: inline-block;
+	position: absolute;
+	right: 100%;
+	top: 12px;
+	border-top: 12px solid transparent;
+	border-right: 12px solid rgba(0, 0, 0, 0.9);
+	border-bottom: 12px solid transparent;
 }
 

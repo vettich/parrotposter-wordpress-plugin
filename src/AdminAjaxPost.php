@@ -41,6 +41,7 @@ class AdminAjaxPost
 		add_action('wp_ajax_parrotposter_api_connect', [$this, 'api_connect']);
 		add_action('wp_ajax_parrotposter_api_delete_account', [$this, 'api_delete_account']);
 		add_action('wp_ajax_parrotposter_api_get_me', [$this, 'api_get_me']);
+		add_action('wp_ajax_parrotposter_api_create_transaction', [$this, 'api_create_transaction']);
 	}
 
 	public function init()
@@ -379,6 +380,25 @@ class AdminAjaxPost
 			'connect_btn_disabled' => $connect_disabled,
 			'accounts_badge_txt' => parrotposter__('Added %s of %s.', $accounts_cur_cnt, $accounts_cnt),
 		]);
+		exit;
+	}
+
+	public function api_create_transaction()
+	{
+		FormHelpers::must_be_right_input_data();
+		$tariff_id = sanitize_text_field($_POST['parrotposter']['tariff_id']);
+		$period = sanitize_text_field($_POST['parrotposter']['period']);
+		$success_url = add_query_arg([
+			'page' => 'parrotposter_tariffs',
+			'view' => 'success',
+		], admin_url('admin.php'));
+		$fail_url = add_query_arg([
+			'page' => 'parrotposter_tariffs',
+			'view' => 'fail',
+		], admin_url('admin.php'));
+
+		$res = Api::create_transaction($tariff_id, $period, $success_url, $fail_url);
+		echo json_encode($res);
 		exit;
 	}
 }

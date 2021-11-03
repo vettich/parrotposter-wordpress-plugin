@@ -80,4 +80,17 @@ $connect_btn_args = ['connect_disabled' => $connect_disabled];
 		<?php endforeach ?>
 	</div>
 
+	<div id="parrotposter-confirm" class="parrotposter-modal">
+		<div class="parrotposter-modal__container">
+			<div class="parrotposter-modal__close"></div>
+			<div class="parrotposter-modal__title">
+				<?php parrotposter_e('Are you sure you want to delete "#account_name#"') ?>
+			</div>
+			<div class="parrotposter-modal__footer">
+				<button class="button button-primary"><?php parrotposter_e('Delete') ?></button>
+				<button class="button parrotposter-js-close"><?php parrotposter_e('Cancel') ?></button>
+			</div>
+		</div>
+	</div>
+
 <?php endif ?>
