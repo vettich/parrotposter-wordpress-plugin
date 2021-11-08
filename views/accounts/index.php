@@ -49,11 +49,17 @@ $connect_btn_args = ['connect_disabled' => $connect_disabled];
 <?php if (empty($accounts)): ?>
 
 	<div class="parrotposter-empty-block">
-		<div class="parrotposter-empty-block__label">
+		<div class="parrotposter-empty-block__title">
 			<?php parrotposter_e('You haven\'t connected your social networks accounts yet') ?>
 		</div>
 
-		<?php ParrotPoster::include_view('accounts/connect', $connect_btn_args) ?>
+		<div class="parrotposter-empty-block__note">
+			<?php parrotposter_e('To connect, you need to be the administrator of the group/page/channel and provide all accesses that ParrotPoster asks for, so that everything works correctly') ?>
+		</div>
+
+		<div class="parrotposter-empty-block__connect">
+			<?php ParrotPoster::include_view('accounts/connect', $connect_btn_args) ?>
+		</div>
 	</div>
 
 <?php else: ?>

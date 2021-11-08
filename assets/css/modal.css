@@ -5,29 +5,37 @@
 	right: 0;
 	top: 0;
 	bottom: 0;
-	z-index: 9999999;
+	overflow: hidden auto;
+	justify-content: center;
+	align-items: center;
 	background-color: rgba(0, 0, 0, 0.5);
+	z-index: 9999999;
 }
 
-.parrotposter-modal__content {
-	display: flex;
-	flex-direction: column;
+.parrotposter-modal--open {
+	display: grid;
+}
+
+.parrotposter-modal__body-overflow {
+	overflow: hidden;
 }
 
 .parrotposter-modal__container {
 	display: flex;
 	flex-direction: column;
 	gap: 2em;
-	position: absolute;
-	top: 50%;
-	left: 50%;
-	max-height: 80vh;
-	transform: translateX(-50%) translateY(-50%);
+	position: relative;
 	background-color: #fff;
 	padding: 2em;
+	margin: 3em;
 	min-width: 300px;
 	max-width: 100%;
-	/* width: 50vw; */
+	height: max-content;
+}
+
+.parrotposter-modal__content {
+	display: flex;
+	flex-direction: column;
 }
 
 .parrotposter-modal__close {
@@ -46,6 +54,17 @@
 	line-height: 24px;
 	font-weight: 600;
 }
+
+
+.parrotposter-modal__footer {
+	display: flex;
+	gap: 8px;
+}
+
+
+
+
+
 
 .parrotposter-modal-footer {
 	border-top: 1px solid gray;

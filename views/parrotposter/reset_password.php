@@ -34,7 +34,7 @@ $back_url = add_query_arg([
 
 <hr class="wp-header-end">
 
-<div class="parrotposter-block mw300">
+<div class="parrotposter-block parrotposter-block--min">
 	<h2><?php parrotposter_e('Reset password') ?></h2>
 
 	<form action="<?php echo esc_url(admin_url('admin-post.php')) ?>" method="post">
@@ -43,18 +43,20 @@ $back_url = add_query_arg([
 		<input type="hidden" name="back_url" value="<?php echo esc_url($back_url) ?>">
 		<input type="hidden" name="parrotposter[token]" value="<?php echo esc_attr($token) ?>">
 
-		<label class="parrotposter-input">
-			<span><?php parrotposter_e('Password') ?></span>
-			<input type="password" name="parrotposter[password]">
-		</label>
+		<div class="parrotposter-input__group">
+			<label class="parrotposter-input">
+				<span><?php parrotposter_e('Password') ?></span>
+				<input type="password" name="parrotposter[password]">
+			</label>
 
-		<label class="parrotposter-input">
-			<span><?php parrotposter_e('Confirm password') ?></span>
-			<input type="password" name="parrotposter[confirm_password]">
-		</label>
+			<label class="parrotposter-input">
+				<span><?php parrotposter_e('Confirm password') ?></span>
+				<input type="password" name="parrotposter[confirm_password]">
+			</label>
 
-		<div class="parrotposter-input parrotposter-input--footer">
-			<input class="button button-primary" type="submit" name="submit" value="<?php parrotposter_e('Save') ?>">
+			<div class="parrotposter-input parrotposter-input--footer">
+				<input class="button button-primary" type="submit" name="submit" value="<?php parrotposter_e('Save') ?>">
+			</div>
 		</div>
 	</form>
 </div>

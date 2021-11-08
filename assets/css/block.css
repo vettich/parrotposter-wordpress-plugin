@@ -7,7 +7,10 @@
 	justify-content: center;
 	align-items: center;
 	padding-top: 70px;
+	max-width: 800px;
+	margin: 0 auto;
 }
+
 .parrotposter-empty-block:before {
 	content: "";
 	background-image: url(../images/stuff-zero-items.png);
@@ -18,15 +21,27 @@
 	width: 100%;
 	display: block;
 }
-.parrotposter-empty-block__label {
+
+.parrotposter-empty-block__title {
 	font-size: 24px;
 	line-height: 32px;
 	font-weight: 600;
 	color: #101517;
 	margin-top: 30px;
-	margin-bottom: 40px;
+	margin-bottom: 8px;
+	text-align: center;
 }
 
+.parrotposter-empty-block__note {
+	font-size: 16px;
+	margin: 8px auto;
+	line-height: 30px;
+	text-align: center;
+}
+
+.parrotposter-empty-block__connect {
+	margin-top: 30px;
+}
 
 /******************************
  * block
@@ -64,6 +79,7 @@
 	border-radius: 2px;
 	z-index: -1;
 }
+
 .parrotposter-block--fail:before {
 	border: 1px solid #FF52A1;
 }

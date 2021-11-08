@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2021-11-01 08:58+0500\n"
+"POT-Creation-Date: 2021-11-05 16:02+0500\n"
 "PO-Revision-Date: 2021-08-05 07:14+0500\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -17,6 +17,10 @@ msgstr ""
 "X-Poedit-KeywordsList: parrotposter__;parrotposter_e;parrotposter_n:1,2;"
 "parrotposter_x:1,2c\n"
 "X-Poedit-SearchPath-0: .\n"
+
+#: assets/js/copy.js:21
+msgid "Copied!"
+msgstr ""
 
 #: parrotposter.php:120
 msgid "ParrotPoster settings page"
@@ -33,31 +37,31 @@ msgstr ""
 msgid "Authorization"
 msgstr ""
 
-#: src/AdminAjaxPost.php:60 src/AdminAjaxPost.php:85 src/AdminAjaxPost.php:110
+#: src/AdminAjaxPost.php:61 src/AdminAjaxPost.php:86 src/AdminAjaxPost.php:111
 msgid "Email is empty"
 msgstr ""
 
-#: src/AdminAjaxPost.php:64 src/AdminAjaxPost.php:89 src/AdminAjaxPost.php:140
+#: src/AdminAjaxPost.php:65 src/AdminAjaxPost.php:90 src/AdminAjaxPost.php:141
 msgid "Password is empty"
 msgstr ""
 
-#: src/AdminAjaxPost.php:92 src/AdminAjaxPost.php:143
+#: src/AdminAjaxPost.php:93 src/AdminAjaxPost.php:144
 msgid "Passwords do not match"
 msgstr ""
 
-#: src/AdminAjaxPost.php:123
+#: src/AdminAjaxPost.php:124
 msgid "An email with a link to recover your password was sent to your email."
 msgstr ""
 
-#: src/AdminAjaxPost.php:136
+#: src/AdminAjaxPost.php:137
 msgid "Token is empty"
 msgstr ""
 
-#: src/AdminAjaxPost.php:346
+#: src/AdminAjaxPost.php:347
 msgid "Need enter a code from SMS or email"
 msgstr ""
 
-#: src/AdminAjaxPost.php:380 views/accounts/index.php:41
+#: src/AdminAjaxPost.php:381 views/accounts/index.php:41
 #, php-format
 msgid "Added %s of %s."
 msgstr ""
@@ -75,7 +79,7 @@ msgid "Scheduler"
 msgstr ""
 
 #: src/Menu.php:32 views/parrotposter-user-parts.php:93
-#: views/tariffs/index.php:34
+#: views/tariffs/index.php:35
 msgid "Tariffs"
 msgstr ""
 
@@ -125,90 +129,101 @@ msgstr ""
 msgid "1 year"
 msgstr ""
 
-#: views/accounts/connect.php:17 views/accounts/connect.php:18
-#: views/accounts/connect.php:19 views/accounts/connect.php:20
-#: views/accounts/connect.php:21 views/accounts/connect.php:56
-#: views/accounts/connect.php:91
+#: views/accounts/connect.php:15
+msgid ""
+"1. Create your telegram bot <br>\n"
+"1.1. Start chat with <a href=\"https://t.me/BotFather\" class="
+"\"parrotposter-external-link\" target=\"_blank\">@BotFather</a> <br>\n"
+"1.2. Send the command <span class=\"parrotposter-copy\">/newbot</span> and "
+"follow @BotFather's instructions <br>\n"
+"2. Send the command <span class=\"parrotposter-copy\">/token</span> to bot "
+"@BotFather to generate a token <br>\n"
+"3. Copy your bot's token here"
+msgstr ""
+
+#: views/accounts/connect.php:21
+msgid ""
+"1. Copy to here your channel or group link. Example: https://t.me/"
+"your_channel <br>\n"
+"2. Make sure you add the created bot to your channel or group"
+msgstr ""
+
+#: views/accounts/connect.php:24
+msgid ""
+"Please note!\n"
+"<ul>\n"
+"\t<li>For security reasons, Instagram may reset your password. Before "
+"connecting your account, please make sure you have access to the email or "
+"phone number on your Instagram profile</li>\n"
+"\t<li>If your account doesn't connect, try turning off/on two-factor "
+"authentication</li>\n"
+"</ul>"
+msgstr ""
+
+#: views/accounts/connect.php:30
+msgid ""
+"Please note!\n"
+"<ul>\n"
+"\t<li>Only open groups or channels can be connected</li>\n"
+"\t<li>In channels, posts are published on behalf of the channel, and in "
+"groups - on behalf of the created bot</li>\n"
+"</ul>"
+msgstr ""
+
+#: views/accounts/connect.php:38 views/accounts/connect.php:39
+#: views/accounts/connect.php:40 views/accounts/connect.php:41
+#: views/accounts/connect.php:42 views/accounts/connect.php:80
+#: views/accounts/connect.php:108
 msgid "Connect"
 msgstr ""
 
-#: views/accounts/connect.php:27
+#: views/accounts/connect.php:48
 msgid "Connect Instagram"
 msgstr ""
 
-#: views/accounts/connect.php:31
+#: views/accounts/connect.php:52
 msgctxt "Connect Instagram"
 msgid "Username"
 msgstr ""
 
-#: views/accounts/connect.php:33
+#: views/accounts/connect.php:54
 msgid "Your Instagram username: @example or example"
 msgstr ""
 
-#: views/accounts/connect.php:38 views/parrotposter-auth-parts.php:75
+#: views/accounts/connect.php:59 views/parrotposter-auth-parts.php:75
 #: views/parrotposter-auth-parts.php:105 views/parrotposter/index.php:42
 #: views/parrotposter/reset_password.php:47 views/parrotposter/signup.php:47
 msgid "Password"
 msgstr ""
 
-#: views/accounts/connect.php:40
+#: views/accounts/connect.php:61
 msgid "We do not store passwords anywhere"
 msgstr ""
 
-#: views/accounts/connect.php:45
-msgid "Proxy"
+#: views/accounts/connect.php:66
+msgid "Proxy (optional)"
 msgstr ""
 
-#: views/accounts/connect.php:47
+#: views/accounts/connect.php:68
 msgid ""
-"You can enter a proxy for Instagram connection. Proxy format: user:"
-"password@domain_or_ip"
-msgstr ""
-
-#: views/accounts/connect.php:52
-msgid "Code"
-msgstr ""
-
-#: views/accounts/connect.php:63
-msgid "Connect Telegram"
-msgstr ""
-
-#: views/accounts/connect.php:67
-msgid "Telegram bot token"
-msgstr ""
-
-#: views/accounts/connect.php:69
-msgid "1. Create your telegram bot"
-msgstr ""
-
-#: views/accounts/connect.php:71
-msgid "1.1. Start chat with @BotFather"
+"You can enter a proxy for Instagram connection. Proxy format: https://user:"
+"password@domain_or_ip:port"
 msgstr ""
 
 #: views/accounts/connect.php:73
-msgid "1.2. Send the command /newbot and follow @BotFather's instructions"
+msgid "Code"
 msgstr ""
 
-#: views/accounts/connect.php:75
-msgid "2. Send the command /token to bot @BotFather"
+#: views/accounts/connect.php:87
+msgid "Connect Telegram"
 msgstr ""
 
-#: views/accounts/connect.php:77
-msgid "3. Copy your bot's token here"
+#: views/accounts/connect.php:91
+msgid "Telegram bot token"
 msgstr ""
 
-#: views/accounts/connect.php:82
+#: views/accounts/connect.php:98
 msgid "Channel or group link"
-msgstr ""
-
-#: views/accounts/connect.php:84
-msgid ""
-"1. Copy to here your channel or group link. Example: https://t.me/"
-"your_channel"
-msgstr ""
-
-#: views/accounts/connect.php:86
-msgid "2. Make sure you add the created bot to your channel or group"
 msgstr ""
 
 #: views/accounts/index.php:37
@@ -223,15 +238,22 @@ msgstr ""
 msgid "You haven't connected your social networks accounts yet"
 msgstr ""
 
-#: views/accounts/index.php:87
+#: views/accounts/index.php:57
+msgid ""
+"To connect, you need to be the administrator of the group/page/channel and "
+"provide all accesses that ParrotPoster asks for, so that everything works "
+"correctly"
+msgstr ""
+
+#: views/accounts/index.php:93
 msgid "Are you sure you want to delete \"#account_name#\""
 msgstr ""
 
-#: views/accounts/index.php:90
+#: views/accounts/index.php:96
 msgid "Delete"
 msgstr ""
 
-#: views/accounts/index.php:91
+#: views/accounts/index.php:97
 msgid "Cancel"
 msgstr ""
 
@@ -363,7 +385,7 @@ msgstr ""
 msgid "Payment in ParrotPoster"
 msgstr ""
 
-#: views/parrotposter-tariff-payed.php:6
+#: views/parrotposter-tariff-payed.php:6 views/tariffs/success.php:18
 msgid "You paid successfully. Thank you!"
 msgstr ""
 
@@ -431,7 +453,7 @@ msgstr ""
 msgid "Tariff"
 msgstr ""
 
-#: views/profile/index.php:53 views/tariffs/index.php:45
+#: views/profile/index.php:53 views/tariffs/index.php:46
 #, php-format
 msgid "%s of %s"
 msgstr ""
@@ -440,50 +462,60 @@ msgstr ""
 msgid "Expiry at"
 msgstr ""
 
-#: views/tariffs/index.php:40
+#: views/tariffs/fail.php:18
+msgid ""
+"There was an error making the payment, try again! Or report it to "
+"support@parrotposter.com"
+msgstr ""
+
+#: views/tariffs/fail.php:22 views/tariffs/success.php:22
+msgid "Back to tariffs"
+msgstr ""
+
+#: views/tariffs/index.php:41
 msgid "Your tariff"
 msgstr ""
 
-#: views/tariffs/index.php:44
+#: views/tariffs/index.php:45
 msgid "Added accounts"
 msgstr ""
 
-#: views/tariffs/index.php:48
+#: views/tariffs/index.php:49
 msgid "Tariff expired at"
 msgstr ""
 
-#: views/tariffs/index.php:81
+#: views/tariffs/index.php:82
 msgid "Current"
 msgstr ""
 
-#: views/tariffs/index.php:86
+#: views/tariffs/index.php:87
 msgid "per month"
 msgstr ""
 
-#: views/tariffs/index.php:93
+#: views/tariffs/index.php:94
 msgid "Unlimited posts"
 msgstr ""
 
-#: views/tariffs/index.php:96
+#: views/tariffs/index.php:97
 #, php-format
 msgid "%s accounts of social networks"
 msgstr ""
 
-#: views/tariffs/index.php:102 views/tariffs/index.php:110
+#: views/tariffs/index.php:103 views/tariffs/index.php:111
 msgid "Select and pay"
 msgstr ""
 
-#: views/tariffs/index.php:106
+#: views/tariffs/index.php:107
 msgid "Prolong"
 msgstr ""
 
-#: views/tariffs/index.php:121
+#: views/tariffs/index.php:122
 msgid ""
 "The price in dollars is calculated on the basis of the Bank of Russia "
 "exchange rate"
 msgstr ""
 
-#: views/tariffs/index.php:126
+#: views/tariffs/index.php:127
 msgid ""
 "If you select a new tariff, the remaining days at the current tariff will "
 "be recalculated and transferred to the new tariff"

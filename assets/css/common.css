@@ -1,0 +1,14 @@
+.parrotposter-external-link {
+	position: relative;
+	display: inline-block;
+	padding-right: 16px;
+	background-image: url(../images/external-link.svg);
+	background-size: auto 12px;
+	background-repeat: no-repeat;
+	background-position: right;
+}
+
+.parrotposter-input__help .parrotposter-external-link,
+.parrotposter-external-link--white {
+	background-image: url(../images/external-link-white.svg);
+}

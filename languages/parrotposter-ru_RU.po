@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-11-01 08:58+0500\n"
-"PO-Revision-Date: 2021-11-01 09:00+0500\n"
+"POT-Creation-Date: 2021-11-05 16:02+0500\n"
+"PO-Revision-Date: 2021-11-05 16:11+0500\n"
 "Last-Translator: Vettich <vetti.ch@mail.ru>\n"
 "Language-Team: \n"
 "Language: ru_RU\n"
@@ -17,6 +17,10 @@ msgstr ""
 "X-Poedit-SourceCharset: UTF-8\n"
 "X-Poedit-KeywordsList: __;_e;parrotposter__;parrotposter_e\n"
 "X-Poedit-SearchPath-0: .\n"
+
+#: assets/js/copy.js:21
+msgid "Copied!"
+msgstr "Скопировано!"
 
 #: parrotposter.php:120
 msgid "ParrotPoster settings page"
@@ -33,33 +37,33 @@ msgstr ""
 msgid "Authorization"
 msgstr "Авторизация"
 
-#: src/AdminAjaxPost.php:60 src/AdminAjaxPost.php:85 src/AdminAjaxPost.php:110
+#: src/AdminAjaxPost.php:61 src/AdminAjaxPost.php:86 src/AdminAjaxPost.php:111
 msgid "Email is empty"
 msgstr "Email пустой"
 
-#: src/AdminAjaxPost.php:64 src/AdminAjaxPost.php:89 src/AdminAjaxPost.php:140
+#: src/AdminAjaxPost.php:65 src/AdminAjaxPost.php:90 src/AdminAjaxPost.php:141
 msgid "Password is empty"
 msgstr "Пароль пуст"
 
-#: src/AdminAjaxPost.php:92 src/AdminAjaxPost.php:143
+#: src/AdminAjaxPost.php:93 src/AdminAjaxPost.php:144
 msgid "Passwords do not match"
 msgstr "Пароли не совпадают"
 
-#: src/AdminAjaxPost.php:123
+#: src/AdminAjaxPost.php:124
 msgid "An email with a link to recover your password was sent to your email."
 msgstr ""
 "На вашу электронную почту было отправлено письмо со ссылкой для "
 "восстановления пароля."
 
-#: src/AdminAjaxPost.php:136
+#: src/AdminAjaxPost.php:137
 msgid "Token is empty"
 msgstr "Токен пустой"
 
-#: src/AdminAjaxPost.php:346
+#: src/AdminAjaxPost.php:347
 msgid "Need enter a code from SMS or email"
 msgstr "Нужно ввести код из СМС или почты"
 
-#: src/AdminAjaxPost.php:380 views/accounts/index.php:41
+#: src/AdminAjaxPost.php:381 views/accounts/index.php:41
 #, php-format
 msgid "Added %s of %s."
 msgstr "Добавлено %s из %s."
@@ -77,7 +81,7 @@ msgid "Scheduler"
 msgstr "Планировщик"
 
 #: src/Menu.php:32 views/parrotposter-user-parts.php:93
-#: views/tariffs/index.php:34
+#: views/tariffs/index.php:35
 msgid "Tariffs"
 msgstr "Тарифы"
 
@@ -130,93 +134,131 @@ msgstr "6 месяцев"
 msgid "1 year"
 msgstr "1 год"
 
-#: views/accounts/connect.php:17 views/accounts/connect.php:18
-#: views/accounts/connect.php:19 views/accounts/connect.php:20
-#: views/accounts/connect.php:21 views/accounts/connect.php:56
-#: views/accounts/connect.php:91
+#: views/accounts/connect.php:15
+msgid ""
+"1. Create your telegram bot <br>\n"
+"1.1. Start chat with <a href=\"https://t.me/BotFather\" class=\"parrotposter-"
+"external-link\" target=\"_blank\">@BotFather</a> <br>\n"
+"1.2. Send the command <span class=\"parrotposter-copy\">/newbot</span> and "
+"follow @BotFather's instructions <br>\n"
+"2. Send the command <span class=\"parrotposter-copy\">/token</span> to bot "
+"@BotFather to generate a token <br>\n"
+"3. Copy your bot's token here"
+msgstr ""
+"1. Создайте вашего Telegram бота <br>\n"
+"1.1. Начните чат с <a href=\"https://t.me/BotFather\" class=\"parrotposter-"
+"external-link\" target=\"_blank\">@BotFather</a> <br>\n"
+"1.2. Отправьте ему команду <span class=\"parrotposter-copy parrotposter-"
+"copy--white\">/newbot</span> и следуйте инструкции @BotFather <br>\n"
+"2. Отправьте команду <span class=\"parrotposter-copy parrotposter-copy--white"
+"\">/token</span> боту @BotFather чтобы сгенерировать токен<br>\n"
+"3. Скопируйте токен вашего бота сюда"
+
+#: views/accounts/connect.php:21
+msgid ""
+"1. Copy to here your channel or group link. Example: https://t.me/"
+"your_channel <br>\n"
+"2. Make sure you add the created bot to your channel or group"
+msgstr ""
+"1. Скопируйте сюда ссылку на ваш канал или группу. Например, https://t.me/"
+"your_channel <br>\n"
+"2. Убедитесь что вы добавили бота в свой канал или группу"
+
+#: views/accounts/connect.php:24
+msgid ""
+"Please note!\n"
+"<ul>\n"
+"\t<li>For security reasons, Instagram may reset your password. Before "
+"connecting your account, please make sure you have access to the email or "
+"phone number on your Instagram profile</li>\n"
+"\t<li>If your account doesn't connect, try turning off/on two-factor "
+"authentication</li>\n"
+"</ul>"
+msgstr ""
+"Обратите внимание!\n"
+"<ul>\n"
+"\t<li>По соображениям безопасности Instagram может сбросить ваш пароль. "
+"Перед подключением вашей учетной записи, пожалуйста, убедитесь, что у вас "
+"есть доступ к электронной почте или номеру телефона, указанному в вашем "
+"профиле Instagram\n"
+"\t<li>Если аккаунт не подключается, попробуйте выключить/включить "
+"двухфакторную авторизацию\n"
+"</ul>"
+
+#: views/accounts/connect.php:30
+msgid ""
+"Please note!\n"
+"<ul>\n"
+"\t<li>Only open groups or channels can be connected</li>\n"
+"\t<li>In channels, posts are published on behalf of the channel, and in "
+"groups - on behalf of the created bot</li>\n"
+"</ul>"
+msgstr ""
+"Обратите внимание!\n"
+"\n"
+"<ul>\n"
+"\t<li>Подключить можно только открытые группы или каналы<li>\n"
+"\t<li>В каналах посты публикуются от имени канала, а в группах - от имени "
+"созданного бота.</li>\n"
+"</ul>"
+
+#: views/accounts/connect.php:38 views/accounts/connect.php:39
+#: views/accounts/connect.php:40 views/accounts/connect.php:41
+#: views/accounts/connect.php:42 views/accounts/connect.php:80
+#: views/accounts/connect.php:108
 msgid "Connect"
 msgstr "Подключить"
 
-#: views/accounts/connect.php:27
+#: views/accounts/connect.php:48
 msgid "Connect Instagram"
 msgstr "Подключить Instagram"
 
-#: views/accounts/connect.php:31
+#: views/accounts/connect.php:52
 msgctxt "Connect Instagram"
 msgid "Username"
 msgstr "Имя пользователя"
 
-#: views/accounts/connect.php:33
+#: views/accounts/connect.php:54
 msgid "Your Instagram username: @example or example"
 msgstr "Ваше имя пользователя в Instagram: @example или example"
 
-#: views/accounts/connect.php:38 views/parrotposter-auth-parts.php:75
+#: views/accounts/connect.php:59 views/parrotposter-auth-parts.php:75
 #: views/parrotposter-auth-parts.php:105 views/parrotposter/index.php:42
 #: views/parrotposter/reset_password.php:47 views/parrotposter/signup.php:47
 msgid "Password"
 msgstr "Пароль"
 
-#: views/accounts/connect.php:40
+#: views/accounts/connect.php:61
 msgid "We do not store passwords anywhere"
 msgstr "Мы нигде не сохраняем пароли"
 
-#: views/accounts/connect.php:45
-msgid "Proxy"
-msgstr "Прокси"
+#: views/accounts/connect.php:66
+msgid "Proxy (optional)"
+msgstr "Прокси (опционально)"
 
-#: views/accounts/connect.php:47
+#: views/accounts/connect.php:68
 msgid ""
-"You can enter a proxy for Instagram connection. Proxy format: user:"
-"password@domain_or_ip"
+"You can enter a proxy for Instagram connection. Proxy format: https://user:"
+"password@domain_or_ip:port"
 msgstr ""
-"Вы можете ввести прокси для подключения к Instagram. Формат прокси: user:"
-"password@domain_or_ip"
+"Вы можете ввести прокси для подключения к Instagram. Формат прокси: https://;"
+"inuser:password@domain_or_ip:port"
 
-#: views/accounts/connect.php:52
+#: views/accounts/connect.php:73
 msgid "Code"
 msgstr "Код"
 
-#: views/accounts/connect.php:63
+#: views/accounts/connect.php:87
 msgid "Connect Telegram"
 msgstr "Подключить Telegram"
 
-#: views/accounts/connect.php:67
+#: views/accounts/connect.php:91
 msgid "Telegram bot token"
 msgstr "Токен бота Telegram"
 
-#: views/accounts/connect.php:69
-msgid "1. Create your telegram bot"
-msgstr "1. Создайте вашего телеграм бота"
-
-#: views/accounts/connect.php:71
-msgid "1.1. Start chat with @BotFather"
-msgstr ""
-
-#: views/accounts/connect.php:73
-msgid "1.2. Send the command /newbot and follow @BotFather's instructions"
-msgstr ""
-
-#: views/accounts/connect.php:75
-msgid "2. Send the command /token to bot @BotFather"
-msgstr ""
-
-#: views/accounts/connect.php:77
-msgid "3. Copy your bot's token here"
-msgstr ""
-
-#: views/accounts/connect.php:82
+#: views/accounts/connect.php:98
 msgid "Channel or group link"
 msgstr "Ссылка на канал или группу"
-
-#: views/accounts/connect.php:84
-msgid ""
-"1. Copy to here your channel or group link. Example: https://t.me/"
-"your_channel"
-msgstr ""
-
-#: views/accounts/connect.php:86
-msgid "2. Make sure you add the created bot to your channel or group"
-msgstr ""
 
 #: views/accounts/index.php:37
 msgid "Social networks accounts"
@@ -230,15 +272,25 @@ msgstr "Сменить тариф"
 msgid "You haven't connected your social networks accounts yet"
 msgstr "У вас еще нет подключенных аккаунтов социальных сетей"
 
-#: views/accounts/index.php:87
+#: views/accounts/index.php:57
+msgid ""
+"To connect, you need to be the administrator of the group/page/channel and "
+"provide all accesses that ParrotPoster asks for, so that everything works "
+"correctly"
+msgstr ""
+"Для подключения нужно быть администратором группы/страницы/канала и "
+"предоставить все доступы, которые запрашивает ParrotPoster, чтобы всё "
+"работало корректно"
+
+#: views/accounts/index.php:93
 msgid "Are you sure you want to delete \"#account_name#\""
 msgstr "Вы действительно хотите удалить \"#account_name#\""
 
-#: views/accounts/index.php:90
+#: views/accounts/index.php:96
 msgid "Delete"
 msgstr "Удалить"
 
-#: views/accounts/index.php:91
+#: views/accounts/index.php:97
 msgid "Cancel"
 msgstr "Отмена"
 
@@ -372,7 +424,7 @@ msgstr "Отправить"
 msgid "Payment in ParrotPoster"
 msgstr "Оплата в ParrotPoster"
 
-#: views/parrotposter-tariff-payed.php:6
+#: views/parrotposter-tariff-payed.php:6 views/tariffs/success.php:18
 msgid "You paid successfully. Thank you!"
 msgstr "Вы успешно оплатили. Спасибо!"
 
@@ -442,7 +494,7 @@ msgstr "Чтобы просмотреть свои посты, перейдит�
 msgid "Tariff"
 msgstr "Тариф"
 
-#: views/profile/index.php:53 views/tariffs/index.php:45
+#: views/profile/index.php:53 views/tariffs/index.php:46
 #, php-format
 msgid "%s of %s"
 msgstr "%s из %s"
@@ -451,56 +503,123 @@ msgstr "%s из %s"
 msgid "Expiry at"
 msgstr "Срок действия"
 
-#: views/tariffs/index.php:40
+#: views/tariffs/fail.php:18
+msgid ""
+"There was an error making the payment, try again! Or report it to "
+"support@parrotposter.com"
+msgstr ""
+"Произошла ошибка при проведении платежа, попробуйте еще раз! Или сообщите об "
+"этом на support@parrotposter.com"
+
+#: views/tariffs/fail.php:22 views/tariffs/success.php:22
+msgid "Back to tariffs"
+msgstr "Назад к тарифам"
+
+#: views/tariffs/index.php:41
 msgid "Your tariff"
 msgstr "Ваш тариф"
 
-#: views/tariffs/index.php:44
+#: views/tariffs/index.php:45
 msgid "Added accounts"
 msgstr "Добавлено аккаунтов"
 
-#: views/tariffs/index.php:48
+#: views/tariffs/index.php:49
 msgid "Tariff expired at"
 msgstr "Срок тарифа"
 
-#: views/tariffs/index.php:81
+#: views/tariffs/index.php:82
 msgid "Current"
 msgstr "Текущий"
 
-#: views/tariffs/index.php:86
+#: views/tariffs/index.php:87
 msgid "per month"
 msgstr "в месяц"
 
-#: views/tariffs/index.php:93
+#: views/tariffs/index.php:94
 msgid "Unlimited posts"
 msgstr "Неограниченное количество постов"
 
-#: views/tariffs/index.php:96
+#: views/tariffs/index.php:97
 #, php-format
 msgid "%s accounts of social networks"
 msgstr "%s аккаунтов соц. сетей"
 
-#: views/tariffs/index.php:102 views/tariffs/index.php:110
+#: views/tariffs/index.php:103 views/tariffs/index.php:111
 msgid "Select and pay"
 msgstr "Выбрать и оплатить"
 
-#: views/tariffs/index.php:106
+#: views/tariffs/index.php:107
 msgid "Prolong"
 msgstr "Продлить"
 
-#: views/tariffs/index.php:121
+#: views/tariffs/index.php:122
 msgid ""
 "The price in dollars is calculated on the basis of the Bank of Russia "
 "exchange rate"
 msgstr "Цена в долларах подсчитана на основе курса Банка России"
 
-#: views/tariffs/index.php:126
+#: views/tariffs/index.php:127
 msgid ""
 "If you select a new tariff, the remaining days at the current tariff will be "
 "recalculated and transferred to the new tariff"
 msgstr ""
 "При выборе нового тарифа остатки дней по текущему тарифу пересчитаются и "
 "перейдут на новый тариф"
+
+#~ msgid ""
+#~ "1. Create your telegram bot <br>\n"
+#~ "1.1. Start chat with <a href=\"https://t.me/BotFather\" class="
+#~ "\"parrotposter-external-link parrotposter-external-link--white\" target="
+#~ "\"_blank\">@BotFather</a> <br>\n"
+#~ "1.2. Send the command <span class=\"parrotposter-copy parrotposter-copy--"
+#~ "white\">/newbot</span> and follow @BotFather's instructions <br>\n"
+#~ "2. Send the command <span class=\"parrotposter-copy parrotposter-copy--"
+#~ "white\">/token</span> to bot @BotFather to generate a token <br>\n"
+#~ "3. Copy your bot's token here"
+#~ msgstr ""
+#~ "1. Создайте вашего Telegram бота <br>\n"
+#~ "1.1. Начните чат с <a href=\"https://t.me/BotFather\" class="
+#~ "\"parrotposter-external-link parrotposter-external-link--white\" target="
+#~ "\"_blank\">@BotFather</a> <br>\n"
+#~ "1.2. Отправьте ему команду <span class=\"parrotposter-copy parrotposter-"
+#~ "copy--white\">/newbot</span> и следуйте инструкции @BotFather <br>\n"
+#~ "2. Отправьте команду <span class=\"parrotposter-copy parrotposter-copy--"
+#~ "white\">/token</span> боту @BotFather чтобы сгенерировать токен<br>\n"
+#~ "3. Скопируйте токен вашего бота сюда"
+
+#~ msgid ""
+#~ "1. Create your telegram bot <br>\n"
+#~ "1.1. Start chat with <a href=\"https://t.me/BotFather\" class="
+#~ "\"parrotposter-external-link parrotposter-external-link--white\" target="
+#~ "\"_blank\">@BotFather</a> <br>\n"
+#~ "1.2. Send the command <span class=\"parrotposter-copy parrotposter-copy--"
+#~ "white\">/newbot</span> and follow @BotFather's instructions <br>\n"
+#~ "2. Send the command <span class=\"parrotposter-copy parrotposter-copy--"
+#~ "white\">/token</span> to bot @BotFather <br>\n"
+#~ "3. Copy your bot's token here"
+#~ msgstr ""
+#~ "1. Создайте вашего Telegram бота <br>\n"
+#~ "1.1. Начните чат с <a href=\"https://t.me/BotFather\" class="
+#~ "\"parrotposter-external-link parrotposter-external-link--white\" target="
+#~ "\"_blank\">@BotFather</a> <br>\n"
+#~ "1.2. Отправьте ему команду <span class=\"parrotposter-copy parrotposter-"
+#~ "copy--white\">/newbot</span> и следуйте инструкции @BotFather <br>\n"
+#~ "2. Отправьте <span class=\"parrotposter-copy parrotposter-copy--white\">/"
+#~ "token</span> to bot @BotFather <br>\n"
+#~ "3. Copy your bot's token here"
+
+#~ msgid ""
+#~ "You can enter a proxy for Instagram connection. Proxy format: user:"
+#~ "password@domain_or_ip"
+#~ msgstr ""
+#~ "Вы можете ввести прокси для подключения к Instagram. Формат прокси: user:"
+#~ "password@domain_or_ip"
+
+#~ msgid "Proxy"
+#~ msgstr "Прокси"
+
+#~ msgid "1. Create your telegram bot"
+#~ msgstr "1. Создайте вашего телеграм бота"
 
 #~ msgid ""
 #~ "The price in dollars is calculated on the basis of the Bank of Russia "

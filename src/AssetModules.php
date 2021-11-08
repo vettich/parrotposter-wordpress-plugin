@@ -7,12 +7,14 @@ use ParrotPoster;
 class AssetModules
 {
 	private static $modules = [
+		'common',
 		'header',
 		'modal',
 		'block',
 		'nav-tab',
 		'notice',
 		'input',
+		'copy',
 		'loading',
 		'accounts',
 		'accounts-connect',
