@@ -1,0 +1,42 @@
+.parrotposter-modal__post-images {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+	align-items: start;
+}
+
+.parrotposter-modal__post-images img {
+	max-width: 72px;
+}
+
+.parrotposter-modal__post-text {
+	font-size: 13px;
+	line-height: 16px;
+	color: #000;
+	white-space: pre-wrap;
+}
+
+.parrotposter-modal__post-info {
+	display: flex;
+	gap: 24px;
+}
+
+.parrotposter-modal__post-info-item {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+}
+
+.parrotposter-modal__post-info-label {
+	font-size: 13px;
+	font-weight: 600;
+	line-height: 16px;
+	color: #101517;
+}
+
+.parrotposter-modal__post-info-value {
+	font-size: 13px;
+	line-height: 16px;
+	color: #101517;
+	word-break: break-word;
+}

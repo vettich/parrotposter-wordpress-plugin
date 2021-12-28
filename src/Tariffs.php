@@ -2,6 +2,8 @@
 
 namespace parrotposter;
 
+defined('ABSPATH') || exit;
+
 class Tariffs
 {
 	public static function get_periods()

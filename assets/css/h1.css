@@ -1,0 +1,17 @@
+.parrotposter-h1 {
+	display: flex;
+	align-items: center;
+}
+
+.parrotposter-h1__back {
+	display: block;
+	width: 24px;
+	height: 24px;
+	background-image: url(../images/arrow-back.svg);
+	margin-right: 8px;
+}
+
+.parrotposter-h1__button-link,
+a.parrotposter-h1__button-link.button {
+	margin-left: 8px;
+}

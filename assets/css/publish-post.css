@@ -1,0 +1,50 @@
+.parrotposter-post-select-images-list {
+	display: flex;
+	justify-content: left;
+	align-items: center;
+	flex-wrap: wrap;
+}
+
+.parrotposter-post-select-images-item {
+	position: relative;
+}
+
+.parrotposter-post-select-images-item input[type=checkbox] {
+	display: none;
+}
+
+.parrotposter-post-select-images-item img {
+	width: 100px;
+	border: 1px solid white;
+	border-radius: 12px;
+	margin: 1em;
+	padding: 1em;
+	background: white;
+}
+
+.parrotposter-post-select-images-item input[type=checkbox]:checked + img {
+	box-shadow: 0 0 12px #1fa2ff;
+}
+
+.parrotposter-post-select-images-item input[type=checkbox]:checked + img + span {
+	background: no-repeat center / calc(100% - 8px) url(../images/check.png) white;
+	display: inline-block;
+	position: absolute;
+	height: 2em;
+	width: 2em;
+	bottom: 1.5em;
+	right: 1.5em;
+	border-radius: 50%;
+}
+
+#pick-publication-time {
+	opacity: 0;
+	height: 0;
+	min-height: 0;
+}
+
+.parrotposter-post-pick-row {
+	display: flex;
+	flex-direction: column;
+}
+

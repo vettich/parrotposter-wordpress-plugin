@@ -1,42 +1,43 @@
 <?php
 
+defined('ABSPATH') || exit;
+
+use parrotposter\PP;
 use parrotposter\Options;
+use parrotposter\AssetModules;
 
 $post_id = isset($_GET['post']) ? (int) $_GET['post'] : 0;
 if (empty($post_id)) {
 	return;
 }
 
-wp_enqueue_script('parrotposter-post-meta-box');
+if (!Options::user_id()) {
+	return;
+}
+
+AssetModules::enqueue(['loading', 'post-meta-box']);
 ?>
 
-<p class="parrotposter-meta-box-post-items parrotposter-loading-spinner">
+<p>
+	<a class="button button-primary" href="admin.php?page=parrotposter_posts&view=publish-post&post_id=<?php echo esc_attr($post_id) ?>">
+		<?php parrotposter_e('Publish to socials network') ?>
+	</a>
 </p>
 
-<a class="button button-primary" href="admin.php?page=parrotposter&subpage=publish_post&post_id=<?php echo esc_attr($post_id) ?>">
-	<?php parrotposter_e('Publish to socials network') ?>
-</a>
+<p>
+	<a class="parrotposter-meta-box__show-posts-btn" href="#">
+		<span class="parrotposter-meta-box__text-show"><?php parrotposter_e('Show posts on social networks') ?></span>
+		<span class="parrotposter-meta-box__text-hide"><?php parrotposter_e('Hide posts on social networks') ?></span>
+	</a>
+</p>
 
-<div id="parrotposter-post-details" class="parrotposter-modal">
-	<div class="parrotposter-modal-container">
-		<div class="parrotposter-modal-header">
-			<div class="parrotposter-modal-title"><?php parrotposter_e('Post details') ?></div>
-			<div class="parrotposter-modal-close-btn parrotposter-js-close"></div>
-		</div>
-		<div class="parrotposter-modal-body">
-			<p class="parrotposter-loading-spinner"></p>
-			<p class="parrotposter-modal-post-text"></p>
-			<p class="parrotposter-modal-post-images"></p>
-			<p class="parrotposter-modal-post-results"></p>
-			<p class="parrotposter-modal-post-actions"></p>
-		</div>
-		<div class="parrotposter-modal-footer">
-			<button class="button button-primary parrotposter-js-close"><?php parrotposter_e('Close') ?></button>
-		</div>
-	</div>
-</div>
+<p class="parrotposter-meta-box-post-items">
+</p>
+
+<?php PP::include_view('posts/detail') ?>
+
 
 <script>
 	const parrotposter_post_id = <?php echo json_encode(esc_attr($post_id)) ?>;
-	const parrotposter_user_id = <?php echo json_encode(esc_attr(Options::user_id())) ?>;
+	const parrotposter_user_id = <?php echo json_encode(Options::user_id()) ?>;
 </script>

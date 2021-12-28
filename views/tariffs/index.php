@@ -3,6 +3,7 @@ if (!defined('ABSPATH')) {
 	die;
 }
 
+use parrotposter\PP;
 use parrotposter\Api;
 use parrotposter\ApiHelpers;
 use parrotposter\AssetModules;
@@ -30,11 +31,9 @@ foreach ($tariffs as $tariffs_k => $tariff) {
 
 ?>
 
-<?php ParrotPoster::include_view('header') ?>
+<?php PP::include_view('header') ?>
 
 <h1><?php parrotposter_e('Tariffs') ?></h1>
-
-<hr class="wp-header-end">
 
 <div class="parrotposter-block parrotposter-block--horizontal">
 	<div class="parrotposter-block__group">

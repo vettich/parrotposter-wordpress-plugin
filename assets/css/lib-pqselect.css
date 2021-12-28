@@ -1,0 +1,11 @@
+.pq-select-menu {
+	width: 100%;
+}
+
+.pq-select-button.pq-select-multiple {
+	background-color: #fff !important;
+	min-height: 30px;
+	padding: 2px 24px 2px 8px;
+	display: flex;
+	align-items: center;
+}

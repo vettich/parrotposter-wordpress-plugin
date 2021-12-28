@@ -1,69 +1,139 @@
-(function($) {
-	let accounts = null;
+jQuery(function($) {
 
-	function __ (msg) {
-		return wp.i18n.__(msg, 'parrotposter')
+	$('.parrotposter-meta-box__show-posts-btn').click(function(e) {
+		e.preventDefault()
+		const elem = $(e.target).closest('a')
+		elem.toggleClass('parrotposter-meta-box__show-posts-btn--open')
+		const isOpen = elem.hasClass('parrotposter-meta-box__show-posts-btn--open')
+		if (!isOpen) {
+			$('.parrotposter-meta-box-post-items').hide()
+		} else {
+			const items = $('.parrotposter-meta-box-post-items')
+			items.show()
+			if (!items.children().length) {
+				loadPostsList()
+			}
+		}
+	})
+
+	function loading(elem, show) {
+		if (show) {
+			$(elem).append($(`<span class="parrotposter-loading parrotposter-loading-row">`))
+		} else {
+			$(elem).find('.parrotposter-loading').remove()
+		}
 	}
 
-	// get exists posts by wp_post_id
-	if (parrotposter_user_id) {
-		$.post(ajaxurl, {
-			'action': 'parrotposter_api_list_posts',
-			'parrotposter': {
-				'filter': {
-					'user_id': parrotposter_user_id,
-					'fields.extra.wp_post_id': parrotposter_post_id,
+	function noPosts() {
+		$('.parrotposter-meta-box-post-items')
+			.append('<p>'+wp.i18n.__('Posts have not yet been created')+'</p>')
+	}
+
+	function loadPostsList() {
+		// get exists posts by wp_post_id
+		if (parrotposter_user_id) {
+
+			loading('.parrotposter-meta-box-post-items', true)
+
+			$.post(ajaxurl, {
+				'action': 'parrotposter_api_list_posts_by_wp_post',
+				'parrotposter': {
+					'wp_post_id': parrotposter_post_id,
 				}
-			}
-		}, function (data) {
-			$('.parrotposter-meta-box-post-items').removeClass('parrotposter-loading-spinner')
+			}, function (data) {
+				loading('.parrotposter-meta-box-post-items', false)
 
-			data = JSON.parse(data);
-			if (!data.response || !data.response.posts) {
-				return
-			}
+				data = JSON.parse(data);
+				console.log(data)
+				if (!data.response || !data.response.posts) {
+					return
+				}
 
-			if (!data.response.posts.length) {
-				$('.parrotposter-meta-box-post-items').append('<p>'+__('Posts have not yet been created')+'</p>')
-				return
-			}
+				if (!data.response.posts.length) {
+					noPosts()
+					return
+				}
 
-			$('.parrotposter-meta-box-post-items').empty();
-			data.response.posts.forEach(function(elem) {
-				const template = `<p class="parrotposter-meta-box-post-item" data-post-id="{post_id}">
-					<b>`+__('Post published at')+`:</b> {publish_at}<br>
-					<b>`+__('Status')+`:<b> {status}<br>
-					<a class="parrotposter-meta-box-post-view-detail-link" href="#" data-post-id="{post_id}">
-						`+__('View details')+`
-					</a>
-				</p>`
-				const publish_at = (new Date(elem['publish_at'])).toLocaleString()
-				const html = template
-					.split('{publish_at}').join(publish_at)
-					.split('{status}').join(elem['status'])
-					.split('{post_id}').join(elem['id'])
-				$('.parrotposter-meta-box-post-items').append(html)
+				$('.parrotposter-meta-box-post-items').empty();
+				const html_list = []
+				data.response.posts.forEach(function(post_item) {
+
+					// const template = `
+					// <hr/>
+					// <p class="parrotposter-meta-box-post-item" data-post-id="{post_id}">
+					// 	<div><b>`+wp.i18n.__('Post published at', 'parrotposter')+`:</b></div>
+					// 	<div>{publish_at}</div>
+					// 	<div><b>`+wp.i18n.__('Status', 'parrotposter')+`:</b></div>
+					// 	<div>{status}</div>
+					// 	<a class="parrotposter-meta-box-post-view-detail-link" href="#" data-post-id="{post_id}">
+					// 		<b>`+wp.i18n.__('View details', 'parrotposter')+`</b>
+					// 	</a>
+					// </p>
+					// `
+
+					const template = `
+					<hr data-post-id="{post_id}"/>
+					<div class="parrotposter-meta-box-post-item" data-post-id="{post_id}">
+						<div>
+							<b>`+wp.i18n.__('Post published at', 'parrotposter')+`:</b>
+							{publish_at}
+						</div>
+						<div>
+							<b>`+wp.i18n.__('Status', 'parrotposter')+`:</b>
+							{status}
+						</div>
+						<a class="parrotposter-meta-box-post-view-detail-link" href="#" data-post-id="{post_id}">
+							<b>`+wp.i18n.__('View details', 'parrotposter')+`</b>
+						</a>
+					</div>
+					`
+
+					const publish_at = (new Date(post_item['publish_at'])).toLocaleString()
+					const html = template
+						.split('{publish_at}').join(publish_at)
+						.split('{status}').join(post_item['status'])
+						.split('{post_id}').join(post_item['id'])
+					html_list.push(html)
+				})
+				$('.parrotposter-meta-box-post-items').append(html_list.join(''))
+				$('.parrotposter-meta-box-post-view-detail-link').click(loadPostDetailHandler)
 			})
-			$('.parrotposter-meta-box-post-view-detail-link').click(loadPostDetailHandler)
-		});
-	} else {
-		$('.parrotposter-meta-box-post-items').removeClass('parrotposter-loading-spinner')
-		$('.parrotposter-meta-box-post-items').append('<p>'+__('Posts have not yet been created')+'</p>')
+
+		} else {
+			noPosts()
+		}
 	}
 
 	// load and display post by id
 	function loadPostDetailHandler(event) {
 		event.preventDefault()
-		const elem = $(event.target)
+		const elem = $(event.target).closest('a')
 		const post_id = elem.data('post-id')
 
-		$('#parrotposter-post-details').show()
-		$('#parrotposter-post-details .parrotposter-modal-body').empty()
-		$('#parrotposter-post-details .parrotposter-modal-body').append(`<p class="parrotposter-loading-spinner"></p>`)
+		function deleteFn (id) {
+			$.post(ajaxurl, {
+				'action': 'parrotposter_api_delete_post',
+				'parrotposter': {'post_id': post_id}
+			}, function (data) {
+				data = JSON.parse(data);
+				if (data.error) {
+					return
+				}
+				$('.parrotposter-meta-box-post-items [data-post-id='+post_id+']').remove()
+				parrotposterClosePostModal()
+			})
 
-		loadAccounts(function() {
-			loadPostDetail(post_id)
-		})
+		}
+
+		parrotposterLoadPost(post_id, elem, deleteFn)
+
+		// $('#parrotposter-post-details').show()
+		// $('#parrotposter-post-details .parrotposter-modal-body').empty()
+		// $('#parrotposter-post-details .parrotposter-modal-body').append(`<p class="parrotposter-loading-spinner"></p>`)
+    //
+		// loadAccounts(function() {
+		// 	loadPostDetail(post_id)
+		// })
 	}
 
 	function loadPostDetail(post_id) {
@@ -86,7 +156,7 @@
 			}
 
 			const results = []
-			const resultTemplate = `<p>[{type}] {name}: <a href="{link}" target="_blank">`+__('View post')+`</a></p>`
+			const resultTemplate = `<p>[{type}] {name}: <a href="{link}" target="_blank">`+wp.i18n.__('View post', 'parrotposter')+`</a></p>`
 			const resultErrorTemplate = `<p>[{type}] {name}: {error}</p>`
 			if (!!post.results) {
 				Object.keys(post.results).forEach(function (id) {
@@ -116,7 +186,7 @@
 				<p class="parrotposter-modal-post-images">{images}</p>
 				<p class="parrotposter-modal-post-results">{results}</p>
 				<p class="parrotposter-modal-post-actions">
-					<a class="parrotposter-link-remove" href="#" data-post-id="{post_id}">`+__('Remove post')+`</a>
+					<a class="parrotposter-link-remove" href="#" data-post-id="{post_id}">`+wp.i18n.__('Remove post', 'parrotposter')+`</a>
 				</p>
 			</div>`
 			const body = template
@@ -157,7 +227,7 @@
 
 	function removePostHandler(event) {
 		event.preventDefault()
-		if (!window.confirm(__('Remove post from ParrotPoster and social networks?'))) {
+		if (!window.confirm(wp.i18n.__('Remove post from ParrotPoster and social networks?', 'parrotposter'))) {
 			return
 		}
 
@@ -174,9 +244,8 @@
 				el.append(data.error.msg)
 				return
 			}
-			el.replaceWith(__('Removed success'))
+			el.replaceWith(wp.i18n.__('Removed success', 'parrotposter'))
 			$('.parrotposter-meta-box-post-items .parrotposter-meta-box-post-item[data-post-id='+post_id+']').remove()
 		})
 	}
-})(jQuery);
-
+})

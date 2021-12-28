@@ -66,4 +66,15 @@ jQuery(function($) {
 			}
 		})
 	}
+
+	$('.parrotposter-accounts__item--input input[type=checkbox]').change(check_inputs)
+	function check_inputs() {
+		$('.parrotposter-accounts__item--input input[type=checkbox]:not(:checked)')
+			.closest('.parrotposter-accounts__item--input')
+			.removeClass('parrotposter-accounts__item--selected')
+		$('.parrotposter-accounts__item--input input[type=checkbox]:checked')
+			.closest('.parrotposter-accounts__item--input')
+			.addClass('parrotposter-accounts__item--selected')
+	}
+	check_inputs()
 })

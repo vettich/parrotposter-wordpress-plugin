@@ -2,22 +2,17 @@
 
 namespace parrotposter;
 
-use ParrotPoster;
-use parrotposter\Api;
+defined('ABSPATH') || exit;
 
 class Profile
 {
 	public static function get_info()
 	{
-		$res = Api::me();
-		$user = $res['response'] ?: [];
+		list($user, $error) = Api::me();
 
 		if (!empty($user)) {
-			$res = Api::get_tariff($user['tariff']['id'] ?: $user['tariff']['code']);
-			$tariff = $res['response'] ?: [];
-			if (isset($res['error'])) {
-				$error_msg = $res['error']['msg'];
-			}
+			list($tariff, $error) = Api::get_tariff($user['tariff']['id'] ?: $user['tariff']['code']);
+
 			$lang = Tools::get_current_lang();
 			if (isset($tariff['translates'][$lang])) {
 				$tariff['name'] = $tariff['translates'][$lang]['name'];
@@ -36,7 +31,7 @@ class Profile
 		}
 
 		return [
-			'error' => isset($res['error']) ? $res['error'] : null,
+			'error' => $error,
 			'user' => $user,
 			'tariff' => $tariff,
 			'left' => $left,

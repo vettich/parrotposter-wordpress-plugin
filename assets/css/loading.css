@@ -46,4 +46,10 @@
 	padding: 0 1em;
 }
 
+.parrotposter-loading-row {
+	display: inline-block;
+	width: 100%;
+	height: 2em;
+	margin-top: 2em;
+}
 

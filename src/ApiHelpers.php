@@ -2,11 +2,37 @@
 
 namespace parrotposter;
 
-use ParrotPoster;
+defined('ABSPATH') || exit;
 
 class ApiHelpers
 {
 	const RFC3339_EXTENDED = 'Y-m-d\TH:i:s.uP';
+
+	public static function prepare_api_response($resp = [], $field_in_resp = '', $default_value = null)
+	{
+		$result = [
+			$default_value, // response
+			null, // error
+		];
+
+		if (empty($resp)) {
+			return $result;
+		}
+
+		if (isset($resp['error'])) {
+			$result[1] = $resp['error'];
+		}
+
+		if (isset($resp['response'])) {
+			if (empty($field_in_resp)) {
+				$result[0] = $resp['response'];
+			} else {
+				$result[0] = $resp['response'][$field_in_resp];
+			}
+		}
+
+		return $result;
+	}
 
 	public static function retrieve_response($resp = [], $field = '')
 	{
@@ -23,21 +49,25 @@ class ApiHelpers
 
 	public static function fix_accounts_photos($accounts = [])
 	{
+		if (empty($accounts)) {
+			return [];
+		}
+
 		foreach ($accounts as $key => $account) {
 			if (!isset($account['photo'])) {
-				$accounts[$key]['photo'] = ParrotPoster::asset('images/no-photo.svg');
+				$accounts[$key]['photo'] = PP::asset('images/no-photo.svg');
 				continue;
 			}
 			$res = wp_remote_get($account['photo']);
 
 			$res_code = wp_remote_retrieve_response_code($res);
 			if ($res_code != "200") {
-				$accounts[$key]['photo'] = ParrotPoster::asset('images/no-photo.svg');
+				$accounts[$key]['photo'] = PP::asset('images/no-photo.svg');
 			}
 
 			$corp_header = wp_remote_retrieve_header($res, 'cross-origin-resource-policy');
 			if ($corp_header == 'same-origin') {
-				$accounts[$key]['photo'] = ParrotPoster::asset('images/no-photo.svg');
+				$accounts[$key]['photo'] = PP::asset('images/no-photo.svg');
 			}
 		}
 		return $accounts;
@@ -55,5 +85,55 @@ class ApiHelpers
 			}
 		}
 		return date(self::RFC3339_EXTENDED, $strtime);
+	}
+
+	public static function getTimestamp($apiTime)
+	{
+		$d = new \DateTimeImmutable($apiTime);
+		return $d->getTimestamp();
+	}
+
+	public static function get_social_network_name($account_id)
+	{
+		list($user_id, $type, $network_id) = explode(':', $account_id);
+		switch ($type) {
+		case 'vk':
+			return parrotposter__('VKontakte');
+		case 'fb':
+			return parrotposter__('Facebook');
+		case 'ok':
+			return parrotposter__('Odnoklassniki');
+		case 'tg':
+			return parrotposter__('Telegram');
+		case 'insta':
+			return parrotposter__('Instagram');
+		}
+		return '';
+	}
+
+	public static function list_social_network_names($account_ids, $return_string = true)
+	{
+		$names = [];
+		foreach ($account_ids as $id) {
+			$names[] = self::get_social_network_name($id);
+		}
+		if ($return_string) {
+			return implode(', ', $names);
+		}
+		return $names;
+	}
+
+	public static function get_post_status_text($status)
+	{
+		switch ($status) {
+		case 'success':
+			return parrotposter__('Published');
+		case 'fail':
+			return parrotposter__('Published with error');
+		case 'ready':
+			return parrotposter__('In queue');
+		case 'queue':
+			return parrotposter__('Publishing in progress');
+		}
 	}
 }

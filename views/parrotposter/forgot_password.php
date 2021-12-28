@@ -1,5 +1,6 @@
 <?php
 
+use parrotposter\PP;
 use parrotposter\Api;
 use parrotposter\Tools;
 use parrotposter\FormHelpers;
@@ -13,10 +14,8 @@ AssetModules::enqueue(['block', 'input', 'nav-tab']);
 
 ?>
 
-<?php ParrotPoster::include_view('header') ?>
-<?php ParrotPoster::include_view('notice') ?>
-
-<hr class="wp-header-end">
+<?php PP::include_view('header') ?>
+<?php PP::include_view('notice') ?>
 
 <nav class="parrotposter-nav-tab__wrapper">
 	<a href="?page=parrotposter" class="parrotposter-nav-tab__item"><?php parrotposter_e('Authorization') ?></a>

@@ -2,7 +2,7 @@
 
 namespace parrotposter;
 
-use ParrotPoster;
+defined('ABSPATH') || exit;
 
 class Menu
 {

@@ -1,0 +1,39 @@
+#parrotposter-post-meta-box .inside {
+	padding: 0 12px 6px;
+}
+
+.edit-post-meta-boxes-area #parrotposter-post-meta-box .inside {
+	padding: 12px 12px 6px;
+}
+
+.parrotposter-meta-box-post-items {
+	display: none;
+}
+
+.parrotposter-meta-box-post-item {
+	line-height: 1.5;
+	margin: 1em 0;
+}
+
+.parrotposter-meta-box__show-posts-btn {
+	border-bottom: 1px dashed;
+}
+
+.parrotposter-meta-box__show-posts-btn--open {
+}
+
+.parrotposter-meta-box__text-hide {
+	display: none;
+}
+
+.parrotposter-meta-box__show-posts-btn--open .parrotposter-meta-box__text-hide {
+	display: inline-block;
+}
+
+.parrotposter-meta-box__text-show {
+	display:  inline-block;
+}
+
+.parrotposter-meta-box__show-posts-btn--open .parrotposter-meta-box__text-show {
+	display: none;
+}

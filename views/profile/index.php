@@ -1,5 +1,6 @@
 <?php
 
+use parrotposter\PP;
 use parrotposter\FormHelpers;
 use parrotposter\AssetModules;
 use parrotposter\Profile;
@@ -18,17 +19,13 @@ if (!empty($profile['user'])) {
 
 ?>
 
-<?php ParrotPoster::include_view('header') ?>
-
-<h1><?php parrotposter_e('Profile') ?></h1>
+<?php PP::include_view('header', ['title' => parrotposter__('Profile')]) ?>
 
 <?php if (!empty($profile['error'])): ?>
 	<div class="notice notice-error">
 		<p><?php echo esc_attr(is_array($profile['error']) ? $profile['error']['msg'] : $profile['error']) ?></p>
 	</div>
 <?php endif ?>
-
-<hr class="wp-header-end">
 
 <div class="parrotposter-block parrotposter-block--min">
 	<?php if (!empty($profile['user']['name'])): ?>

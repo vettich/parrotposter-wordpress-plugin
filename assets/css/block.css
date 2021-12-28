@@ -22,6 +22,10 @@
 	display: block;
 }
 
+.parrotposter-empty-block.parrotposter-empty-block--in-development:before {
+	background-image: url(../images/stuff-in-development.png);
+}
+
 .parrotposter-empty-block__title {
 	font-size: 24px;
 	line-height: 32px;
@@ -66,6 +70,16 @@
 	max-width: 100%;
 }
 
+.parrotposter-block--min2 {
+	min-width: 600px;
+	max-width: 100%;
+}
+
+.parrotposter-block--scheduler-edit {
+	width: 600px;
+	max-width: 100%;
+}
+
 .parrotposter-block--success:before,
 .parrotposter-block--fail:before {
 	content: "";
@@ -82,6 +96,19 @@
 
 .parrotposter-block--fail:before {
 	border: 1px solid #FF52A1;
+}
+
+.parrotposter-block__title {
+	font-weight: 600;
+	font-size: 16px;
+	line-height: 24px;
+	margin-top: 16px;
+	margin-bottom: 16px;
+	color: #000;
+}
+
+.parrotposter-block__title:first-child {
+	margin-top: 0px;
 }
 
 .parrotposter-block__group {

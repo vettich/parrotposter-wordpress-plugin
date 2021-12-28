@@ -1,0 +1,138 @@
+.parrotposter-autoposting-form__input-row {
+	display: flex;
+	gap: 16px;
+	align-items: end;
+}
+
+.parrotposter-autoposting-form__input-row textarea {
+	width: 80%;
+	height: 96px;
+	resize: both;
+}
+
+.parrotposter-autoposting-form__post-fields-wrap {
+	position: relative;
+	z-index: 99;
+}
+
+.parrotposter-autoposting-form__post-fields-button {
+	display: block;
+	border: 1px solid #007CBA;
+	border-radius: 2px;
+	padding: 4px 10px;
+	color: #007CBA;
+}
+
+.parrotposter-autoposting-form__post-fields-button:before {
+	content: "...";
+}
+
+.parrotposter-autoposting-form__post-fields {
+	display: none;
+	background-color: #fff;
+	border: 1px solid #8c8f94;
+	border-radius: 2px;
+	overflow: auto;
+}
+
+.parrotposter-autoposting-form__post-fields-wrap:hover .parrotposter-autoposting-form__post-fields {
+	display: block;
+	position: absolute;
+	right: 0;
+	top: 100%;
+	height: max-content;
+	max-height: 300px;
+	width: 220px;
+}
+
+.parrotposter-autoposting-form__post-fields > div {
+	padding: 10px;
+	border-bottom: 1px solid #ccc;
+}
+
+.parrotposter-autoposting-form__post-fields > div:last-child {
+	border-bottom: none;
+}
+
+.parrotposter-autoposting-form__post-fields > div:hover {
+	background-color: #f5f5f5;
+}
+
+.parrotposter-autoposting-form__post-field-key {
+	display: block;
+	font-weight: 600;
+	font-size: 14px;
+	line-height: 20px;
+}
+
+.parrotposter-autoposting-form__post-field-label {
+	display: block;
+	font-size: 13px;
+	line-height: 16px;
+}
+
+.parrotposter-input__items {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.parrotposter-input__add-btn {
+	width: max-content;
+}
+
+.parrotposter-input__remove-btn {
+	display: inline-block;
+	text-decoration: none;
+	font-size: 13px;
+	line-height: 2.15384615;
+	min-height: 30px;
+	margin: 0;
+	padding: 0 10px;
+	cursor: pointer;
+	-webkit-appearance: none;
+	border-radius: 3px;
+	white-space: nowrap;
+	box-sizing: border-box;
+	color: #db4f4f;
+	vertical-align: top;
+	visibility: hidden;
+}
+
+.parrotposter-input__item:hover .parrotposter-input__remove-btn {
+	visibility: visible;
+}
+
+.parrotposter-input__remove-btn:hover {
+	background-color: #ffd0d0;
+}
+
+.parrotposter--condition-key {
+	width: 200px !important;
+}
+
+.parrotposter--condition-op {
+	width: 124px !important;
+}
+
+.parrotposter--condition-value {
+	width: 200px !important;
+}
+
+/* select.parrotposter--condition-value[multiple] { */
+/* 	height: 11em; */
+/* } */
+
+.parrotposter--wp-post-type-changed {
+	position: absolute;
+	left: 278px;
+	top: 2em;
+}
+
+@media screen and (max-width: 500px) {
+	.parrotposter--wp-post-type-changed {
+		position: relative;
+		left: inherit;
+		top: inherit;
+	}
+}

@@ -23,10 +23,55 @@
 }
 
 
+.parrotposter-accounts__no-list {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	width: 358px;
+	max-width: 100%;
+	border: 1px solid #F0F0F1;
+	box-sizing: border-box;
+	border-radius: 2px;
+	padding: 16px;
+}
+
+.parrotposter-accounts__no-list-pic {
+	background-image: url(../images/stuff-zero-items.png);
+	background-size: auto 100%;
+	background-position: center;
+	background-repeat: no-repeat;
+	height: 55px;
+	width: 100%;
+	display: block;
+}
+
+.parrotposter-accounts__no-list-title {
+	font-weight: 600;
+	font-size: 12px;
+	line-height: 16px;
+	color: #101517;
+}
+
+.parrotposter-accounts__no-list-subtitle {
+	font-size: 11px;
+	line-height: 16px;
+	color: #101517;
+}
+
+
 .parrotposter-accounts__list {
 	display: flex;
 	gap: 12px;
 	flex-wrap: wrap;
+}
+
+.parrotposter-accounts__list--inputs {
+	gap: 8px;
+}
+
+.parrotposter-accounts__list--results {
 }
 
 .parrotposter-accounts__item {
@@ -40,6 +85,31 @@
 	position: relative;
 	transition: opacity 0.3s;
 }
+
+.parrotposter-accounts__item--input {
+	border: 1px solid #F0F0F1;
+	border-radius: 2px;
+	padding: 18px;
+	width: 100px;
+	cursor: pointer;
+}
+
+.parrotposter-accounts__item--selected {
+	background-color: rgba(0, 124, 186, 0.12);
+	border-color: #007CBA;
+}
+
+.parrotposter-accounts__item--input input[type=checkbox] {
+	display: none;
+}
+
+.parrotposter-accounts__list--results .parrotposter-accounts__item {
+	flex-direction: row;
+	align-items: start;
+	padding: 0;
+	width: 270px;
+}
+
 .parrotposter-accounts__delete {
 	position: absolute;
 	right: 1em;
@@ -57,17 +127,26 @@
 	opacity: 1;
 }
 
+
+
 .parrotposter-accounts__photo {
 	position: relative;
 	width: 56px;
 	height: 56px;
 }
+
+.parrotposter-accounts__list--results .parrotposter-accounts__photo {
+	width: 32px;
+	height: 32px;
+}
+
 .parrotposter-accounts__photo img {
 	width: 100%;
 	height: 100%;
 	object-fit: cover;
 	border-radius: 50%;
 }
+
 .parrotposter-accounts__name {
 	font-size: 14px;
 	line-height: 20px;
@@ -80,6 +159,19 @@
 	-webkit-line-clamp: 2;
 	-webkit-box-orient: vertical;
 }
+
+.parrotposter-accounts__item--input .parrotposter-accounts__name {
+	font-size: 11px;
+	line-height: 16px;
+}
+
+.parrotposter-accounts__list--results .parrotposter-accounts__name {
+	font-size: 11px;
+	line-height: 16px;
+	color: #101517;
+	text-align: left;
+}
+
 .parrotposter-accounts__link {
 	line-height: 16px;
 	color: #007CBA;
@@ -93,12 +185,21 @@
 .parrotposter-accounts__type {
 	width: 24px;
 	height: 24px;
+	background-color: transparent;
 	background-size: 100%;
 	background-repeat: no-repeat;
 	position: absolute;
 	right: 0;
 	bottom: 0;
 }
+
+.parrotposter-accounts__list--results .parrotposter-accounts__type {
+	width: 16px;
+	height: 16px;
+	right: -2px;
+	bottom: -2px;
+}
+
 .parrotposter-accounts__type.vk {
 	background-image: url(../images/vk.svg);
 }
@@ -113,4 +214,16 @@
 }
 .parrotposter-accounts__type.insta {
 	background-image: url(../images/insta.svg);
+}
+
+.parrotposter-accounts__result a {
+	text-decoration: none;
+	font-size: 11px;
+	line-height: 16px;
+}
+
+.parrotposter-accounts__result span {
+	font-size: 11px;
+	line-height: 16px;
+	color: #787C82;
 }

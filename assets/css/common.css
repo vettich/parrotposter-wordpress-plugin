@@ -12,3 +12,23 @@
 .parrotposter-external-link--white {
 	background-image: url(../images/external-link-white.svg);
 }
+
+.parrotposter-table__wrap {
+	width: calc(100% - 20px);
+}
+
+.parrotposter-button--delete {
+	color: #B52727 !important;
+	border-color: #B52727 !important;
+	background-color: transparent !important;
+}
+
+.parrotposter-button--delete:hover,
+.parrotposter-button--delete:active {
+	color: #A02222 !important;
+	border-color: #A02222 !important;
+}
+
+.parrotposter-button--delete:focus {
+	box-shadow: 0 0 0 1px #A02222 !important;
+}

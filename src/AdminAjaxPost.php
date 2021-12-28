@@ -2,7 +2,7 @@
 
 namespace parrotposter;
 
-use ParrotPoster;
+defined('ABSPATH') || exit;
 
 class AdminAjaxPost
 {
@@ -14,6 +14,14 @@ class AdminAjaxPost
 			self::$instance = new self;
 		}
 		return self::$instance;
+	}
+
+	public static function init($textdomain = true)
+	{
+		self::get_instance();
+		if ($textdomain) {
+			PP::get_instance()->load_textdomain();
+		}
 	}
 
 	public function __construct()
@@ -31,9 +39,16 @@ class AdminAjaxPost
 
 		// posts
 		add_action('admin_post_parrotposter_publish_post', [$this, 'publish_post']);
+		add_action('wp_ajax_parrotposter_get_post_html', [$this, 'get_post_html']);
+
+		// scheduler
+		add_action('admin_post_parrotposter_autoposting_add', [$this, 'autoposting_add']);
+		add_action('admin_post_parrotposter_autoposting_edit', [$this, 'autoposting_edit']);
+		add_action('wp_ajax_parrotposter_autoposting_enable', [$this, 'autoposting_enable']);
 
 		// api access
 		add_action('wp_ajax_parrotposter_api_list_posts', [$this, 'api_list_posts']);
+		add_action('wp_ajax_parrotposter_api_list_posts_by_wp_post', [$this, 'api_list_posts_by_wp_post']);
 		add_action('wp_ajax_parrotposter_api_get_post', [$this, 'api_get_post']);
 		add_action('wp_ajax_parrotposter_api_delete_post', [$this, 'api_delete_post']);
 		add_action('wp_ajax_parrotposter_api_list_accounts', [$this, 'api_list_accounts']);
@@ -44,9 +59,31 @@ class AdminAjaxPost
 		add_action('wp_ajax_parrotposter_api_create_transaction', [$this, 'api_create_transaction']);
 	}
 
-	public function init()
+	private static function api_error($error)
 	{
-		ParrotPoster::get_instance()->load_textdomain();
+		return json_encode(['error' => $error]);
+		exit;
+	}
+
+	private static function api_response($resp, $list = [], $flags = 0)
+	{
+		// like php code:
+		//     list($var1, $var2) = $resp;
+		if (!empty($list)) {
+			$result = [];
+			foreach ($list as $i => $k) {
+				if (isset($resp[$i])) {
+					$result[$k] = $resp[$i];
+				} else {
+					$result[$k] = null;
+				}
+			}
+			echo json_encode($result, $flags);
+			exit;
+		}
+
+		echo json_encode($resp, $flags);
+		exit;
 	}
 
 	public function auth()
@@ -204,14 +241,11 @@ class AdminAjaxPost
 		FormHelpers::must_be_post_nonce();
 
 		$post_id = sanitize_text_field($_POST['parrotposter']['post_id']);
-		$text = sanitize_textarea_field($_POST['parrotposter']['text']);
-		$link = sanitize_url($_POST['parrotposter']['link']);
-		$images_ids = $_POST['parrotposter']['images_ids']; // it is array, sanitizing below
-		$publish_at = sanitize_text_field($_POST['parrotposter']['publish_at']);
-		$publish_at_2 = sanitize_text_field($_POST['parrotposter']['publish_at_2']);
-		$accounts = $_POST['parrotposter']['accounts']; // it is array, sanitizing below
+		$text = sanitize_textarea_field($_POST['parrotposter']['post_text']);
+		$link = esc_url_raw($_POST['parrotposter']['post_link']);
 
 		$images = [];
+		$images_ids = $_POST['parrotposter']['images_ids']; // it is array, sanitizing below
 		foreach ($images_ids as $id) {
 			$id = sanitize_text_field($id);
 			$attached_file = get_attached_file($id);
@@ -219,23 +253,45 @@ class AdminAjaxPost
 				continue;
 			}
 			$res = Api::upload_file($attached_file);
-			ParrotPoster::log($res);
+			PP::log($res);
 			$file_id = ApiHelpers::retrieve_response($res, 'file_id');
-			ParrotPoster::log($file_id);
+			PP::log($file_id);
 			if (empty($file_id)) {
 				continue;
 			}
 			$images[] = $file_id;
 		}
 
-		if (empty($publish_at)) {
-			$publish_at = $publish_at_2;
+		$when_publish = sanitize_text_field($_POST['parrotposter']['when_publish']);
+		switch ($when_publish) {
+		case 'now':
+			$publish_at = ApiHelpers::datetimeFormat('now');
+			break;
+		case 'post_date':
+			$publish_at = ApiHelpers::datetimeFormat(get_the_date('c', $post_id));
+			break;
+		case 'delay':
+			$delay = intval($_POST['parrotposter']['publish_delay']);
+			if ($delay < 1) {
+				$delay = 1;
+			} elseif ($delay > 10) {
+				$delay = 10;
+			}
+			$publish_at = ApiHelpers::datetimeFormat("+{$delay} minutes");
+			break;
+		case 'custom':
+			$specific_time = sanitize_text_field($_POST['parrotposter']['specific_time']);
+			$publish_at = ApiHelpers::datetimeFormat($specific_time);
+			break;
 		}
-		$publish_at = ApiHelpers::datetimeFormat($publish_at);
 
-		foreach ($accounts as $k => $id) {
-			$accounts[$k] = sanitize_text_field($id);
+		$account_ids = $_POST['parrotposter']['account_ids'];
+		foreach ($account_ids as $k => $id) {
+			$account_ids[$k] = sanitize_text_field($id);
 		}
+
+		$extra_vk_signed = intval($_POST['parrotposter']['extra_vk_signed']);
+		$extra_vk_from_group = intval($_POST['parrotposter']['extra_vk_from_group']);
 
 		$post = [
 			'fields' => [
@@ -243,12 +299,15 @@ class AdminAjaxPost
 				'link' => $link,
 				'images' => $images,
 				'extra' => [
-					'wp_post_id' => $post_id,
+					'wp_post_id' => intval($post_id),
+					'wp_domain' => WpPostHelpers::get_site_domain(),
+					'extra_vk_signed' => !!$extra_vk_signed,
+					'extra_vk_from_group' => !!$extra_vk_from_group,
 				]
 			],
 			'publish_at' => $publish_at,
 			'networks' => [
-				'accounts' => $accounts,
+				'accounts' => $account_ids,
 			]
 		];
 
@@ -256,6 +315,98 @@ class AdminAjaxPost
 		if (!empty($res['error'])) {
 			FormHelpers::post_error($res['error']);
 		}
+		FormHelpers::post_success();
+	}
+
+	public function get_post_html()
+	{
+		$post_id = sanitize_text_field($_POST['parrotposter']['post_id']);
+		PP::include_view('posts/detail', ['id' => $post_id]);
+		exit;
+	}
+
+	private function autoposting_data()
+	{
+		return FormHelpers::prepare_data_values([
+			'name:text:limit=255' => '%s',
+			'enable:number' => '%d',
+			'wp_post_type' => '%s',
+			'conditions:raw' => '%s',
+			'post_text:textarea' => '%s',
+			'post_link' => '%s',
+			'post_tags' => '%s',
+			'post_images:text_array:remove_empty' => '%s',
+			'utm_enable:number' => '%d',
+			'utm_source' => '%s',
+			'utm_medium' => '%s',
+			'utm_campaign' => '%s',
+			'utm_term' => '%s',
+			'utm_content' => '%s',
+			'account_ids:raw' => '%s',
+			'when_publish' => '%s',
+			'publish_delay:number:min=1:max=10' => '%d',
+			'exclude_duplicates:number' => '%d',
+			'extra_vk_from_group:number' => '%d',
+			'extra_vk_signed:number' => '%d',
+		], $_POST['parrotposter']);
+	}
+
+	public function autoposting_add()
+	{
+		FormHelpers::must_be_post_nonce();
+
+		if (isset($_POST['parrotposter']['apply'])) {
+			set_transient('parrotposter_autoposting_add_data', $_POST['parrotposter'], MINUTE_IN_SECONDS);
+			FormHelpers::post_success('', $_POST['back_url']);
+		}
+
+		list($data, $format) = $this->autoposting_data();
+		$err = DBAutopostingTable::insert($data, $format);
+		if (!empty($err)) {
+			set_transient('parrotposter_autoposting_add_data', $data, MINUTE_IN_SECONDS);
+			FormHelpers::post_error($err);
+		}
+
+		$n = intval(sanitize_text_field($_POST['parrotposter']['increment']));
+		if ($n > 0) {
+			update_option('parrotposter_autoposting_n', $n, false);
+		}
+
+		FormHelpers::post_success();
+	}
+
+	public function autoposting_edit()
+	{
+		FormHelpers::must_be_post_nonce();
+
+		if (isset($_POST['parrotposter']['apply'])) {
+			set_transient('parrotposter_autoposting_edit_data', $_POST['parrotposter'], MINUTE_IN_SECONDS);
+			FormHelpers::post_success('', $_POST['back_url']);
+		}
+
+		$id = intval(sanitize_text_field($_POST['parrotposter']['id']));
+		list($data, $format) = $this->autoposting_data();
+		$err = DBAutopostingTable::update($id, $data, $format);
+		if (!empty($err)) {
+			set_transient('parrotposter_autoposting_edit_data', $data, MINUTE_IN_SECONDS);
+			FormHelpers::post_error($err);
+		}
+
+		FormHelpers::post_success();
+	}
+
+	public function autoposting_enable()
+	{
+		FormHelpers::must_be_post_nonce();
+
+		$err = DBAutopostingTable::switch_enable(
+			$_POST['parrotposter']['id'],
+			$_POST['parrotposter']['enable']
+		);
+		if (!empty($err)) {
+			FormHelpers::post_error($err);
+		}
+
 		FormHelpers::post_success();
 	}
 
@@ -290,12 +441,31 @@ class AdminAjaxPost
 		exit;
 	}
 
+	public function api_list_posts_by_wp_post()
+	{
+		if (isset($_POST['parrotposter']) && !is_array($_POST['parrotposter'])) {
+			FormHelpers::post_error('wrong input data');
+		}
+
+		$filter = [
+			'user_id' => Options::user_id(),
+			'fields.extra.wp_post_id' => intval($_POST['parrotposter']['wp_post_id']),
+		];
+
+		$res = Api::list_posts($filter);
+		echo json_encode($res);
+		exit;
+	}
+
 	public function api_get_post()
 	{
 		FormHelpers::must_be_right_input_data();
 		$post_id = sanitize_text_field($_POST['parrotposter']['post_id']);
-		$res = Api::get_post($post_id);
-		echo json_encode($res);
+		list($post, $error) = Api::get_post($post_id);
+		echo json_encode([
+			'post' => $post,
+			'error' => $error,
+		]);
 		exit;
 	}
 
@@ -310,15 +480,15 @@ class AdminAjaxPost
 
 	public function api_list_accounts()
 	{
-		$res = Api::list_accounts();
-		echo json_encode($res);
-		exit;
+		list($accounts, $error) = Api::list_accounts();
+		$accounts = ApiHelpers::fix_accounts_photos($accounts);
+		self::api_response([$accounts, $error], ['accounts', 'error']);
 	}
 
 	public function api_get_connect_url()
 	{
 		$type = sanitize_text_field($_POST['parrotposter']['type']);
-		$callback_url = sanitize_url($_POST['parrotposter']['callback_url']);
+		$callback_url = esc_url_raw($_POST['parrotposter']['callback_url']);
 		$res = Api::get_connect_url($type, $callback_url);
 		echo json_encode($res);
 		exit;
@@ -360,11 +530,9 @@ class AdminAjaxPost
 
 	public function api_get_me()
 	{
-		$res = Api::me();
-		$user = $res['response'] ?: [];
-		if (isset($res['error'])) {
-			echo json_encode($res);
-			exit;
+		list($user, $error) = Api::me();
+		if (!empty($error)) {
+			self::api_error($error);
 		}
 
 		$accounts_cur_cnt = $user['tariff_limits']['accounts_current_cnt'];
@@ -375,12 +543,11 @@ class AdminAjaxPost
 			$connect_disabled = true;
 		}
 
-		echo json_encode([
+		self::api_response([
 			'user' => $user,
 			'connect_btn_disabled' => $connect_disabled,
 			'accounts_badge_txt' => parrotposter__('Added %s of %s.', $accounts_cur_cnt, $accounts_cnt),
 		]);
-		exit;
 	}
 
 	public function api_create_transaction()

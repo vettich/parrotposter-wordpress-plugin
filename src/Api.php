@@ -2,7 +2,7 @@
 
 namespace parrotposter;
 
-use ParrotPoster;
+defined('ABSPATH') || exit;
 
 class Api
 {
@@ -11,7 +11,7 @@ class Api
 	const FROM = 'wordpress';
 	const USER_AGENT = 'ParrotPoster WP Plugin';
 
-	private static $api_log_enabled = true;
+	private static $_api_log_enabled = true;
 
 	public static function ping()
 	{
@@ -90,17 +90,17 @@ class Api
 	public static function me()
 	{
 		$res = self::get('me');
-		return $res;
+		return ApiHelpers::prepare_api_response($res, '', []);
 	}
 
 	public static function get_tariff($id)
 	{
 		if (empty($id)) {
-			return [];
+			return [null, 'id is empty'];
 		}
 
 		$res = self::get("tariffs/$id");
-		return $res;
+		return ApiHelpers::prepare_api_response($res);
 	}
 
 	public static function list_tariffs()
@@ -131,7 +131,7 @@ class Api
 	public static function list_accounts()
 	{
 		$res = self::get('accounts');
-		return $res;
+		return ApiHelpers::prepare_api_response($res, 'accounts', []);
 	}
 
 	public static function get_connect_url($account_type, $callback_url)
@@ -160,17 +160,20 @@ class Api
 		return $res;
 	}
 
-	public static function list_posts($filter = [], $sort = [], $paging = [])
+	public static function list_posts($filter = [], $sort = [], $paging = [], $needCounts = false)
 	{
-		$data = [];
-		if (!empty($filter)) {
-			$data['filter'] = $filter;
-		}
+		$filter['from'] = self::FROM;
+		$data = [
+			'filter' => $filter,
+		];
 		if (!empty($sort)) {
 			$data['sort'] = $sort;
 		}
 		if (!empty($paging)) {
 			$data['paging'] = $paging;
+		}
+		if ($needCounts) {
+			$data['need_counts'] = true;
 		}
 		return self::get('posts', $data);
 	}
@@ -178,7 +181,7 @@ class Api
 	public static function get_post($post_id = '')
 	{
 		$res = self::get("posts/$post_id");
-		return $res;
+		return ApiHelpers::prepare_api_response($res, '', []);
 	}
 
 	public static function delete_post($post_id = '')
@@ -219,9 +222,9 @@ class Api
 			],
 			'body' => $payload,
 		];
-		self::$api_log_enabled = false;
+		self::$_api_log_enabled = false;
 		$res = self::call('files', $params);
-		self::$api_log_enabled = true;
+		self::$_api_log_enabled = true;
 		if (!empty($res['error'])) {
 			return $res;
 		}
@@ -253,10 +256,12 @@ class Api
 		}
 		$args = Tools::array_merge_recursive_distinct($defaults, $params);
 
+		$time_start = microtime(true);
 		$ret = json_decode(wp_remote_retrieve_body(wp_remote_request($url, $args)), true);
+		$time_secs = microtime(true) - $time_start;
 
-		if (self::$api_log_enabled) {
-			ParrotPoster::log([$endpoint, $args, $ret, $url]);
+		if (self::$_api_log_enabled) {
+			PP::log([$endpoint, $time_secs, $args, $ret, $url]);
 		}
 
 		return $ret;
@@ -276,6 +281,7 @@ class Api
 	{
 		$params['method'] = 'POST';
 		$params['headers']['Content-Type'] = 'application/json';
+		$data = mb_convert_encoding($data, 'UTF-8', 'UTF-8');
 		$params['body'] = json_encode($data);
 		return self::call($endpoint, $params);
 	}

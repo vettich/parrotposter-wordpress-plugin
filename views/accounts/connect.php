@@ -47,7 +47,7 @@ $tg_note = parrotposter__('Please note!
 		<div class="parrotposter-modal__close"></div>
 		<div class="parrotposter-modal__title"><?php parrotposter_e('Connect Instagram') ?></div>
 		<div class="parrotposter-notice parrotposter-notice__error" style="display: none"><p></p></div>
-		<div class="parrotposter-input__group">
+		<div class="parrotposter-input__group parrotposter-input--full">
 			<label class="parrotposter-input">
 				<span><?php echo parrotposter_x('Username', 'Connect Instagram') ?></span>
 				<div class="parrotposter-input__help">
@@ -55,6 +55,7 @@ $tg_note = parrotposter__('Please note!
 				</div>
 				<input type="text" name="parrotposter[username]">
 			</label>
+
 			<label class="parrotposter-input">
 				<span><?php parrotposter_e('Password') ?></span>
 				<div class="parrotposter-input__help">
@@ -62,6 +63,7 @@ $tg_note = parrotposter__('Please note!
 				</div>
 				<input type="password" name="parrotposter[password]">
 			</label>
+
 			<label class="parrotposter-input">
 				<span><?php parrotposter_e('Proxy (optional)') ?></span>
 				<div class="parrotposter-input__help">
@@ -69,6 +71,7 @@ $tg_note = parrotposter__('Please note!
 				</div>
 				<input type="text" name="parrotposter[proxy]">
 			</label>
+
 			<label class="parrotposter-input" style="display: none">
 				<span><?php parrotposter_e('Code') ?></span>
 				<input type="text" name="parrotposter[code]">
@@ -86,7 +89,7 @@ $tg_note = parrotposter__('Please note!
 		<div class="parrotposter-modal__close"></div>
 		<div class="parrotposter-modal__title"><?php parrotposter_e('Connect Telegram') ?></div>
 		<div class="parrotposter-notice parrotposter-notice__error" style="display: none"><p></p></div>
-		<div class="parrotposter-input__group">
+		<div class="parrotposter-input__group parrotposter-input--full">
 			<label class="parrotposter-input">
 				<span><?php parrotposter_e('Telegram bot token') ?></span>
 				<div class="parrotposter-input__help">

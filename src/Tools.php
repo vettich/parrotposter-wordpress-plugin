@@ -2,6 +2,8 @@
 
 namespace parrotposter;
 
+defined('ABSPATH') || exit;
+
 class Tools
 {
 
@@ -30,7 +32,13 @@ class Tools
 
 	public static function clear_text($text)
 	{
-		return trim(html_entity_decode(strip_tags($text)));
+		$replaces = [
+			'&nbsp;' => ' ',
+		];
+		$text = str_replace(array_keys($replaces), array_values($replaces), $text);
+		$text = trim(html_entity_decode(strip_tags($text)));
+		$text = preg_replace("/(?:\r?\n|\r){2,}/", "\n\n", $text);
+		return $text;
 	}
 
 	public static function get_current_lang()
@@ -53,5 +61,35 @@ class Tools
 			'telegram.com/' => 't.me/',
 		];
 		return str_replace(array_keys($replaces), array_values($replaces), $link);
+	}
+
+	public static function arr_value($arr, $field, $default = '')
+	{
+		if (isset($arr[$field])) {
+			return $arr[$field];
+		}
+		return $default;
+	}
+
+	public static function clear_null_from_array($arr)
+	{
+		$result = [];
+		foreach ($arr as $k => $v) {
+			if ($v === null) {
+				continue;
+			}
+			$result[$k] = $v;
+		}
+		return $result;
+	}
+
+	public static function in_array($needle, $haystack)
+	{
+		foreach ($haystack as $v) {
+			if ($needle == $v) {
+				return true;
+			}
+		}
+		return false;
 	}
 }

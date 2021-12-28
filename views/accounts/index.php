@@ -3,16 +3,16 @@ if (!defined('ABSPATH')) {
 	die;
 }
 
+use parrotposter\PP;
 use parrotposter\Api;
 use parrotposter\Tools;
 use parrotposter\AssetModules;
 
 AssetModules::enqueue(['accounts', 'block', 'loading']);
 
-$res = Api::me();
-$user = $res['response'] ?: [];
-if (isset($res['error'])) {
-	$error_msg = $res['error']['msg'];
+list($user, $error) = Api::me();
+if (!empty($error)) {
+	$error_msg = $error['msg'];
 }
 
 $accounts_cur_cnt = $user['tariff_limits']['accounts_current_cnt'];
@@ -23,15 +23,13 @@ if ($accounts_cur_cnt >= $accounts_cnt) {
 	$connect_disabled = true;
 }
 
-$accounts_res = Api::list_accounts();
-$accounts = parrotposter\ApiHelpers::retrieve_response($accounts_res, 'accounts');
-$accounts = $accounts ?: [];
+list($accounts) = Api::list_accounts();
 $accounts = parrotposter\ApiHelpers::fix_accounts_photos($accounts);
 
 $connect_btn_args = ['connect_disabled' => $connect_disabled];
 ?>
 
-<?php ParrotPoster::include_view('header') ?>
+<?php PP::include_view('header') ?>
 
 <div class="parrotposter-accounts__header">
 	<h1><?php parrotposter_e('Social networks accounts') ?></h1>
@@ -43,8 +41,6 @@ $connect_btn_args = ['connect_disabled' => $connect_disabled];
 		<a href="admin.php?page=parrotposter_tariffs"><?php parrotposter_e('Change tariff') ?></a>
 	</div>
 </div>
-
-<hr class="wp-header-end">
 
 <?php if (empty($accounts)): ?>
 
@@ -58,14 +54,14 @@ $connect_btn_args = ['connect_disabled' => $connect_disabled];
 		</div>
 
 		<div class="parrotposter-empty-block__connect">
-			<?php ParrotPoster::include_view('accounts/connect', $connect_btn_args) ?>
+			<?php PP::include_view('accounts/connect', $connect_btn_args) ?>
 		</div>
 	</div>
 
 <?php else: ?>
 
 	<p>
-		<?php ParrotPoster::include_view('accounts/connect', $connect_btn_args) ?>
+		<?php PP::include_view('accounts/connect', $connect_btn_args) ?>
 	</p>
 
 	<div class="parrotposter-accounts__list">

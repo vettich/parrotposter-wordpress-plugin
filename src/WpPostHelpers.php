@@ -2,12 +2,41 @@
 
 namespace parrotposter;
 
+defined('ABSPATH') || exit;
+
 class WpPostHelpers
 {
 	public static function get_images_from_content($content)
 	{
 		$output = preg_match_all('/<img.+src=[\'"](?<src>[^\'"]+)[\'"].*>/i', $content, $matches);
 		return $matches['src'];
+	}
+
+	public static function get_image_ids_from_content($content)
+	{
+		$urls = self::get_images_from_content($content);
+		$ids = [];
+		foreach ($urls as $url) {
+			$id = self::get_attachment_id($url);
+			if (empty($id)) {
+				continue;
+			}
+			$ids[] = $id;
+		}
+		return $ids;
+	}
+
+	public static function get_post_types($output = 'names')
+	{
+		$post_types = get_post_types(['public' => true], $output);
+		$exclude = ['attachment', 'nav_menu_item', 'revision'];
+		if ($output == 'names') {
+			$post_types = array_diff($post_types, $exclude);
+		}
+		if ($output == 'object') {
+			$post_types = array_diff_key($post_types, array_combine($exclude, $exclude));
+		}
+		return $post_types;
 	}
 
 	/**
@@ -88,7 +117,8 @@ class WpPostHelpers
 			foreach ($ids as $id) {
 
 				// first entry of returned array is the URL
-				if ($url === array_shift(wp_get_attachment_image_src($id, 'full'))) {
+				$arr = wp_get_attachment_image_src($id, 'full');
+				if ($url === array_shift($arr)) {
 					return $id;
 				}
 			}
@@ -115,5 +145,27 @@ class WpPostHelpers
 		}
 
 		return false;
+	}
+
+	public static function list_autoposting_by_post($post)
+	{
+		$result = [];
+		$items = DBAutopostingTable::get_all();
+		foreach ($items as $item) {
+			if ($item['wp_post_type'] == $post->post_type) {
+				$result[$item['id']] = $item;
+			}
+		}
+		return $result;
+	}
+
+	public static function get_site_domain()
+	{
+		$wp_domain = site_url();
+		$wp_domain = str_replace(['http://', 'https://'], '', $wp_domain);
+		if (strpos($wp_domain, '/') !== false) {
+			$wp_domain = strstr($wp_domain, '/', true);
+		}
+		return $wp_domain;
 	}
 }

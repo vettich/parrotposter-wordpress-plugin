@@ -5,9 +5,21 @@
 }
 
 .parrotposter-input {
-	display: flex;
+	display: inline-flex;
 	position: relative;
 	flex-direction: column;
+	gap: 8px;
+	width: max-content;
+	max-width: 100%;
+}
+
+.parrotposter-input--full,
+.parrotposter-input--full .parrotposter-input {
+	width: 100%;
+}
+
+.parrotposter-input--wide {
+	width: 100%;
 }
 
 .parrotposter-input--footer {
@@ -15,13 +27,101 @@
 	padding-bottom: 0;
 }
 
-.parrotposter-input > span {
-	color: #000000;
-	margin-bottom: 8px;
+.parrotposter-input--row {
+	flex-direction: row;
+	padding-top: 16px;
 }
 
-.parrotposter-input input {
+.parrotposter-input--toggle,
+.parrotposter-input--checkbox {
+	display: inline-flex;
+	flex-direction: row;
+	justify-content: left;
+	align-items: center;
+}
+
+.parrotposter-input > span {
+	color: #000000;
+}
+
+.parrotposter-input input,
+.parrotposter-input select {
+	width: 270px;
+	max-width: 100%;
+}
+
+.parrotposter-input--full input,
+.parrotposter-input--full select {
 	width: 100%;
+}
+
+.parrotposter-input--checkbox input {
+	width: 1rem;
+}
+
+.parrotposter-input--footer input {
+	width: auto;
+}
+
+.parrotposter-input--toggle > span {
+	margin: 0;
+}
+
+.parrotposter-input--toggle input[type=checkbox] {
+	display: inline-block;
+	-webkit-appearance: none;
+	-webkit-tap-highlight-color: transparent;
+	position: relative;
+	border: 0;
+	outline: 0;
+	cursor: pointer;
+	width: calc(32px + 4px);
+	height: calc(18px + 4px);
+	box-shadow: none;
+	margin: 0;
+}
+
+.parrotposter-input--toggle input[type=checkbox]:after {
+	content: '';
+	width: 32px;
+	height: 18px;
+	display: inline-block;
+	border-radius: 100px;
+	border: 2px solid #000;
+	clear: both;
+}
+
+.parrotposter-input--toggle input[type=checkbox]:before {
+	content: '';
+	width: 12px;
+	height: 12px;
+	display: block;
+	position: absolute;
+	margin: 0;
+	left: 5px;
+	top: 5px;
+	border-radius: 50%;
+	background: #000;
+}
+
+.parrotposter-input--toggle input[type=checkbox]:checked:before {
+	margin: 0;
+	left: 19px;
+	background-color: #fff;
+}
+
+.parrotposter-input--toggle input[type=checkbox]:checked:after {
+	background-color: #007CBA;
+	border-color: #007CBA;
+}
+
+.parrotposter-input--toggle input[type=checkbox],
+.parrotposter-input--toggle input[type=checkbox]:before,
+.parrotposter-input--toggle input[type=checkbox]:after {
+	transition: ease .3s;
+	-webkit-transition: ease .3s;
+	-moz-transition: ease .3s;
+	-o-transition: ease .3s;
 }
 
 .parrotposter-input__help {
@@ -97,3 +197,35 @@
 	margin-right: 4px;
 }
 
+.parrotposter-input__item {
+	display: flex;
+	gap: 2px;
+	align-items: start;
+}
+
+.parrotposter-input__row {
+	display: flex;
+	gap: 16px;
+	align-items: end;
+}
+
+.parrotposter-input__row textarea {
+	width: 80%;
+	height: 96px;
+	resize: both;
+}
+
+.parrotposter-input__info {
+	color: #757575;
+	/* margin-top: 4px; */
+	font-size: 12px;
+	line-height: 16px;
+}
+
+.parrotposter-input__info-btn {
+	display: inline-block;
+}
+
+.parrotposter-input__info-btn:before {
+	content: "i";
+}

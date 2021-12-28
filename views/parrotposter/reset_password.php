@@ -1,5 +1,6 @@
 <?php
 
+use parrotposter\PP;
 use parrotposter\Api;
 use parrotposter\Tools;
 use parrotposter\FormHelpers;
@@ -29,10 +30,8 @@ $back_url = add_query_arg([
 ], 'admin.php');
 ?>
 
-<?php ParrotPoster::include_view('header') ?>
-<?php ParrotPoster::include_view('notice') ?>
-
-<hr class="wp-header-end">
+<?php PP::include_view('header') ?>
+<?php PP::include_view('notice') ?>
 
 <div class="parrotposter-block parrotposter-block--min">
 	<h2><?php parrotposter_e('Reset password') ?></h2>

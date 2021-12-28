@@ -3,15 +3,14 @@ if (!defined('ABSPATH')) {
 	die;
 }
 
+use parrotposter\PP;
 use parrotposter\AssetModules;
 
 AssetModules::enqueue(['block']);
 
 ?>
 
-<?php ParrotPoster::include_view('header') ?>
-
-<hr class="wp-header-end">
+<?php PP::include_view('header') ?>
 
 <div class="parrotposter-block parrotposter-block--success">
 	<div class="parrotposter-block__value">

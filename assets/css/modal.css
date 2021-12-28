@@ -33,9 +33,14 @@
 	height: max-content;
 }
 
+.parrotposter-modal--post .parrotposter-modal__container {
+	width: 600px;
+}
+
 .parrotposter-modal__content {
 	display: flex;
 	flex-direction: column;
+	gap: 2em;
 }
 
 .parrotposter-modal__close {
