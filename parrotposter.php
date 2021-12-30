@@ -21,12 +21,13 @@ define('PARROTPOSTER_DB_VERSION', '1.0.7');
 define('PARROTPOSTER_PLUGIN_FILE', __FILE__);
 define('PARROTPOSTER_PLUGIN_DIR', plugin_dir_path(__FILE__));
 
-// include helpers
-require_once PARROTPOSTER_PLUGIN_DIR.'helpers/language.php';
-
 // register autoloaders
 require_once PARROTPOSTER_PLUGIN_DIR.'src/autoloader.php';
 //require_once PARROTPOSTER_PLUGIN_DIR.'vendor/autoloader.php';
+
+// include includes
+require_once PARROTPOSTER_PLUGIN_DIR.'includes/language.php';
+require_once PARROTPOSTER_PLUGIN_DIR.'includes/posts_custom_column.php';
 
 use parrotposter\PP;
 

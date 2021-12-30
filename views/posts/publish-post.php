@@ -68,6 +68,9 @@ foreach ($contentImages as $img_url) {
 $post_text = implode("\n\n", Fields::get_field_values(['title', 'excerpt'], $post));
 
 $back_url = "post.php?post=$post_id&action=edit";
+if (isset($_GET['back_url'])) {
+	$back_url = esc_url_raw($_GET['back_url']);
+}
 ?>
 
 <?php PP::include_view('header', [
