@@ -91,8 +91,7 @@ class PP
 
 	public function enqueue_admin_translates()
 	{
-		wp_set_script_translations('parrotposter-main-script', 'parrotposter', PARROTPOSTER_PLUGIN_DIR.'languages');
-		wp_set_script_translations('parrotposter-post-meta-box', 'parrotposter', PARROTPOSTER_PLUGIN_DIR.'languages');
+		AssetModules::enqueue_script_translates();
 	}
 
 	public function admin_menu()
