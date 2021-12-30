@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2021-12-30 17:57+0500\n"
+"POT-Creation-Date: 2021-12-31 01:58+0500\n"
 "PO-Revision-Date: 2021-08-05 07:14+0500\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -75,6 +75,10 @@ msgstr ""
 msgid "Removed success"
 msgstr ""
 
+#: includes/posts_custom_column.php:37
+msgid "Publish to social networks"
+msgstr ""
+
 #: src/AdminAjaxPost.php:98 src/AdminAjaxPost.php:123
 #: src/AdminAjaxPost.php:148
 msgid "Email is empty"
@@ -97,11 +101,11 @@ msgstr ""
 msgid "Token is empty"
 msgstr ""
 
-#: src/AdminAjaxPost.php:526
+#: src/AdminAjaxPost.php:519
 msgid "Need enter a code from SMS or email"
 msgstr ""
 
-#: src/AdminAjaxPost.php:558 views/accounts/index.php:39
+#: src/AdminAjaxPost.php:551 views/accounts/index.php:39
 #, php-format
 msgid "Added %s of %s."
 msgstr ""
@@ -188,7 +192,7 @@ msgstr ""
 msgid "Immediately upon publishing the post"
 msgstr ""
 
-#: src/AutopostingListTable.php:108 views/posts/publish-post.php:130
+#: src/AutopostingListTable.php:108 views/posts/publish-post.php:133
 #: views/scheduler/autoposting_form.php:21
 msgid "With a delay"
 msgstr ""
@@ -1248,7 +1252,7 @@ msgstr ""
 msgid "Tags"
 msgstr ""
 
-#: views/posts/detail.php:32 views/posts/publish-post.php:98
+#: views/posts/detail.php:32 views/posts/publish-post.php:101
 #: views/scheduler/autoposting_form.php:141
 msgid "Link"
 msgstr ""
@@ -1275,92 +1279,92 @@ msgstr ""
 msgid "Error post_id"
 msgstr ""
 
-#: views/posts/publish-post.php:74
+#: views/posts/publish-post.php:77
 #, php-format
 msgid "Publish: %s"
 msgstr ""
 
-#: views/posts/publish-post.php:87
+#: views/posts/publish-post.php:90
 msgid "Post data"
 msgstr ""
 
-#: views/posts/publish-post.php:91 views/scheduler/autoposting_form.php:120
+#: views/posts/publish-post.php:94 views/scheduler/autoposting_form.php:120
 msgid "Post text"
 msgstr ""
 
-#: views/posts/publish-post.php:104
+#: views/posts/publish-post.php:107
 msgid "Select post images"
 msgstr ""
 
-#: views/posts/publish-post.php:115
+#: views/posts/publish-post.php:118
 msgid "Use drag'n'drop to move images. A maximum of 10 images will be loaded"
 msgstr ""
 
-#: views/posts/publish-post.php:121 views/scheduler/autoposting_form.php:234
+#: views/posts/publish-post.php:124 views/scheduler/autoposting_form.php:234
 msgid "When to publish"
 msgstr ""
 
-#: views/posts/publish-post.php:126
+#: views/posts/publish-post.php:129
 msgid "Now"
 msgstr ""
 
-#: views/posts/publish-post.php:128
+#: views/posts/publish-post.php:131
 msgid "Post date"
 msgstr ""
 
-#: views/posts/publish-post.php:131
+#: views/posts/publish-post.php:134
 msgid "Enter a specific time"
 msgstr ""
 
-#: views/posts/publish-post.php:136 views/scheduler/autoposting_form.php:253
+#: views/posts/publish-post.php:139 views/scheduler/autoposting_form.php:253
 msgid "Publish with a delay of 1 to 10 minutes"
 msgstr ""
 
-#: views/posts/publish-post.php:142
+#: views/posts/publish-post.php:145
 msgid "Specific time"
 msgstr ""
 
-#: views/posts/publish-post.php:151 views/scheduler/autoposting_form.php:219
+#: views/posts/publish-post.php:154 views/scheduler/autoposting_form.php:219
 msgid "Choice of social networks"
 msgstr ""
 
-#: views/posts/publish-post.php:159 views/scheduler/autoposting_form.php:227
+#: views/posts/publish-post.php:162 views/scheduler/autoposting_form.php:227
 msgid "Images must be in jpg/png/wepb format"
 msgstr ""
 
-#: views/posts/publish-post.php:160 views/scheduler/autoposting_form.php:228
+#: views/posts/publish-post.php:163 views/scheduler/autoposting_form.php:228
 msgid "The weight of one image must not exceed 10MB"
 msgstr ""
 
-#: views/posts/publish-post.php:161 views/scheduler/autoposting_form.php:229
+#: views/posts/publish-post.php:164 views/scheduler/autoposting_form.php:229
 msgid "There can be no more than 10 images in a post"
 msgstr ""
 
-#: views/posts/publish-post.php:162 views/scheduler/autoposting_form.php:230
+#: views/posts/publish-post.php:165 views/scheduler/autoposting_form.php:230
 msgid "Only one image is uploaded to Facebook (the first image in the list)"
 msgstr ""
 
-#: views/posts/publish-post.php:166 views/scheduler/autoposting_form.php:273
+#: views/posts/publish-post.php:169 views/scheduler/autoposting_form.php:273
 msgid "Additional settings for VKontakte"
 msgstr ""
 
-#: views/posts/publish-post.php:171 views/scheduler/autoposting_form.php:278
+#: views/posts/publish-post.php:174 views/scheduler/autoposting_form.php:278
 msgid "Publish a post on behalf of the group"
 msgstr ""
 
-#: views/posts/publish-post.php:176 views/scheduler/autoposting_form.php:283
+#: views/posts/publish-post.php:179 views/scheduler/autoposting_form.php:283
 msgid "Add a signature to the post"
 msgstr ""
 
-#: views/posts/publish-post.php:182
+#: views/posts/publish-post.php:185
 msgid "1. You need to fill in the text or choose pictures."
 msgstr ""
 
-#: views/posts/publish-post.php:183
+#: views/posts/publish-post.php:186
 msgid "2. Select at least one social network account"
 msgstr ""
 
-#: views/posts/publish-post.php:188
+#: views/posts/publish-post.php:191
 msgid "Publish"
 msgstr ""
 
