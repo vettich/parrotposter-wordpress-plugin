@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2021-11-05 16:02+0500\n"
+"POT-Creation-Date: 2021-12-30 02:39+0500\n"
 "PO-Revision-Date: 2021-08-05 07:14+0500\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -15,118 +15,598 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Poedit-SourceCharset: UTF-8\n"
 "X-Poedit-KeywordsList: parrotposter__;parrotposter_e;parrotposter_n:1,2;"
-"parrotposter_x:1,2c\n"
+"parrotposter_x:1,2c;parrotposter_xe:1,2c;__\n"
 "X-Poedit-SearchPath-0: .\n"
 
-#: assets/js/copy.js:21
+#: assets/js/autoposting_form.js:167
+msgid "Select value(s)"
+msgstr ""
+
+#: assets/js/autoposting_form.js:168
+msgid "{ 0 } of { 1 } selected"
+msgstr ""
+
+#: assets/js/autoposting_form.js:271
+msgid "Reload to apply change"
+msgstr ""
+
+#: assets/js/copy.js:19
 msgid "Copied!"
 msgstr ""
 
-#: parrotposter.php:120
-msgid "ParrotPoster settings page"
+#: assets/js/post-detail.js:152
+msgid "No result yet"
 msgstr ""
 
-#: parrotposter.php:120 views/parrotposter-user-parts.php:83
-msgid "ParrotPoster"
+#: assets/js/post-detail.js:155 assets/js/post-meta-box.js:159
+#: views/posts/detail.php:14
+msgid "View post"
 msgstr ""
 
-#: parrotposter.php:121 views/parrotposter-auth-parts.php:32
-#: views/parrotposter-auth-parts.php:54
-#: views/parrotposter/forgot_password.php:22 views/parrotposter/index.php:22
-#: views/parrotposter/index.php:28 views/parrotposter/signup.php:22
-msgid "Authorization"
+#: assets/js/post-detail.js:157
+msgid "Error:"
 msgstr ""
 
-#: src/AdminAjaxPost.php:61 src/AdminAjaxPost.php:86 src/AdminAjaxPost.php:111
+#: assets/js/post-meta-box.js:29
+msgid "Posts have not yet been created"
+msgstr ""
+
+#: assets/js/post-meta-box.js:78
+msgid "Post published at"
+msgstr ""
+
+#: assets/js/post-meta-box.js:82 src/PostsListTable.php:39
+msgid "Status"
+msgstr ""
+
+#: assets/js/post-meta-box.js:86
+msgid "View details"
+msgstr ""
+
+#: assets/js/post-meta-box.js:189
+msgid "Remove post"
+msgstr ""
+
+#: assets/js/post-meta-box.js:230
+msgid "Remove post from ParrotPoster and social networks?"
+msgstr ""
+
+#: assets/js/post-meta-box.js:247
+msgid "Removed success"
+msgstr ""
+
+#: src/AdminAjaxPost.php:98 src/AdminAjaxPost.php:123
+#: src/AdminAjaxPost.php:148
 msgid "Email is empty"
 msgstr ""
 
-#: src/AdminAjaxPost.php:65 src/AdminAjaxPost.php:90 src/AdminAjaxPost.php:141
+#: src/AdminAjaxPost.php:102 src/AdminAjaxPost.php:127
+#: src/AdminAjaxPost.php:178
 msgid "Password is empty"
 msgstr ""
 
-#: src/AdminAjaxPost.php:93 src/AdminAjaxPost.php:144
+#: src/AdminAjaxPost.php:130 src/AdminAjaxPost.php:181
 msgid "Passwords do not match"
 msgstr ""
 
-#: src/AdminAjaxPost.php:124
+#: src/AdminAjaxPost.php:161
 msgid "An email with a link to recover your password was sent to your email."
 msgstr ""
 
-#: src/AdminAjaxPost.php:137
+#: src/AdminAjaxPost.php:174
 msgid "Token is empty"
 msgstr ""
 
-#: src/AdminAjaxPost.php:347
+#: src/AdminAjaxPost.php:517
 msgid "Need enter a code from SMS or email"
 msgstr ""
 
-#: src/AdminAjaxPost.php:381 views/accounts/index.php:41
+#: src/AdminAjaxPost.php:549 views/accounts/index.php:39
 #, php-format
 msgid "Added %s of %s."
 msgstr ""
 
-#: src/Menu.php:20 views/posts.php:1
+#: src/ApiHelpers.php:101
+msgid "VKontakte"
+msgstr ""
+
+#: src/ApiHelpers.php:103
+msgid "Facebook"
+msgstr ""
+
+#: src/ApiHelpers.php:105
+msgid "Odnoklassniki"
+msgstr ""
+
+#: src/ApiHelpers.php:107
+msgid "Telegram"
+msgstr ""
+
+#: src/ApiHelpers.php:109
+msgid "Instagram"
+msgstr ""
+
+#: src/ApiHelpers.php:130
+msgid "Published"
+msgstr ""
+
+#: src/ApiHelpers.php:132
+msgid "Published with error"
+msgstr ""
+
+#: src/ApiHelpers.php:134
+msgid "In queue"
+msgstr ""
+
+#: src/ApiHelpers.php:136
+msgid "Publishing in progress"
+msgstr ""
+
+#: src/AutopostingListTable.php:14 views/scheduler/header.php:33
+msgid "Autoposting"
+msgstr ""
+
+#: src/AutopostingListTable.php:15
+msgid "Autopostings"
+msgstr ""
+
+#: src/AutopostingListTable.php:22
+msgid "No autoposting found"
+msgstr ""
+
+#: src/AutopostingListTable.php:29 views/scheduler/autoposting_form.php:70
+msgid "Name"
+msgstr ""
+
+#: src/AutopostingListTable.php:30
+msgid "WP Post type"
+msgstr ""
+
+#: src/AutopostingListTable.php:31
+msgid "When publish"
+msgstr ""
+
+#: src/AutopostingListTable.php:32
+msgid "Social networks"
+msgstr ""
+
+#: src/AutopostingListTable.php:33 views/scheduler/autoposting_form.php:79
+msgid "Enable"
+msgstr ""
+
+#: src/AutopostingListTable.php:52
+msgid "Edit"
+msgstr ""
+
+#: src/AutopostingListTable.php:64 src/AutopostingListTable.php:156
+#: src/PostsListTable.php:63 views/accounts/index.php:92
+#: views/posts/detail.php:63 views/posts/index.php:63
+msgid "Delete"
+msgstr ""
+
+#: src/AutopostingListTable.php:106 views/scheduler/autoposting_form.php:20
+msgid "Immediately upon publishing the post"
+msgstr ""
+
+#: src/AutopostingListTable.php:108 views/posts/publish-post.php:130
+#: views/scheduler/autoposting_form.php:21
+msgid "With a delay"
+msgstr ""
+
+#: src/AutopostingListTable.php:119
+msgid "<Not selected>"
+msgstr ""
+
+#: src/AutopostingListTable.php:151
+msgid "Are you sure you want to delete {autoposting_name}?"
+msgstr ""
+
+#: src/AutopostingListTable.php:158 views/accounts/index.php:93
+#: views/posts/detail.php:64 views/posts/index.php:64
+#: views/scheduler/autoposting_form.php:291
+msgid "Cancel"
+msgstr ""
+
+#: src/Menu.php:20 src/PostsListTable.php:15 views/posts.php:1
+#: views/posts/index.php:28
 msgid "Posts"
 msgstr ""
 
-#: src/Menu.php:24 views/profile/index.php:52
+#: src/Menu.php:24 src/PostsListTable.php:38 views/profile/index.php:49
 msgid "Accounts"
 msgstr ""
 
-#: src/Menu.php:28
+#: src/Menu.php:28 views/scheduler/header.php:23
 msgid "Scheduler"
 msgstr ""
 
 #: src/Menu.php:32 views/parrotposter-user-parts.php:93
-#: views/tariffs/index.php:35
+#: views/tariffs/index.php:36
 msgid "Tariffs"
 msgstr ""
 
 #: src/Menu.php:36 views/parrotposter-user-parts.php:92
-#: views/profile/index.php:23
+#: views/profile/index.php:22
 msgid "Profile"
 msgstr ""
 
-#: src/Profile.php:28
+#: src/PP.php:101
+msgid "ParrotPoster settings page"
+msgstr ""
+
+#: src/PP.php:101 views/parrotposter-user-parts.php:83
+msgid "ParrotPoster"
+msgstr ""
+
+#: src/PP.php:102 views/parrotposter-auth-parts.php:32
+#: views/parrotposter-auth-parts.php:54
+#: views/parrotposter/forgot_password.php:21 views/parrotposter/index.php:21
+#: views/parrotposter/index.php:27 views/parrotposter/signup.php:21
+msgid "Authorization"
+msgstr ""
+
+#: src/PostsListTable.php:14
+msgid "Post"
+msgstr ""
+
+#: src/PostsListTable.php:22
+msgid "No posts found"
+msgstr ""
+
+#: src/PostsListTable.php:36
+msgid "Text"
+msgstr ""
+
+#: src/PostsListTable.php:37 views/posts/detail.php:41
+msgid "Publish at"
+msgstr ""
+
+#: src/PostsListTable.php:58
+msgid "View"
+msgstr ""
+
+#: src/Profile.php:23
 msgid "(expired)"
 msgstr ""
 
-#: src/Profile.php:30
+#: src/Profile.php:25
 #, php-format
 msgid "(left %s year)"
 msgid_plural "(left %s years)"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/Profile.php:32
+#: src/Profile.php:27
 #, php-format
 msgid "(left %s month)"
 msgid_plural "(left %s months)"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/Profile.php:34
+#: src/Profile.php:29
 #, php-format
 msgid "(left %s day)"
 msgid_plural "(left %s days)"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/Tariffs.php:12
+#: src/Tariffs.php:14
 msgid "1 month"
 msgstr ""
 
-#: src/Tariffs.php:17
+#: src/Tariffs.php:19
 msgid "3 month"
 msgstr ""
 
-#: src/Tariffs.php:22
+#: src/Tariffs.php:24
 msgid "6 month"
 msgstr ""
 
-#: src/Tariffs.php:27
+#: src/Tariffs.php:29
 msgid "1 year"
+msgstr ""
+
+#: src/WPListTable.php:174
+msgid "Compact view"
+msgstr ""
+
+#: src/WPListTable.php:175
+msgid "Extended view"
+msgstr ""
+
+#: src/WPListTable.php:506
+msgid "Select bulk action"
+msgstr ""
+
+#: src/WPListTable.php:508
+msgid "Bulk actions"
+msgstr ""
+
+#: src/WPListTable.php:529
+msgid "Apply"
+msgstr ""
+
+#: src/WPListTable.php:590 src/WPListTable.php:1514
+msgid "Show more details"
+msgstr ""
+
+#: src/WPListTable.php:687
+#, php-format
+msgid "%1$s %2$d"
+msgstr ""
+
+#: src/WPListTable.php:764 src/WPListTable.php:794 src/WPListTable.php:817
+msgid "No comments"
+msgstr ""
+
+#: src/WPListTable.php:794
+msgid "No approved comments"
+msgstr ""
+
+#: src/WPListTable.php:817
+msgid "No pending comments"
+msgstr ""
+
+#: src/WPListTable.php:951
+msgid "First page"
+msgstr ""
+
+#: src/WPListTable.php:962
+msgid "Previous page"
+msgstr ""
+
+#: src/WPListTable.php:969 src/WPListTable.php:973
+msgid "Current Page"
+msgstr ""
+
+#: src/WPListTable.php:992
+msgid "Next page"
+msgstr ""
+
+#: src/WPListTable.php:1003
+msgid "Last page"
+msgstr ""
+
+#: src/WPListTable.php:1238
+msgid "Select All"
+msgstr ""
+
+#: src/fields/CommonType.php:31
+msgctxt "wp_post_field"
+msgid "Break line"
+msgstr ""
+
+#: src/fields/CommonType.php:35 src/fields/conditions/Common.php:14
+msgctxt "wp_post_field"
+msgid "Title"
+msgstr ""
+
+#: src/fields/CommonType.php:39
+msgctxt "wp_post_field"
+msgid "Content"
+msgstr ""
+
+#: src/fields/CommonType.php:43
+msgctxt "wp_post_field"
+msgid "Excerpt"
+msgstr ""
+
+#: src/fields/CommonType.php:54
+msgctxt "wp_post_field"
+msgid "Link"
+msgstr ""
+
+#: src/fields/CommonType.php:65
+msgctxt "wp_post_field"
+msgid "Date"
+msgstr ""
+
+#: src/fields/CommonType.php:76
+msgctxt "wp_post_field"
+msgid "Featured image"
+msgstr ""
+
+#: src/fields/CommonType.php:80
+msgctxt "wp_post_field"
+msgid "Images in content"
+msgstr ""
+
+#: src/fields/ProductType.php:33
+msgctxt "wp_post_field"
+msgid "Product title"
+msgstr ""
+
+#: src/fields/ProductType.php:37
+msgctxt "wp_post_field"
+msgid "Product short description"
+msgstr ""
+
+#: src/fields/ProductType.php:41
+msgctxt "wp_post_field"
+msgid "Product description"
+msgstr ""
+
+#: src/fields/ProductType.php:49
+msgctxt "wp_post_field"
+msgid "Regular price"
+msgstr ""
+
+#: src/fields/ProductType.php:53
+msgctxt "wp_post_field"
+msgid "Sale price"
+msgstr ""
+
+#: src/fields/ProductType.php:57
+msgctxt "wp_post_field"
+msgid "Product currency"
+msgstr ""
+
+#: src/fields/ProductType.php:61
+msgctxt "wp_post_field"
+msgid "Height"
+msgstr ""
+
+#: src/fields/ProductType.php:65
+msgctxt "wp_post_field"
+msgid "Length"
+msgstr ""
+
+#: src/fields/ProductType.php:69
+msgctxt "wp_post_field"
+msgid "Width"
+msgstr ""
+
+#: src/fields/ProductType.php:73
+msgctxt "wp_post_field"
+msgid "Weight"
+msgstr ""
+
+#: src/fields/ProductType.php:84
+msgctxt "wp_post_field"
+msgid "Product link"
+msgstr ""
+
+#: src/fields/ProductType.php:102
+msgctxt "wp_post_field"
+msgid "Product image"
+msgstr ""
+
+#: src/fields/ProductType.php:106
+msgctxt "wp_post_field"
+msgid "Product gallery"
+msgstr ""
+
+#: src/fields/conditions/Common.php:16
+msgctxt "wp_post_condition"
+msgid "Include"
+msgstr ""
+
+#: src/fields/conditions/Common.php:17
+msgctxt "wp_post_condition"
+msgid "Not include"
+msgstr ""
+
+#: src/fields/conditions/Common.php:23
+msgctxt "wp_post_field"
+msgid "Author"
+msgstr ""
+
+#: src/fields/conditions/Common.php:25
+#: src/fields/conditions/ProductType.php:98
+#: src/fields/conditions/Taxonomies.php:19
+msgctxt "wp_post_condition"
+msgid "Equals one of"
+msgstr ""
+
+#: src/fields/conditions/Common.php:26
+#: src/fields/conditions/ProductType.php:99
+#: src/fields/conditions/Taxonomies.php:20
+msgctxt "wp_post_condition"
+msgid "Not equal to one of"
+msgstr ""
+
+#: src/fields/conditions/ProductType.php:18
+msgctxt "wp_post_field"
+msgid "Product regular price"
+msgstr ""
+
+#: src/fields/conditions/ProductType.php:20
+#: src/fields/conditions/ProductType.php:33
+#: src/fields/conditions/ProductType.php:46
+#: src/fields/conditions/ProductType.php:59
+#: src/fields/conditions/ProductType.php:72
+#: src/fields/conditions/ProductType.php:85
+msgctxt "wp_post_condition"
+msgid "Equal"
+msgstr ""
+
+#: src/fields/conditions/ProductType.php:21
+#: src/fields/conditions/ProductType.php:34
+#: src/fields/conditions/ProductType.php:47
+#: src/fields/conditions/ProductType.php:60
+#: src/fields/conditions/ProductType.php:73
+#: src/fields/conditions/ProductType.php:86
+msgctxt "wp_post_condition"
+msgid "Not equal"
+msgstr ""
+
+#: src/fields/conditions/ProductType.php:22
+#: src/fields/conditions/ProductType.php:35
+#: src/fields/conditions/ProductType.php:48
+#: src/fields/conditions/ProductType.php:61
+#: src/fields/conditions/ProductType.php:74
+#: src/fields/conditions/ProductType.php:87
+msgctxt "wp_post_condition"
+msgid "Less"
+msgstr ""
+
+#: src/fields/conditions/ProductType.php:23
+#: src/fields/conditions/ProductType.php:36
+#: src/fields/conditions/ProductType.php:49
+#: src/fields/conditions/ProductType.php:62
+#: src/fields/conditions/ProductType.php:75
+#: src/fields/conditions/ProductType.php:88
+msgctxt "wp_post_condition"
+msgid "Less or equal"
+msgstr ""
+
+#: src/fields/conditions/ProductType.php:24
+#: src/fields/conditions/ProductType.php:37
+#: src/fields/conditions/ProductType.php:50
+#: src/fields/conditions/ProductType.php:63
+#: src/fields/conditions/ProductType.php:76
+#: src/fields/conditions/ProductType.php:89
+msgctxt "wp_post_condition"
+msgid "Greater"
+msgstr ""
+
+#: src/fields/conditions/ProductType.php:25
+#: src/fields/conditions/ProductType.php:38
+#: src/fields/conditions/ProductType.php:51
+#: src/fields/conditions/ProductType.php:64
+#: src/fields/conditions/ProductType.php:77
+#: src/fields/conditions/ProductType.php:90
+msgctxt "wp_post_condition"
+msgid "Greater or equal"
+msgstr ""
+
+#: src/fields/conditions/ProductType.php:31
+msgctxt "wp_post_field"
+msgid "Product min regular price"
+msgstr ""
+
+#: src/fields/conditions/ProductType.php:44
+msgctxt "wp_post_field"
+msgid "Product max regular price"
+msgstr ""
+
+#: src/fields/conditions/ProductType.php:57
+msgctxt "wp_post_field"
+msgid "Product sale price"
+msgstr ""
+
+#: src/fields/conditions/ProductType.php:70
+msgctxt "wp_post_field"
+msgid "Product min sale price"
+msgstr ""
+
+#: src/fields/conditions/ProductType.php:83
+msgctxt "wp_post_field"
+msgid "Product max sale price"
+msgstr ""
+
+#: src/fields/conditions/ProductType.php:96
+msgctxt "wp_post_field"
+msgid "Product type"
+msgstr ""
+
+#: views/accounts/choice_list.php:25
+msgid "You have no accounts connected"
+msgstr ""
+
+#: views/accounts/choice_list.php:28
+#, php-format
+msgid "To connect, go to <a href=\"%s\">Accounts</a>"
 msgstr ""
 
 #: views/accounts/connect.php:15
@@ -172,8 +652,8 @@ msgstr ""
 
 #: views/accounts/connect.php:38 views/accounts/connect.php:39
 #: views/accounts/connect.php:40 views/accounts/connect.php:41
-#: views/accounts/connect.php:42 views/accounts/connect.php:80
-#: views/accounts/connect.php:108
+#: views/accounts/connect.php:42 views/accounts/connect.php:83
+#: views/accounts/connect.php:111
 msgid "Connect"
 msgstr ""
 
@@ -190,96 +670,88 @@ msgstr ""
 msgid "Your Instagram username: @example or example"
 msgstr ""
 
-#: views/accounts/connect.php:59 views/parrotposter-auth-parts.php:75
+#: views/accounts/connect.php:60 views/parrotposter-auth-parts.php:75
 #: views/parrotposter-auth-parts.php:105 views/parrotposter/index.php:42
 #: views/parrotposter/reset_password.php:47 views/parrotposter/signup.php:47
 msgid "Password"
 msgstr ""
 
-#: views/accounts/connect.php:61
+#: views/accounts/connect.php:62
 msgid "We do not store passwords anywhere"
 msgstr ""
 
-#: views/accounts/connect.php:66
+#: views/accounts/connect.php:68
 msgid "Proxy (optional)"
 msgstr ""
 
-#: views/accounts/connect.php:68
+#: views/accounts/connect.php:70
 msgid ""
 "You can enter a proxy for Instagram connection. Proxy format: https://user:"
 "password@domain_or_ip:port"
 msgstr ""
 
-#: views/accounts/connect.php:73
+#: views/accounts/connect.php:76
 msgid "Code"
 msgstr ""
 
-#: views/accounts/connect.php:87
+#: views/accounts/connect.php:90
 msgid "Connect Telegram"
 msgstr ""
 
-#: views/accounts/connect.php:91
+#: views/accounts/connect.php:94
 msgid "Telegram bot token"
 msgstr ""
 
-#: views/accounts/connect.php:98
+#: views/accounts/connect.php:101
 msgid "Channel or group link"
 msgstr ""
 
-#: views/accounts/index.php:37
+#: views/accounts/index.php:35
 msgid "Social networks accounts"
 msgstr ""
 
-#: views/accounts/index.php:43
+#: views/accounts/index.php:41
 msgid "Change tariff"
 msgstr ""
 
-#: views/accounts/index.php:53
+#: views/accounts/index.php:49
 msgid "You haven't connected your social networks accounts yet"
 msgstr ""
 
-#: views/accounts/index.php:57
+#: views/accounts/index.php:53
 msgid ""
 "To connect, you need to be the administrator of the group/page/channel and "
 "provide all accesses that ParrotPoster asks for, so that everything works "
 "correctly"
 msgstr ""
 
-#: views/accounts/index.php:93
+#: views/accounts/index.php:89
 msgid "Are you sure you want to delete \"#account_name#\""
 msgstr ""
 
-#: views/accounts/index.php:96
-msgid "Delete"
-msgstr ""
-
-#: views/accounts/index.php:97
-msgid "Cancel"
-msgstr ""
-
 #: views/parrotposter-auth-parts.php:34 views/parrotposter-auth-parts.php:55
-#: views/parrotposter/forgot_password.php:23 views/parrotposter/index.php:23
-#: views/parrotposter/signup.php:23 views/parrotposter/signup.php:28
+#: views/parrotposter/forgot_password.php:22 views/parrotposter/index.php:22
+#: views/parrotposter/signup.php:22 views/parrotposter/signup.php:27
 msgid "Registration"
 msgstr ""
 
 #: views/parrotposter-auth-parts.php:36
 #: views/parrotposter-reset-password-part.php:33
-#: views/parrotposter/reset_password.php:38
+#: views/parrotposter/reset_password.php:37
 msgid "Reset password"
 msgstr ""
 
 #: views/parrotposter-auth-parts.php:56
-#: views/parrotposter/forgot_password.php:24
-#: views/parrotposter/forgot_password.php:28 views/parrotposter/index.php:24
-#: views/parrotposter/signup.php:24
+#: views/parrotposter/forgot_password.php:23
+#: views/parrotposter/forgot_password.php:27 views/parrotposter/index.php:23
+#: views/parrotposter/signup.php:23
 msgid "Forgot password?"
 msgstr ""
 
 #: views/parrotposter-auth-parts.php:69 views/parrotposter-auth-parts.php:99
 #: views/parrotposter-auth-parts.php:129
 #: views/parrotposter/forgot_password.php:36 views/parrotposter/index.php:37
-#: views/parrotposter/signup.php:42 views/profile/index.php:42
+#: views/parrotposter/signup.php:42 views/profile/index.php:39
 msgid "Email"
 msgstr ""
 
@@ -288,7 +760,7 @@ msgid "Login"
 msgstr ""
 
 #: views/parrotposter-auth-parts.php:93 views/parrotposter/signup.php:37
-#: views/profile/index.php:36
+#: views/profile/index.php:33
 msgid "Your name"
 msgstr ""
 
@@ -307,72 +779,6 @@ msgstr ""
 msgid "Send"
 msgstr ""
 
-#: views/parrotposter-publish-post-part.php:10
-msgid "Error post_id"
-msgstr ""
-
-#: views/parrotposter-publish-post-part.php:106
-msgid "Publish:"
-msgstr ""
-
-#: views/parrotposter-publish-post-part.php:115
-msgid "Available keys"
-msgstr ""
-
-#: views/parrotposter-publish-post-part.php:133
-msgid "Post text"
-msgstr ""
-
-#: views/parrotposter-publish-post-part.php:138
-msgid "Post link"
-msgstr ""
-
-#: views/parrotposter-publish-post-part.php:143
-msgid "Select post images"
-msgstr ""
-
-#: views/parrotposter-publish-post-part.php:155
-msgid "Select publication time"
-msgstr ""
-
-#: views/parrotposter-publish-post-part.php:158
-msgid "Now"
-msgstr ""
-
-#: views/parrotposter-publish-post-part.php:165
-msgid "Post time"
-msgstr ""
-
-#: views/parrotposter-publish-post-part.php:173
-msgid "Enter another time"
-msgstr ""
-
-#: views/parrotposter-publish-post-part.php:175
-msgid "Enter time"
-msgstr ""
-
-#: views/parrotposter-publish-post-part.php:180
-msgid "Select social networks"
-msgstr ""
-
-#: views/parrotposter-publish-post-part.php:199
-msgid ""
-"You don't have social media accounts. To create a post, first connect the "
-"social media accounts you want."
-msgstr ""
-
-#: views/parrotposter-publish-post-part.php:205
-msgid "1. You need to fill in the text or choose pictures."
-msgstr ""
-
-#: views/parrotposter-publish-post-part.php:206
-msgid "2. Select at least one social network account"
-msgstr ""
-
-#: views/parrotposter-publish-post-part.php:208
-msgid "Publish"
-msgstr ""
-
 #: views/parrotposter-reset-password-part.php:48
 msgid "New password"
 msgstr ""
@@ -385,7 +791,7 @@ msgstr ""
 msgid "Payment in ParrotPoster"
 msgstr ""
 
-#: views/parrotposter-tariff-payed.php:6 views/tariffs/success.php:18
+#: views/parrotposter-tariff-payed.php:6 views/tariffs/success.php:17
 msgid "You paid successfully. Thank you!"
 msgstr ""
 
@@ -419,7 +825,7 @@ msgstr ""
 msgid "Expiry at %s"
 msgstr ""
 
-#: views/parrotposter-user-parts.php:112 views/profile/index.php:69
+#: views/parrotposter-user-parts.php:112 views/profile/index.php:66
 msgid "Logout"
 msgstr ""
 
@@ -433,89 +839,410 @@ msgstr ""
 msgid "Save"
 msgstr ""
 
-#: views/post-meta-box.php:17
+#: views/post-meta-box.php:23
 msgid "Publish to socials network"
 msgstr ""
 
-#: views/post-meta-box.php:23
-msgid "Post details"
+#: views/post-meta-box.php:29
+msgid "Show published posts on social networks"
 msgstr ""
 
-#: views/post-meta-box.php:34
-msgid "Close"
+#: views/post-meta-box.php:30
+msgid "Hide"
 msgstr ""
 
 #: views/posts.php:4
 msgid "To view your posts go to web app:"
 msgstr ""
 
-#: views/profile/index.php:47
+#: views/posts/add.php:16
+msgid "Creating post"
+msgstr ""
+
+#: views/posts/add.php:22 views/scheduler/unload.php:22
+msgid "This section is in development"
+msgstr ""
+
+#: views/posts/detail.php:23 views/scheduler/autoposting_form.php:197
+msgid "Tags"
+msgstr ""
+
+#: views/posts/detail.php:32 views/posts/publish-post.php:98
+#: views/scheduler/autoposting_form.php:139
+msgid "Link"
+msgstr ""
+
+#: views/posts/detail.php:51
+msgid "Delete post"
+msgstr ""
+
+#: views/posts/detail.php:60 views/posts/index.php:60
+msgid "Are you sure you want to delete post from ParrotPoster?"
+msgstr ""
+
+#: views/posts/index.php:40
+msgid "You don't have posts yet"
+msgstr ""
+
+#: views/posts/index.php:44
+msgid ""
+"Set up auto-posting in the Scheduler or post directly from an article, "
+"product, etc"
+msgstr ""
+
+#: views/posts/publish-post.php:15
+msgid "Error post_id"
+msgstr ""
+
+#: views/posts/publish-post.php:74
+#, php-format
+msgid "Publish: %s"
+msgstr ""
+
+#: views/posts/publish-post.php:87
+msgid "Post data"
+msgstr ""
+
+#: views/posts/publish-post.php:91 views/scheduler/autoposting_form.php:118
+msgid "Post text"
+msgstr ""
+
+#: views/posts/publish-post.php:104
+msgid "Select post images"
+msgstr ""
+
+#: views/posts/publish-post.php:115
+msgid "Use drag'n'drop to move images. A maximum of 10 images will be loaded"
+msgstr ""
+
+#: views/posts/publish-post.php:121 views/scheduler/autoposting_form.php:230
+msgid "When to publish"
+msgstr ""
+
+#: views/posts/publish-post.php:126
+msgid "Now"
+msgstr ""
+
+#: views/posts/publish-post.php:128
+msgid "Post date"
+msgstr ""
+
+#: views/posts/publish-post.php:131
+msgid "Enter a specific time"
+msgstr ""
+
+#: views/posts/publish-post.php:136 views/scheduler/autoposting_form.php:249
+msgid "Publish with a delay of 1 to 10 minutes"
+msgstr ""
+
+#: views/posts/publish-post.php:142
+msgid "Specific time"
+msgstr ""
+
+#: views/posts/publish-post.php:151 views/scheduler/autoposting_form.php:215
+msgid "Choice of social networks"
+msgstr ""
+
+#: views/posts/publish-post.php:159 views/scheduler/autoposting_form.php:223
+msgid "Images must be in jpg/png/wepb format"
+msgstr ""
+
+#: views/posts/publish-post.php:160 views/scheduler/autoposting_form.php:224
+msgid "The weight of one image must not exceed 10MB"
+msgstr ""
+
+#: views/posts/publish-post.php:161 views/scheduler/autoposting_form.php:225
+msgid "There can be no more than 10 images in a post"
+msgstr ""
+
+#: views/posts/publish-post.php:162 views/scheduler/autoposting_form.php:226
+msgid "Only one image is uploaded to Facebook (the first image in the list)"
+msgstr ""
+
+#: views/posts/publish-post.php:166 views/scheduler/autoposting_form.php:269
+msgid "Additional settings for VKontakte"
+msgstr ""
+
+#: views/posts/publish-post.php:171 views/scheduler/autoposting_form.php:274
+msgid "Publish a post on behalf of the group"
+msgstr ""
+
+#: views/posts/publish-post.php:176 views/scheduler/autoposting_form.php:279
+msgid "Add a signature to the post"
+msgstr ""
+
+#: views/posts/publish-post.php:182
+msgid "1. You need to fill in the text or choose pictures."
+msgstr ""
+
+#: views/posts/publish-post.php:183
+msgid "2. Select at least one social network account"
+msgstr ""
+
+#: views/posts/publish-post.php:188
+msgid "Publish"
+msgstr ""
+
+#: views/profile/index.php:44
 msgid "Tariff"
 msgstr ""
 
-#: views/profile/index.php:53 views/tariffs/index.php:46
+#: views/profile/index.php:50 views/tariffs/index.php:45
 #, php-format
 msgid "%s of %s"
 msgstr ""
 
-#: views/profile/index.php:57
+#: views/profile/index.php:54
 msgid "Expiry at"
 msgstr ""
 
-#: views/tariffs/fail.php:18
+#: views/scheduler/autoposting_add.php:14
+msgid "Autoposting #1"
+msgstr ""
+
+#: views/scheduler/autoposting_add.php:39
+msgid "Creating autoposting"
+msgstr ""
+
+#: views/scheduler/autoposting_edit.php:26
+msgid "Edit autoposting"
+msgstr ""
+
+#: views/scheduler/autoposting_form.php:30
+#: views/scheduler/autoposting_form.php:42
+msgctxt "wp_post_type"
+msgid "Select field"
+msgstr ""
+
+#: views/scheduler/autoposting_form.php:66
+msgid "General"
+msgstr ""
+
+#: views/scheduler/autoposting_form.php:73
+msgid "Name of autoposting template"
+msgstr ""
+
+#: views/scheduler/autoposting_form.php:83
+msgid "Activation conditions"
+msgstr ""
+
+#: views/scheduler/autoposting_form.php:87
+msgid "Wordpress post type"
+msgstr ""
+
+#: views/scheduler/autoposting_form.php:98
+msgid ""
+"Post type for autoposting. If you change the value, you should press the "
+"Reload button to display changes in the template fields"
+msgstr ""
+
+#: views/scheduler/autoposting_form.php:103
+msgid "Custom conditions"
+msgstr ""
+
+#: views/scheduler/autoposting_form.php:108
+msgid "The post will be published if all conditions are met"
+msgstr ""
+
+#: views/scheduler/autoposting_form.php:114
+msgid "Post template"
+msgstr ""
+
+#: views/scheduler/autoposting_form.php:134
+msgid ""
+"The text of the post in the social networks. Customize the template the way "
+"you need, using substitution macros"
+msgstr ""
+
+#: views/scheduler/autoposting_form.php:142
+msgid ""
+"The link to the site with the news or product. You can delete the macros so "
+"that the link will not be published"
+msgstr ""
+
+#: views/scheduler/autoposting_form.php:149
+msgid "UTM tags"
+msgstr ""
+
+#: views/scheduler/autoposting_form.php:152
+msgid ""
+"If checked, special UTM tags will be added to the end of the link (the "
+"field above) to track traffic in analytics"
+msgstr ""
+
+#: views/scheduler/autoposting_form.php:157
+msgctxt "utm"
+msgid "Traffic source"
+msgstr ""
+
+#: views/scheduler/autoposting_form.php:160
+msgid ""
+"You can use {social_code} macro, which will be replaced by a social network "
+"code (telegram, facebook, etc) when published"
+msgstr ""
+
+#: views/scheduler/autoposting_form.php:165
+msgctxt "utm"
+msgid "Traffic type"
+msgstr ""
+
+#: views/scheduler/autoposting_form.php:168
+msgid ""
+"Identifies what type of link was used, such as cost per click or email. "
+"Example: cpc"
+msgstr ""
+
+#: views/scheduler/autoposting_form.php:173
+msgctxt "utm"
+msgid "Campaign name"
+msgstr ""
+
+#: views/scheduler/autoposting_form.php:176
+msgid ""
+"Identifies a specific product promotion or strategic campaign. Example: news"
+msgstr ""
+
+#: views/scheduler/autoposting_form.php:181
+msgctxt "utm"
+msgid "Keyword"
+msgstr ""
+
+#: views/scheduler/autoposting_form.php:184
+msgid "Identifies search terms"
+msgstr ""
+
+#: views/scheduler/autoposting_form.php:189
+msgctxt "utm"
+msgid "Content type"
+msgstr ""
+
+#: views/scheduler/autoposting_form.php:192
+msgid ""
+"Identifies what specifically was clicked to bring the user to the site, "
+"such as a banner ad or a text link. It is often used for A/B testing and "
+"content-targeted ads"
+msgstr ""
+
+#: views/scheduler/autoposting_form.php:200
+msgid ""
+"Tags (hashtags) will be added to the end of the post text. Tags from this "
+"field will be converted to \"correct\" hashtags for social networks. For "
+"example, \"red book, bestseller\" will be converted to \"#red #book "
+"#bestseller\""
+msgstr ""
+
+#: views/scheduler/autoposting_form.php:205
+msgid "Images"
+msgstr ""
+
+#: views/scheduler/autoposting_form.php:210
+msgid ""
+"Images for posting to social networks. You can specify several fields from "
+"which images from the news, products, etc. will be taken. For posting to "
+"Instagram the image is required"
+msgstr ""
+
+#: views/scheduler/autoposting_form.php:244
+msgid ""
+"You can specify the time when the post will be published. Immediately - the "
+"post will be published on social networks at the same time when the news, "
+"product, etc. is published. With a delay - the post will be published with "
+"a delay of the specified number of minutes"
+msgstr ""
+
+#: views/scheduler/autoposting_form.php:255
+msgid "Additional settings"
+msgstr ""
+
+#: views/scheduler/autoposting_form.php:261
+msgid "Exclude duplicates (within this template)"
+msgstr ""
+
+#: views/scheduler/autoposting_form.php:264
+msgid ""
+"If checked, the same news, product, etc. will not be republished within "
+"this autopublishing template. If not checked, the same post can be "
+"published several times"
+msgstr ""
+
+#: views/scheduler/autoposting_form.php:286
+msgid "Update"
+msgstr ""
+
+#: views/scheduler/autoposting_form.php:288
+msgid "Create"
+msgstr ""
+
+#: views/scheduler/header.php:10 views/scheduler/index.php:36
+msgid "+ Add autoposting"
+msgstr ""
+
+#: views/scheduler/header.php:15
+msgid "+ Add autounloading"
+msgstr ""
+
+#: views/scheduler/header.php:39
+msgid "Autounloading"
+msgstr ""
+
+#: views/scheduler/index.php:31
+msgid "You don't have autopublications yet"
+msgstr ""
+
+#: views/tariffs/fail.php:17
 msgid ""
 "There was an error making the payment, try again! Or report it to "
 "support@parrotposter.com"
 msgstr ""
 
-#: views/tariffs/fail.php:22 views/tariffs/success.php:22
+#: views/tariffs/fail.php:21 views/tariffs/success.php:21
 msgid "Back to tariffs"
 msgstr ""
 
-#: views/tariffs/index.php:41
+#: views/tariffs/index.php:40
 msgid "Your tariff"
 msgstr ""
 
-#: views/tariffs/index.php:45
+#: views/tariffs/index.php:44
 msgid "Added accounts"
 msgstr ""
 
-#: views/tariffs/index.php:49
+#: views/tariffs/index.php:48
 msgid "Tariff expired at"
 msgstr ""
 
-#: views/tariffs/index.php:82
+#: views/tariffs/index.php:81
 msgid "Current"
 msgstr ""
 
-#: views/tariffs/index.php:87
+#: views/tariffs/index.php:86
 msgid "per month"
 msgstr ""
 
-#: views/tariffs/index.php:94
+#: views/tariffs/index.php:93
 msgid "Unlimited posts"
 msgstr ""
 
-#: views/tariffs/index.php:97
+#: views/tariffs/index.php:96
 #, php-format
 msgid "%s accounts of social networks"
 msgstr ""
 
-#: views/tariffs/index.php:103 views/tariffs/index.php:111
+#: views/tariffs/index.php:102 views/tariffs/index.php:110
 msgid "Select and pay"
 msgstr ""
 
-#: views/tariffs/index.php:107
+#: views/tariffs/index.php:106
 msgid "Prolong"
 msgstr ""
 
-#: views/tariffs/index.php:122
+#: views/tariffs/index.php:121
 msgid ""
 "The price in dollars is calculated on the basis of the Bank of Russia "
 "exchange rate"
 msgstr ""
 
-#: views/tariffs/index.php:127
+#: views/tariffs/index.php:126
 msgid ""
 "If you select a new tariff, the remaining days at the current tariff will "
 "be recalculated and transferred to the new tariff"

@@ -8,17 +8,16 @@ function parrotposterCopyToClipboard(text) {
 }
 
 jQuery(function($) {
-	function parrotposter__ (msg) {
-		return wp.i18n.__(msg, 'parrotposter')
-	}
-
 	$('.parrotposter-copy').click(function(event) {
 		event.preventDefault()
 		const elem = $(event.target)
 
 		parrotposterCopyToClipboard(elem.text())
 
-		let tooltip = $('<div class="parrotposter-copy__tooltip">'+parrotposter__('Copied!')+'</div>')
+		let tooltip = $(
+			'<div class="parrotposter-copy__tooltip">' +
+				wp.i18n.__('Copied!', 'parrotposter') +
+			'</div>')
 		elem.append(tooltip)
 		setTimeout(function() {
 			tooltip.remove()

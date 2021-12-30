@@ -301,8 +301,8 @@ class AdminAjaxPost
 				'extra' => [
 					'wp_post_id' => intval($post_id),
 					'wp_domain' => WpPostHelpers::get_site_domain(),
-					'extra_vk_signed' => !!$extra_vk_signed,
-					'extra_vk_from_group' => !!$extra_vk_from_group,
+					'vk_signed' => !!$extra_vk_signed,
+					'vk_from_group' => !!$extra_vk_from_group,
 				]
 			],
 			'publish_at' => $publish_at,

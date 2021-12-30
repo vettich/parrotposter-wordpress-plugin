@@ -26,8 +26,8 @@ AssetModules::enqueue(['loading', 'post-meta-box']);
 
 <p>
 	<a class="parrotposter-meta-box__show-posts-btn" href="#">
-		<span class="parrotposter-meta-box__text-show"><?php parrotposter_e('Show posts on social networks') ?></span>
-		<span class="parrotposter-meta-box__text-hide"><?php parrotposter_e('Hide posts on social networks') ?></span>
+		<span class="parrotposter-meta-box__text-show"><?php parrotposter_e('Show published posts on social networks') ?></span>
+		<span class="parrotposter-meta-box__text-hide"><?php parrotposter_e('Hide') ?></span>
 	</a>
 </p>
 

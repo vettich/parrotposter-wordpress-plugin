@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-11-05 16:02+0500\n"
-"PO-Revision-Date: 2021-11-05 16:11+0500\n"
+"POT-Creation-Date: 2021-12-30 02:39+0500\n"
+"PO-Revision-Date: 2021-12-30 02:39+0500\n"
 "Last-Translator: Vettich <vetti.ch@mail.ru>\n"
 "Language-Team: \n"
 "Language: ru_RU\n"
@@ -18,83 +18,259 @@ msgstr ""
 "X-Poedit-KeywordsList: __;_e;parrotposter__;parrotposter_e\n"
 "X-Poedit-SearchPath-0: .\n"
 
-#: assets/js/copy.js:21
+#: assets/js/autoposting_form.js:167
+msgid "Select value(s)"
+msgstr "Выберите значение"
+
+#: assets/js/autoposting_form.js:168
+msgid "{ 0 } of { 1 } selected"
+msgstr "выбрано { 0 } из { 1 }"
+
+#: assets/js/autoposting_form.js:271
+msgid "Reload to apply change"
+msgstr "Перезагрузить для применения изменений"
+
+#: assets/js/copy.js:19
 msgid "Copied!"
 msgstr "Скопировано!"
 
-#: parrotposter.php:120
-msgid "ParrotPoster settings page"
-msgstr "Страница настройки ParrotPoster"
+#: assets/js/post-detail.js:152
+msgid "No result yet"
+msgstr "Еще нет результатов"
 
-#: parrotposter.php:120 views/parrotposter-user-parts.php:83
-msgid "ParrotPoster"
-msgstr ""
+#: assets/js/post-detail.js:155 assets/js/post-meta-box.js:159
+#: views/posts/detail.php:14
+msgid "View post"
+msgstr "Посмотреть пост"
 
-#: parrotposter.php:121 views/parrotposter-auth-parts.php:32
-#: views/parrotposter-auth-parts.php:54
-#: views/parrotposter/forgot_password.php:22 views/parrotposter/index.php:22
-#: views/parrotposter/index.php:28 views/parrotposter/signup.php:22
-msgid "Authorization"
-msgstr "Авторизация"
+#: assets/js/post-detail.js:157
+msgid "Error:"
+msgstr "Ошибка:"
 
-#: src/AdminAjaxPost.php:61 src/AdminAjaxPost.php:86 src/AdminAjaxPost.php:111
+#: assets/js/post-meta-box.js:29
+msgid "Posts have not yet been created"
+msgstr "Посты еще не созданы"
+
+#: assets/js/post-meta-box.js:78
+msgid "Post published at"
+msgstr "Время публикации"
+
+#: assets/js/post-meta-box.js:82 src/PostsListTable.php:39
+msgid "Status"
+msgstr "Статус"
+
+#: assets/js/post-meta-box.js:86
+msgid "View details"
+msgstr "Посмотреть подробнее"
+
+#: assets/js/post-meta-box.js:189
+msgid "Remove post"
+msgstr "Удалить пост"
+
+#: assets/js/post-meta-box.js:230
+msgid "Remove post from ParrotPoster and social networks?"
+msgstr "Удалить пост из ParrotPoster и из социальных сетей?"
+
+#: assets/js/post-meta-box.js:247
+msgid "Removed success"
+msgstr "Успешно удалено"
+
+#: src/AdminAjaxPost.php:98 src/AdminAjaxPost.php:123 src/AdminAjaxPost.php:148
 msgid "Email is empty"
 msgstr "Email пустой"
 
-#: src/AdminAjaxPost.php:65 src/AdminAjaxPost.php:90 src/AdminAjaxPost.php:141
+#: src/AdminAjaxPost.php:102 src/AdminAjaxPost.php:127
+#: src/AdminAjaxPost.php:178
 msgid "Password is empty"
 msgstr "Пароль пуст"
 
-#: src/AdminAjaxPost.php:93 src/AdminAjaxPost.php:144
+#: src/AdminAjaxPost.php:130 src/AdminAjaxPost.php:181
 msgid "Passwords do not match"
 msgstr "Пароли не совпадают"
 
-#: src/AdminAjaxPost.php:124
+#: src/AdminAjaxPost.php:161
 msgid "An email with a link to recover your password was sent to your email."
 msgstr ""
 "На вашу электронную почту было отправлено письмо со ссылкой для "
 "восстановления пароля."
 
-#: src/AdminAjaxPost.php:137
+#: src/AdminAjaxPost.php:174
 msgid "Token is empty"
 msgstr "Токен пустой"
 
-#: src/AdminAjaxPost.php:347
+#: src/AdminAjaxPost.php:517
 msgid "Need enter a code from SMS or email"
 msgstr "Нужно ввести код из СМС или почты"
 
-#: src/AdminAjaxPost.php:381 views/accounts/index.php:41
+#: src/AdminAjaxPost.php:549 views/accounts/index.php:39
 #, php-format
 msgid "Added %s of %s."
 msgstr "Добавлено %s из %s."
 
-#: src/Menu.php:20 views/posts.php:1
+#: src/ApiHelpers.php:101
+msgid "VKontakte"
+msgstr "ВКонтакте"
+
+#: src/ApiHelpers.php:103
+msgid "Facebook"
+msgstr ""
+
+#: src/ApiHelpers.php:105
+msgid "Odnoklassniki"
+msgstr "Одноклассники"
+
+#: src/ApiHelpers.php:107
+msgid "Telegram"
+msgstr ""
+
+#: src/ApiHelpers.php:109
+msgid "Instagram"
+msgstr ""
+
+#: src/ApiHelpers.php:130
+msgid "Published"
+msgstr "Опубликовано"
+
+#: src/ApiHelpers.php:132
+msgid "Published with error"
+msgstr "Опубликовано с ошибкой"
+
+#: src/ApiHelpers.php:134
+msgid "In queue"
+msgstr "В очереди"
+
+#: src/ApiHelpers.php:136
+msgid "Publishing in progress"
+msgstr "Сейчас публикуется"
+
+#: src/AutopostingListTable.php:14 views/scheduler/header.php:33
+msgid "Autoposting"
+msgstr "Автопостинг"
+
+#: src/AutopostingListTable.php:15
+msgid "Autopostings"
+msgstr "Автопостинги"
+
+#: src/AutopostingListTable.php:22
+msgid "No autoposting found"
+msgstr "Шаблонов автопостинга не найдено"
+
+#: src/AutopostingListTable.php:29 views/scheduler/autoposting_form.php:70
+msgid "Name"
+msgstr "Название"
+
+#: src/AutopostingListTable.php:30
+msgid "WP Post type"
+msgstr "Тип поста WP"
+
+#: src/AutopostingListTable.php:31
+msgid "When publish"
+msgstr "Когда публиковать"
+
+#: src/AutopostingListTable.php:32
+msgid "Social networks"
+msgstr "Социальные сети"
+
+#: src/AutopostingListTable.php:33 views/scheduler/autoposting_form.php:79
+msgid "Enable"
+msgstr "Вкл/Выкл"
+
+#: src/AutopostingListTable.php:52
+msgid "Edit"
+msgstr "Редактировать"
+
+#: src/AutopostingListTable.php:64 src/AutopostingListTable.php:156
+#: src/PostsListTable.php:63 views/accounts/index.php:92
+#: views/posts/detail.php:63 views/posts/index.php:63
+msgid "Delete"
+msgstr "Удалить"
+
+#: src/AutopostingListTable.php:106 views/scheduler/autoposting_form.php:20
+msgid "Immediately upon publishing the post"
+msgstr "Сразу после публикации поста"
+
+#: src/AutopostingListTable.php:108 views/posts/publish-post.php:130
+#: views/scheduler/autoposting_form.php:21
+msgid "With a delay"
+msgstr "С задержкой"
+
+#: src/AutopostingListTable.php:119
+msgid "<Not selected>"
+msgstr "<Не выбрано>"
+
+#: src/AutopostingListTable.php:151
+msgid "Are you sure you want to delete {autoposting_name}?"
+msgstr "Вы действительно хотите удалить {autoposting_name}?"
+
+#: src/AutopostingListTable.php:158 views/accounts/index.php:93
+#: views/posts/detail.php:64 views/posts/index.php:64
+#: views/scheduler/autoposting_form.php:291
+msgid "Cancel"
+msgstr "Отмена"
+
+#: src/Menu.php:20 src/PostsListTable.php:15 views/posts.php:1
+#: views/posts/index.php:28
 msgid "Posts"
 msgstr "Посты"
 
-#: src/Menu.php:24 views/profile/index.php:52
+#: src/Menu.php:24 src/PostsListTable.php:38 views/profile/index.php:49
 msgid "Accounts"
 msgstr "Аккаунты"
 
-#: src/Menu.php:28
+#: src/Menu.php:28 views/scheduler/header.php:23
 msgid "Scheduler"
 msgstr "Планировщик"
 
 #: src/Menu.php:32 views/parrotposter-user-parts.php:93
-#: views/tariffs/index.php:35
+#: views/tariffs/index.php:36
 msgid "Tariffs"
 msgstr "Тарифы"
 
 #: src/Menu.php:36 views/parrotposter-user-parts.php:92
-#: views/profile/index.php:23
+#: views/profile/index.php:22
 msgid "Profile"
 msgstr "Профиль"
 
-#: src/Profile.php:28
+#: src/PP.php:101
+msgid "ParrotPoster settings page"
+msgstr "Страница настройки ParrotPoster"
+
+#: src/PP.php:101 views/parrotposter-user-parts.php:83
+msgid "ParrotPoster"
+msgstr ""
+
+#: src/PP.php:102 views/parrotposter-auth-parts.php:32
+#: views/parrotposter-auth-parts.php:54
+#: views/parrotposter/forgot_password.php:21 views/parrotposter/index.php:21
+#: views/parrotposter/index.php:27 views/parrotposter/signup.php:21
+msgid "Authorization"
+msgstr "Авторизация"
+
+#: src/PostsListTable.php:14
+msgid "Post"
+msgstr "Пост"
+
+#: src/PostsListTable.php:22
+msgid "No posts found"
+msgstr "Посты не найдены"
+
+#: src/PostsListTable.php:36
+msgid "Text"
+msgstr "Текст"
+
+#: src/PostsListTable.php:37 views/posts/detail.php:41
+msgid "Publish at"
+msgstr "Время публикации"
+
+#: src/PostsListTable.php:58
+msgid "View"
+msgstr "Просмотр"
+
+#: src/Profile.php:23
 msgid "(expired)"
 msgstr "(истек)"
 
-#: src/Profile.php:30
+#: src/Profile.php:25
 #, php-format
 msgid "(left %s year)"
 msgid_plural "(left %s years)"
@@ -102,7 +278,7 @@ msgstr[0] "(остался %s год)"
 msgstr[1] "(осталось %s года)"
 msgstr[2] "(осталось %s лет)"
 
-#: src/Profile.php:32
+#: src/Profile.php:27
 #, php-format
 msgid "(left %s month)"
 msgid_plural "(left %s months)"
@@ -110,7 +286,7 @@ msgstr[0] "(остался %s месяц)"
 msgstr[1] "(осталось %s месяца)"
 msgstr[2] "(осталось %s месяцев)"
 
-#: src/Profile.php:34
+#: src/Profile.php:29
 #, php-format
 msgid "(left %s day)"
 msgid_plural "(left %s days)"
@@ -118,21 +294,322 @@ msgstr[0] "(остался %s день)"
 msgstr[1] "(осталось %s дня)"
 msgstr[2] "(осталось %s дней)"
 
-#: src/Tariffs.php:12
+#: src/Tariffs.php:14
 msgid "1 month"
 msgstr "1 месяц"
 
-#: src/Tariffs.php:17
+#: src/Tariffs.php:19
 msgid "3 month"
 msgstr "3 месяца"
 
-#: src/Tariffs.php:22
+#: src/Tariffs.php:24
 msgid "6 month"
 msgstr "6 месяцев"
 
-#: src/Tariffs.php:27
+#: src/Tariffs.php:29
 msgid "1 year"
 msgstr "1 год"
+
+#: src/WPListTable.php:174
+msgid "Compact view"
+msgstr ""
+
+#: src/WPListTable.php:175
+msgid "Extended view"
+msgstr ""
+
+#: src/WPListTable.php:506
+msgid "Select bulk action"
+msgstr ""
+
+#: src/WPListTable.php:508
+msgid "Bulk actions"
+msgstr ""
+
+#: src/WPListTable.php:529
+msgid "Apply"
+msgstr ""
+
+#: src/WPListTable.php:590 src/WPListTable.php:1514
+msgid "Show more details"
+msgstr ""
+
+#: src/WPListTable.php:687
+#, php-format
+msgid "%1$s %2$d"
+msgstr ""
+
+#: src/WPListTable.php:764 src/WPListTable.php:794 src/WPListTable.php:817
+msgid "No comments"
+msgstr ""
+
+#: src/WPListTable.php:794
+msgid "No approved comments"
+msgstr ""
+
+#: src/WPListTable.php:817
+msgid "No pending comments"
+msgstr ""
+
+#: src/WPListTable.php:951
+msgid "First page"
+msgstr ""
+
+#: src/WPListTable.php:962
+msgid "Previous page"
+msgstr ""
+
+#: src/WPListTable.php:969 src/WPListTable.php:973
+msgid "Current Page"
+msgstr ""
+
+#: src/WPListTable.php:992
+msgid "Next page"
+msgstr ""
+
+#: src/WPListTable.php:1003
+msgid "Last page"
+msgstr ""
+
+#: src/WPListTable.php:1238
+msgid "Select All"
+msgstr ""
+
+#: src/fields/CommonType.php:31
+msgctxt "wp_post_field"
+msgid "Break line"
+msgstr "Перевод строки"
+
+#: src/fields/CommonType.php:35 src/fields/conditions/Common.php:14
+msgctxt "wp_post_field"
+msgid "Title"
+msgstr "Заголовок"
+
+#: src/fields/CommonType.php:39
+msgctxt "wp_post_field"
+msgid "Content"
+msgstr "Контент"
+
+#: src/fields/CommonType.php:43
+msgctxt "wp_post_field"
+msgid "Excerpt"
+msgstr "Отрывок"
+
+#: src/fields/CommonType.php:54
+msgctxt "wp_post_field"
+msgid "Link"
+msgstr "Ссылка"
+
+#: src/fields/CommonType.php:65
+msgctxt "wp_post_field"
+msgid "Date"
+msgstr "Дата"
+
+#: src/fields/CommonType.php:76
+msgctxt "wp_post_field"
+msgid "Featured image"
+msgstr "Изображение поста"
+
+#: src/fields/CommonType.php:80
+msgctxt "wp_post_field"
+msgid "Images in content"
+msgstr "Изображения из контента"
+
+#: src/fields/ProductType.php:33
+msgctxt "wp_post_field"
+msgid "Product title"
+msgstr "Заголовок товара"
+
+#: src/fields/ProductType.php:37
+msgctxt "wp_post_field"
+msgid "Product short description"
+msgstr "Краткое описание товара"
+
+#: src/fields/ProductType.php:41
+msgctxt "wp_post_field"
+msgid "Product description"
+msgstr "Описание товара"
+
+#: src/fields/ProductType.php:49
+msgctxt "wp_post_field"
+msgid "Regular price"
+msgstr "Базовая цена"
+
+#: src/fields/ProductType.php:53
+msgctxt "wp_post_field"
+msgid "Sale price"
+msgstr "Цена распродажи"
+
+#: src/fields/ProductType.php:57
+msgctxt "wp_post_field"
+msgid "Product currency"
+msgstr "Валюта товара"
+
+#: src/fields/ProductType.php:61
+msgctxt "wp_post_field"
+msgid "Height"
+msgstr "Высота"
+
+#: src/fields/ProductType.php:65
+msgctxt "wp_post_field"
+msgid "Length"
+msgstr "Длинна"
+
+#: src/fields/ProductType.php:69
+msgctxt "wp_post_field"
+msgid "Width"
+msgstr "Ширина"
+
+#: src/fields/ProductType.php:73
+msgctxt "wp_post_field"
+msgid "Weight"
+msgstr "Вес"
+
+#: src/fields/ProductType.php:84
+msgctxt "wp_post_field"
+msgid "Product link"
+msgstr "Ссылка на товар"
+
+#: src/fields/ProductType.php:102
+msgctxt "wp_post_field"
+msgid "Product image"
+msgstr "Изображение товара"
+
+#: src/fields/ProductType.php:106
+msgctxt "wp_post_field"
+msgid "Product gallery"
+msgstr "Галерея товара"
+
+#: src/fields/conditions/Common.php:16
+msgctxt "wp_post_condition"
+msgid "Include"
+msgstr "Включает"
+
+#: src/fields/conditions/Common.php:17
+msgctxt "wp_post_condition"
+msgid "Not include"
+msgstr "Не включает"
+
+#: src/fields/conditions/Common.php:23
+msgctxt "wp_post_field"
+msgid "Author"
+msgstr "Автор"
+
+#: src/fields/conditions/Common.php:25 src/fields/conditions/ProductType.php:98
+#: src/fields/conditions/Taxonomies.php:19
+msgctxt "wp_post_condition"
+msgid "Equals one of"
+msgstr "Равно одному из"
+
+#: src/fields/conditions/Common.php:26 src/fields/conditions/ProductType.php:99
+#: src/fields/conditions/Taxonomies.php:20
+msgctxt "wp_post_condition"
+msgid "Not equal to one of"
+msgstr "Не равно одному из"
+
+#: src/fields/conditions/ProductType.php:18
+msgctxt "wp_post_field"
+msgid "Product regular price"
+msgstr "Базовая цена товара"
+
+#: src/fields/conditions/ProductType.php:20
+#: src/fields/conditions/ProductType.php:33
+#: src/fields/conditions/ProductType.php:46
+#: src/fields/conditions/ProductType.php:59
+#: src/fields/conditions/ProductType.php:72
+#: src/fields/conditions/ProductType.php:85
+msgctxt "wp_post_condition"
+msgid "Equal"
+msgstr "Равно"
+
+#: src/fields/conditions/ProductType.php:21
+#: src/fields/conditions/ProductType.php:34
+#: src/fields/conditions/ProductType.php:47
+#: src/fields/conditions/ProductType.php:60
+#: src/fields/conditions/ProductType.php:73
+#: src/fields/conditions/ProductType.php:86
+msgctxt "wp_post_condition"
+msgid "Not equal"
+msgstr "Не равно"
+
+#: src/fields/conditions/ProductType.php:22
+#: src/fields/conditions/ProductType.php:35
+#: src/fields/conditions/ProductType.php:48
+#: src/fields/conditions/ProductType.php:61
+#: src/fields/conditions/ProductType.php:74
+#: src/fields/conditions/ProductType.php:87
+msgctxt "wp_post_condition"
+msgid "Less"
+msgstr "Меньше"
+
+#: src/fields/conditions/ProductType.php:23
+#: src/fields/conditions/ProductType.php:36
+#: src/fields/conditions/ProductType.php:49
+#: src/fields/conditions/ProductType.php:62
+#: src/fields/conditions/ProductType.php:75
+#: src/fields/conditions/ProductType.php:88
+msgctxt "wp_post_condition"
+msgid "Less or equal"
+msgstr "Меньше или равно"
+
+#: src/fields/conditions/ProductType.php:24
+#: src/fields/conditions/ProductType.php:37
+#: src/fields/conditions/ProductType.php:50
+#: src/fields/conditions/ProductType.php:63
+#: src/fields/conditions/ProductType.php:76
+#: src/fields/conditions/ProductType.php:89
+msgctxt "wp_post_condition"
+msgid "Greater"
+msgstr "Больше"
+
+#: src/fields/conditions/ProductType.php:25
+#: src/fields/conditions/ProductType.php:38
+#: src/fields/conditions/ProductType.php:51
+#: src/fields/conditions/ProductType.php:64
+#: src/fields/conditions/ProductType.php:77
+#: src/fields/conditions/ProductType.php:90
+msgctxt "wp_post_condition"
+msgid "Greater or equal"
+msgstr "Больше или равно"
+
+#: src/fields/conditions/ProductType.php:31
+msgctxt "wp_post_field"
+msgid "Product min regular price"
+msgstr "Минимальная базовая цена товара"
+
+#: src/fields/conditions/ProductType.php:44
+msgctxt "wp_post_field"
+msgid "Product max regular price"
+msgstr "Максимальная базовая цена товара"
+
+#: src/fields/conditions/ProductType.php:57
+msgctxt "wp_post_field"
+msgid "Product sale price"
+msgstr "Цена распродажи товара"
+
+#: src/fields/conditions/ProductType.php:70
+msgctxt "wp_post_field"
+msgid "Product min sale price"
+msgstr "Минимальная цена распродажи товара"
+
+#: src/fields/conditions/ProductType.php:83
+msgctxt "wp_post_field"
+msgid "Product max sale price"
+msgstr "Максимальная цена распродажи товара"
+
+#: src/fields/conditions/ProductType.php:96
+msgctxt "wp_post_field"
+msgid "Product type"
+msgstr "Тип товара"
+
+#: views/accounts/choice_list.php:25
+msgid "You have no accounts connected"
+msgstr "Нет подключенных аккаунтов"
+
+#: views/accounts/choice_list.php:28
+#, php-format
+msgid "To connect, go to <a href=\"%s\">Accounts</a>"
+msgstr "Для подключения перейдите в <a href=\"%s\">Аккаунты</a>"
 
 #: views/accounts/connect.php:15
 msgid ""
@@ -204,8 +681,8 @@ msgstr ""
 
 #: views/accounts/connect.php:38 views/accounts/connect.php:39
 #: views/accounts/connect.php:40 views/accounts/connect.php:41
-#: views/accounts/connect.php:42 views/accounts/connect.php:80
-#: views/accounts/connect.php:108
+#: views/accounts/connect.php:42 views/accounts/connect.php:83
+#: views/accounts/connect.php:111
 msgid "Connect"
 msgstr "Подключить"
 
@@ -222,21 +699,21 @@ msgstr "Имя пользователя"
 msgid "Your Instagram username: @example or example"
 msgstr "Ваше имя пользователя в Instagram: @example или example"
 
-#: views/accounts/connect.php:59 views/parrotposter-auth-parts.php:75
+#: views/accounts/connect.php:60 views/parrotposter-auth-parts.php:75
 #: views/parrotposter-auth-parts.php:105 views/parrotposter/index.php:42
 #: views/parrotposter/reset_password.php:47 views/parrotposter/signup.php:47
 msgid "Password"
 msgstr "Пароль"
 
-#: views/accounts/connect.php:61
+#: views/accounts/connect.php:62
 msgid "We do not store passwords anywhere"
 msgstr "Мы нигде не сохраняем пароли"
 
-#: views/accounts/connect.php:66
+#: views/accounts/connect.php:68
 msgid "Proxy (optional)"
 msgstr "Прокси (опционально)"
 
-#: views/accounts/connect.php:68
+#: views/accounts/connect.php:70
 msgid ""
 "You can enter a proxy for Instagram connection. Proxy format: https://user:"
 "password@domain_or_ip:port"
@@ -244,35 +721,35 @@ msgstr ""
 "Вы можете ввести прокси для подключения к Instagram. Формат прокси: https://;"
 "inuser:password@domain_or_ip:port"
 
-#: views/accounts/connect.php:73
+#: views/accounts/connect.php:76
 msgid "Code"
 msgstr "Код"
 
-#: views/accounts/connect.php:87
+#: views/accounts/connect.php:90
 msgid "Connect Telegram"
 msgstr "Подключить Telegram"
 
-#: views/accounts/connect.php:91
+#: views/accounts/connect.php:94
 msgid "Telegram bot token"
 msgstr "Токен бота Telegram"
 
-#: views/accounts/connect.php:98
+#: views/accounts/connect.php:101
 msgid "Channel or group link"
 msgstr "Ссылка на канал или группу"
 
-#: views/accounts/index.php:37
+#: views/accounts/index.php:35
 msgid "Social networks accounts"
 msgstr "Аккаунты социальных сетей"
 
-#: views/accounts/index.php:43
+#: views/accounts/index.php:41
 msgid "Change tariff"
 msgstr "Сменить тариф"
 
-#: views/accounts/index.php:53
+#: views/accounts/index.php:49
 msgid "You haven't connected your social networks accounts yet"
 msgstr "У вас еще нет подключенных аккаунтов социальных сетей"
 
-#: views/accounts/index.php:57
+#: views/accounts/index.php:53
 msgid ""
 "To connect, you need to be the administrator of the group/page/channel and "
 "provide all accesses that ParrotPoster asks for, so that everything works "
@@ -282,41 +759,33 @@ msgstr ""
 "предоставить все доступы, которые запрашивает ParrotPoster, чтобы всё "
 "работало корректно"
 
-#: views/accounts/index.php:93
+#: views/accounts/index.php:89
 msgid "Are you sure you want to delete \"#account_name#\""
 msgstr "Вы действительно хотите удалить \"#account_name#\""
 
-#: views/accounts/index.php:96
-msgid "Delete"
-msgstr "Удалить"
-
-#: views/accounts/index.php:97
-msgid "Cancel"
-msgstr "Отмена"
-
 #: views/parrotposter-auth-parts.php:34 views/parrotposter-auth-parts.php:55
-#: views/parrotposter/forgot_password.php:23 views/parrotposter/index.php:23
-#: views/parrotposter/signup.php:23 views/parrotposter/signup.php:28
+#: views/parrotposter/forgot_password.php:22 views/parrotposter/index.php:22
+#: views/parrotposter/signup.php:22 views/parrotposter/signup.php:27
 msgid "Registration"
 msgstr "Регистрация"
 
 #: views/parrotposter-auth-parts.php:36
 #: views/parrotposter-reset-password-part.php:33
-#: views/parrotposter/reset_password.php:38
+#: views/parrotposter/reset_password.php:37
 msgid "Reset password"
 msgstr "Сброс пароля"
 
 #: views/parrotposter-auth-parts.php:56
-#: views/parrotposter/forgot_password.php:24
-#: views/parrotposter/forgot_password.php:28 views/parrotposter/index.php:24
-#: views/parrotposter/signup.php:24
+#: views/parrotposter/forgot_password.php:23
+#: views/parrotposter/forgot_password.php:27 views/parrotposter/index.php:23
+#: views/parrotposter/signup.php:23
 msgid "Forgot password?"
 msgstr "Забыли пароль?"
 
 #: views/parrotposter-auth-parts.php:69 views/parrotposter-auth-parts.php:99
 #: views/parrotposter-auth-parts.php:129
 #: views/parrotposter/forgot_password.php:36 views/parrotposter/index.php:37
-#: views/parrotposter/signup.php:42 views/profile/index.php:42
+#: views/parrotposter/signup.php:42 views/profile/index.php:39
 msgid "Email"
 msgstr ""
 
@@ -325,7 +794,7 @@ msgid "Login"
 msgstr "Войти"
 
 #: views/parrotposter-auth-parts.php:93 views/parrotposter/signup.php:37
-#: views/profile/index.php:36
+#: views/profile/index.php:33
 msgid "Your name"
 msgstr "Ваше имя"
 
@@ -344,74 +813,6 @@ msgstr "Зарегистрироваться"
 msgid "Send"
 msgstr "Отправить"
 
-#: views/parrotposter-publish-post-part.php:10
-msgid "Error post_id"
-msgstr "Ошибка post_id"
-
-#: views/parrotposter-publish-post-part.php:106
-msgid "Publish:"
-msgstr "Опубликовать:"
-
-#: views/parrotposter-publish-post-part.php:115
-msgid "Available keys"
-msgstr "Доступные ключи"
-
-#: views/parrotposter-publish-post-part.php:133
-msgid "Post text"
-msgstr "Текст поста"
-
-#: views/parrotposter-publish-post-part.php:138
-msgid "Post link"
-msgstr "Ссылка поста"
-
-#: views/parrotposter-publish-post-part.php:143
-msgid "Select post images"
-msgstr "Выберите изображения поста"
-
-#: views/parrotposter-publish-post-part.php:155
-msgid "Select publication time"
-msgstr "Выберите время публикации"
-
-#: views/parrotposter-publish-post-part.php:158
-msgid "Now"
-msgstr "Сейчас"
-
-#: views/parrotposter-publish-post-part.php:165
-msgid "Post time"
-msgstr "Время поста"
-
-#: views/parrotposter-publish-post-part.php:173
-msgid "Enter another time"
-msgstr "Ввести другое время"
-
-#: views/parrotposter-publish-post-part.php:175
-msgid "Enter time"
-msgstr "Введите время"
-
-#: views/parrotposter-publish-post-part.php:180
-msgid "Select social networks"
-msgstr "Выберите соц. сети"
-
-#: views/parrotposter-publish-post-part.php:199
-msgid ""
-"You don't have social media accounts. To create a post, first connect the "
-"social media accounts you want."
-msgstr ""
-"У вас нет аккаунтов социальных сетей. Чтобы создать пост, сначала подключите "
-"нужные вам аккаунты социальных сетей."
-
-#: views/parrotposter-publish-post-part.php:205
-msgid "1. You need to fill in the text or choose pictures."
-msgstr "1. Вам нужно заполнить текст или выбрать картинки."
-
-#: views/parrotposter-publish-post-part.php:206
-msgid "2. Select at least one social network account"
-msgstr "2. Выберите хотя бы один аккаунт в социальной сети"
-
-#: views/parrotposter-publish-post-part.php:208
-msgid "Publish"
-msgstr "Опубликовать"
-
 #: views/parrotposter-reset-password-part.php:48
 msgid "New password"
 msgstr "Новый пароль"
@@ -424,7 +825,7 @@ msgstr "Отправить"
 msgid "Payment in ParrotPoster"
 msgstr "Оплата в ParrotPoster"
 
-#: views/parrotposter-tariff-payed.php:6 views/tariffs/success.php:18
+#: views/parrotposter-tariff-payed.php:6 views/tariffs/success.php:17
 msgid "You paid successfully. Thank you!"
 msgstr "Вы успешно оплатили. Спасибо!"
 
@@ -460,7 +861,7 @@ msgstr "Текущий тариф: %s (%s/%s аккаунтов)"
 msgid "Expiry at %s"
 msgstr "Истекает %s"
 
-#: views/parrotposter-user-parts.php:112 views/profile/index.php:69
+#: views/parrotposter-user-parts.php:112 views/profile/index.php:66
 msgid "Logout"
 msgstr "Выйти"
 
@@ -474,36 +875,392 @@ msgstr "Изменить тариф и оплатить вы можете чер
 msgid "Save"
 msgstr "Сохранить"
 
-#: views/post-meta-box.php:17
+#: views/post-meta-box.php:23
 msgid "Publish to socials network"
 msgstr "Опубликовать в социальные сети"
 
-#: views/post-meta-box.php:23
-msgid "Post details"
-msgstr "Подробности поста"
+#: views/post-meta-box.php:29
+msgid "Show published posts on social networks"
+msgstr "Показать опубликованные в соц. сетях посты"
 
-#: views/post-meta-box.php:34
-msgid "Close"
-msgstr "Закрыть"
+#: views/post-meta-box.php:30
+msgid "Hide"
+msgstr "Скрыть"
 
 #: views/posts.php:4
 msgid "To view your posts go to web app:"
 msgstr "Чтобы просмотреть свои посты, перейдите в веб-приложение:"
 
-#: views/profile/index.php:47
+#: views/posts/add.php:16
+msgid "Creating post"
+msgstr "Создание поста"
+
+#: views/posts/add.php:22 views/scheduler/unload.php:22
+msgid "This section is in development"
+msgstr "Этот раздел находится в разработке"
+
+#: views/posts/detail.php:23 views/scheduler/autoposting_form.php:197
+msgid "Tags"
+msgstr "Теги"
+
+#: views/posts/detail.php:32 views/posts/publish-post.php:98
+#: views/scheduler/autoposting_form.php:139
+msgid "Link"
+msgstr "Ссылка"
+
+#: views/posts/detail.php:51
+msgid "Delete post"
+msgstr "Удалить пост"
+
+#: views/posts/detail.php:60 views/posts/index.php:60
+msgid "Are you sure you want to delete post from ParrotPoster?"
+msgstr "Вы уверены что хотите удалить пост из ParrotPoster?"
+
+#: views/posts/index.php:40
+msgid "You don't have posts yet"
+msgstr "У вас еще нет постов"
+
+#: views/posts/index.php:44
+msgid ""
+"Set up auto-posting in the Scheduler or post directly from an article, "
+"product, etc"
+msgstr ""
+"Настройте автопостинг в Планировщике или опубликуйте пост напрямую из статьи/"
+"товара/и т.д"
+
+#: views/posts/publish-post.php:15
+msgid "Error post_id"
+msgstr "Ошибка post_id"
+
+#: views/posts/publish-post.php:74
+#, php-format
+msgid "Publish: %s"
+msgstr "Публикация: %s"
+
+#: views/posts/publish-post.php:87
+msgid "Post data"
+msgstr "Данные поста"
+
+#: views/posts/publish-post.php:91 views/scheduler/autoposting_form.php:118
+msgid "Post text"
+msgstr "Текст поста"
+
+#: views/posts/publish-post.php:104
+msgid "Select post images"
+msgstr "Выберите изображения поста"
+
+#: views/posts/publish-post.php:115
+msgid "Use drag'n'drop to move images. A maximum of 10 images will be loaded"
+msgstr ""
+"Используйте drag'n'drop для перемещения изображений. Максимум может быть "
+"загружено 10 изображений"
+
+#: views/posts/publish-post.php:121 views/scheduler/autoposting_form.php:230
+msgid "When to publish"
+msgstr "Когда публиковать"
+
+#: views/posts/publish-post.php:126
+msgid "Now"
+msgstr "Сейчас"
+
+#: views/posts/publish-post.php:128
+msgid "Post date"
+msgstr "Дата поста"
+
+#: views/posts/publish-post.php:131
+msgid "Enter a specific time"
+msgstr "Ввести другое время"
+
+#: views/posts/publish-post.php:136 views/scheduler/autoposting_form.php:249
+msgid "Publish with a delay of 1 to 10 minutes"
+msgstr "Публикация с задержкой от 1 до 10 минут"
+
+#: views/posts/publish-post.php:142
+msgid "Specific time"
+msgstr "Определенное время"
+
+#: views/posts/publish-post.php:151 views/scheduler/autoposting_form.php:215
+msgid "Choice of social networks"
+msgstr "Выберите социальные сети"
+
+#: views/posts/publish-post.php:159 views/scheduler/autoposting_form.php:223
+msgid "Images must be in jpg/png/wepb format"
+msgstr "Изображение должно быть в формате jpg/png/wepb"
+
+#: views/posts/publish-post.php:160 views/scheduler/autoposting_form.php:224
+msgid "The weight of one image must not exceed 10MB"
+msgstr "Вес изображения не должен превышать 10Мб"
+
+#: views/posts/publish-post.php:161 views/scheduler/autoposting_form.php:225
+msgid "There can be no more than 10 images in a post"
+msgstr "В посте не может быть больше 10 изображений"
+
+#: views/posts/publish-post.php:162 views/scheduler/autoposting_form.php:226
+msgid "Only one image is uploaded to Facebook (the first image in the list)"
+msgstr "В Facebook будет загружено только одно изображение (первое из списка)"
+
+#: views/posts/publish-post.php:166 views/scheduler/autoposting_form.php:269
+msgid "Additional settings for VKontakte"
+msgstr "Дополнительные настройки для ВКонтакте"
+
+#: views/posts/publish-post.php:171 views/scheduler/autoposting_form.php:274
+msgid "Publish a post on behalf of the group"
+msgstr "Опубликовать пост от имени группы"
+
+#: views/posts/publish-post.php:176 views/scheduler/autoposting_form.php:279
+msgid "Add a signature to the post"
+msgstr "Добавить подпись к посту"
+
+#: views/posts/publish-post.php:182
+msgid "1. You need to fill in the text or choose pictures."
+msgstr "1. Вам нужно заполнить текст или выбрать картинки."
+
+#: views/posts/publish-post.php:183
+msgid "2. Select at least one social network account"
+msgstr "2. Выберите хотя бы один аккаунт в социальной сети"
+
+#: views/posts/publish-post.php:188
+msgid "Publish"
+msgstr "Опубликовать"
+
+#: views/profile/index.php:44
 msgid "Tariff"
 msgstr "Тариф"
 
-#: views/profile/index.php:53 views/tariffs/index.php:46
+#: views/profile/index.php:50 views/tariffs/index.php:45
 #, php-format
 msgid "%s of %s"
 msgstr "%s из %s"
 
-#: views/profile/index.php:57
+#: views/profile/index.php:54
 msgid "Expiry at"
 msgstr "Срок действия"
 
-#: views/tariffs/fail.php:18
+#: views/scheduler/autoposting_add.php:14
+msgid "Autoposting #1"
+msgstr "Автопостинг #1"
+
+#: views/scheduler/autoposting_add.php:39
+msgid "Creating autoposting"
+msgstr "Создание автопубликации"
+
+#: views/scheduler/autoposting_edit.php:26
+msgid "Edit autoposting"
+msgstr "Редактирование автопубликации"
+
+#: views/scheduler/autoposting_form.php:30
+#: views/scheduler/autoposting_form.php:42
+msgctxt "wp_post_type"
+msgid "Select field"
+msgstr "Выберите поле"
+
+#: views/scheduler/autoposting_form.php:66
+msgid "General"
+msgstr "Общие"
+
+#: views/scheduler/autoposting_form.php:73
+msgid "Name of autoposting template"
+msgstr "Название шаблона автопубликации"
+
+#: views/scheduler/autoposting_form.php:83
+msgid "Activation conditions"
+msgstr "Условия активации"
+
+#: views/scheduler/autoposting_form.php:87
+msgid "Wordpress post type"
+msgstr "Тип поста Wordpress"
+
+#: views/scheduler/autoposting_form.php:98
+msgid ""
+"Post type for autoposting. If you change the value, you should press the "
+"Reload button to display changes in the template fields"
+msgstr ""
+"Тип поста для автопостинга. При изменении значения необходимо нажать кнопку "
+"Reload, чтобы отобразить изменения в полях шаблона"
+
+#: views/scheduler/autoposting_form.php:103
+msgid "Custom conditions"
+msgstr "Кастомные условия"
+
+#: views/scheduler/autoposting_form.php:108
+msgid "The post will be published if all conditions are met"
+msgstr "Пост будет опубликован при соблюдении всех условий"
+
+#: views/scheduler/autoposting_form.php:114
+msgid "Post template"
+msgstr "Шаблон поста"
+
+#: views/scheduler/autoposting_form.php:134
+msgid ""
+"The text of the post in the social networks. Customize the template the way "
+"you need, using substitution macros"
+msgstr ""
+"Текст поста в социальных сетях. Настройте шаблон так, как вам нужно, "
+"используя макросы подстановки"
+
+#: views/scheduler/autoposting_form.php:142
+msgid ""
+"The link to the site with the news or product. You can delete the macros so "
+"that the link will not be published"
+msgstr ""
+"Ссылка на сайт с новостью или товаром. Вы можете удалить макросы, чтобы "
+"ссылка не публиковалась"
+
+#: views/scheduler/autoposting_form.php:149
+msgid "UTM tags"
+msgstr "UTM теги"
+
+#: views/scheduler/autoposting_form.php:152
+msgid ""
+"If checked, special UTM tags will be added to the end of the link (the field "
+"above) to track traffic in analytics"
+msgstr ""
+"Если флажок установлен, в конец ссылки (поле выше) будут добавлены "
+"специальные UTM-метки для отслеживания трафика в аналитике"
+
+#: views/scheduler/autoposting_form.php:157
+msgctxt "utm"
+msgid "Traffic source"
+msgstr "Источник трафика"
+
+#: views/scheduler/autoposting_form.php:160
+msgid ""
+"You can use {social_code} macro, which will be replaced by a social network "
+"code (telegram, facebook, etc) when published"
+msgstr ""
+"Вы можете использовать макрос {social_code}, который при публикации будет "
+"заменен на код социальной сети (telegram, facebook и т.д.)"
+
+#: views/scheduler/autoposting_form.php:165
+msgctxt "utm"
+msgid "Traffic type"
+msgstr "Тип трафика"
+
+#: views/scheduler/autoposting_form.php:168
+msgid ""
+"Identifies what type of link was used, such as cost per click or email. "
+"Example: cpc"
+msgstr ""
+"Определяет, какой тип ссылки был использован, например, стоимость за клик "
+"или электронная почта. Пример: cpc"
+
+#: views/scheduler/autoposting_form.php:173
+msgctxt "utm"
+msgid "Campaign name"
+msgstr "Название кампании"
+
+#: views/scheduler/autoposting_form.php:176
+msgid ""
+"Identifies a specific product promotion or strategic campaign. Example: news"
+msgstr ""
+"Определяет конкретное продвижение продукта или стратегическую кампанию. "
+"Пример: новости"
+
+#: views/scheduler/autoposting_form.php:181
+msgctxt "utm"
+msgid "Keyword"
+msgstr "Ключевые слова"
+
+#: views/scheduler/autoposting_form.php:184
+msgid "Identifies search terms"
+msgstr "Определяет поисковые запросы"
+
+#: views/scheduler/autoposting_form.php:189
+msgctxt "utm"
+msgid "Content type"
+msgstr "Тип контента"
+
+#: views/scheduler/autoposting_form.php:192
+msgid ""
+"Identifies what specifically was clicked to bring the user to the site, such "
+"as a banner ad or a text link. It is often used for A/B testing and content-"
+"targeted ads"
+msgstr ""
+"Определяет, что именно было нажато, чтобы привести пользователя на сайт, "
+"например, баннерная реклама или текстовая ссылка. Часто используется для A/B-"
+"тестирования и рекламы, нацеленной на контент."
+
+#: views/scheduler/autoposting_form.php:200
+msgid ""
+"Tags (hashtags) will be added to the end of the post text. Tags from this "
+"field will be converted to \"correct\" hashtags for social networks. For "
+"example, \"red book, bestseller\" will be converted to \"#red #book "
+"#bestseller\""
+msgstr ""
+"Теги (хэштеги) будут добавлены в конец текста поста. Теги из этого поля "
+"будут преобразованы в \"правильные\" хэштеги для социальных сетей. Например, "
+"\"красная книга, бестселлер\" будет преобразовано в \"#красная #книга "
+"#бестселлер\"."
+
+#: views/scheduler/autoposting_form.php:205
+msgid "Images"
+msgstr "Изображения"
+
+#: views/scheduler/autoposting_form.php:210
+msgid ""
+"Images for posting to social networks. You can specify several fields from "
+"which images from the news, products, etc. will be taken. For posting to "
+"Instagram the image is required"
+msgstr ""
+"Изображения для размещения в социальных сетях. Вы можете указать несколько "
+"полей, из которых будут браться изображения из новостей, товаров и т.д. Для "
+"постинга в Instagram требуется изображение"
+
+#: views/scheduler/autoposting_form.php:244
+msgid ""
+"You can specify the time when the post will be published. Immediately - the "
+"post will be published on social networks at the same time when the news, "
+"product, etc. is published. With a delay - the post will be published with a "
+"delay of the specified number of minutes"
+msgstr ""
+"Вы можете указать время, когда будет опубликован пост. Сразу после "
+"публикации - пост будет опубликован в социальных сетях одновременно с "
+"публикацией новости, продукта и т.д. С задержкой - пост будет опубликован с "
+"задержкой на указанное количество минут."
+
+#: views/scheduler/autoposting_form.php:255
+msgid "Additional settings"
+msgstr "Дополнительные настройки"
+
+#: views/scheduler/autoposting_form.php:261
+msgid "Exclude duplicates (within this template)"
+msgstr "Исключать дубликаты (в рамках данного шаблона)"
+
+#: views/scheduler/autoposting_form.php:264
+msgid ""
+"If checked, the same news, product, etc. will not be republished within this "
+"autopublishing template. If not checked, the same post can be published "
+"several times"
+msgstr ""
+"Если флажок установлен, одна и та же новость, продукт и т.д. не будет "
+"повторно публиковаться в этом шаблоне автопубликации. Если флажок не "
+"установлен, одно и то же сообщение может быть опубликовано несколько раз"
+
+#: views/scheduler/autoposting_form.php:286
+msgid "Update"
+msgstr "Обновить"
+
+#: views/scheduler/autoposting_form.php:288
+msgid "Create"
+msgstr "Создать"
+
+#: views/scheduler/header.php:10 views/scheduler/index.php:36
+msgid "+ Add autoposting"
+msgstr "+ Добавить автопостинг"
+
+#: views/scheduler/header.php:15
+msgid "+ Add autounloading"
+msgstr "+ Добавить автовыгрузку"
+
+#: views/scheduler/header.php:39
+msgid "Autounloading"
+msgstr "Автовыгрузка"
+
+#: views/scheduler/index.php:31
+msgid "You don't have autopublications yet"
+msgstr "У вас еще нет ни одно автопубликации"
+
+#: views/tariffs/fail.php:17
 msgid ""
 "There was an error making the payment, try again! Or report it to "
 "support@parrotposter.com"
@@ -511,60 +1268,118 @@ msgstr ""
 "Произошла ошибка при проведении платежа, попробуйте еще раз! Или сообщите об "
 "этом на support@parrotposter.com"
 
-#: views/tariffs/fail.php:22 views/tariffs/success.php:22
+#: views/tariffs/fail.php:21 views/tariffs/success.php:21
 msgid "Back to tariffs"
 msgstr "Назад к тарифам"
 
-#: views/tariffs/index.php:41
+#: views/tariffs/index.php:40
 msgid "Your tariff"
 msgstr "Ваш тариф"
 
-#: views/tariffs/index.php:45
+#: views/tariffs/index.php:44
 msgid "Added accounts"
 msgstr "Добавлено аккаунтов"
 
-#: views/tariffs/index.php:49
+#: views/tariffs/index.php:48
 msgid "Tariff expired at"
 msgstr "Срок тарифа"
 
-#: views/tariffs/index.php:82
+#: views/tariffs/index.php:81
 msgid "Current"
 msgstr "Текущий"
 
-#: views/tariffs/index.php:87
+#: views/tariffs/index.php:86
 msgid "per month"
 msgstr "в месяц"
 
-#: views/tariffs/index.php:94
+#: views/tariffs/index.php:93
 msgid "Unlimited posts"
 msgstr "Неограниченное количество постов"
 
-#: views/tariffs/index.php:97
+#: views/tariffs/index.php:96
 #, php-format
 msgid "%s accounts of social networks"
 msgstr "%s аккаунтов соц. сетей"
 
-#: views/tariffs/index.php:103 views/tariffs/index.php:111
+#: views/tariffs/index.php:102 views/tariffs/index.php:110
 msgid "Select and pay"
 msgstr "Выбрать и оплатить"
 
-#: views/tariffs/index.php:107
+#: views/tariffs/index.php:106
 msgid "Prolong"
 msgstr "Продлить"
 
-#: views/tariffs/index.php:122
+#: views/tariffs/index.php:121
 msgid ""
 "The price in dollars is calculated on the basis of the Bank of Russia "
 "exchange rate"
 msgstr "Цена в долларах подсчитана на основе курса Банка России"
 
-#: views/tariffs/index.php:127
+#: views/tariffs/index.php:126
 msgid ""
 "If you select a new tariff, the remaining days at the current tariff will be "
 "recalculated and transferred to the new tariff"
 msgstr ""
 "При выборе нового тарифа остатки дней по текущему тарифу пересчитаются и "
 "перейдут на новый тариф"
+
+#~ msgid "Traffic source"
+#~ msgstr "Источник трафика"
+
+#~ msgid "Traffic type"
+#~ msgstr "Тип трафика"
+
+#~ msgid "Campaign name"
+#~ msgstr "Название кампании"
+
+#~ msgid "Keyword"
+#~ msgstr "Ключевые слова"
+
+#~ msgid "Content type"
+#~ msgstr "Тип контента"
+
+#~ msgid "Title"
+#~ msgstr "Заголовок"
+
+#~ msgid "Author"
+#~ msgstr "Автор"
+
+#~ msgid "Publish:"
+#~ msgstr "Опубликовать:"
+
+#~ msgid "Available keys"
+#~ msgstr "Доступные ключи"
+
+#~ msgid "Post link"
+#~ msgstr "Ссылка поста"
+
+#~ msgid "Select publication time"
+#~ msgstr "Выберите время публикации"
+
+#~ msgid "Post time"
+#~ msgstr "Время поста"
+
+#~ msgid "Enter another time"
+#~ msgstr "Ввести другое время"
+
+#~ msgid "Enter time"
+#~ msgstr "Введите время"
+
+#~ msgid "Select social networks"
+#~ msgstr "Выберите соц. сети"
+
+#~ msgid ""
+#~ "You don't have social media accounts. To create a post, first connect the "
+#~ "social media accounts you want."
+#~ msgstr ""
+#~ "У вас нет аккаунтов социальных сетей. Чтобы создать пост, сначала "
+#~ "подключите нужные вам аккаунты социальных сетей."
+
+#~ msgid "Post details"
+#~ msgstr "Подробности поста"
+
+#~ msgid "Close"
+#~ msgstr "Закрыть"
 
 #~ msgid ""
 #~ "1. Create your telegram bot <br>\n"
@@ -629,30 +1444,6 @@ msgstr ""
 #~ msgctxt "connect-insta"
 #~ msgid "Login"
 #~ msgstr "Логин"
-
-#~ msgid "Posts have not yet been created"
-#~ msgstr "Посты еще не созданы"
-
-#~ msgid "Post published at"
-#~ msgstr "Время публикации"
-
-#~ msgid "Status"
-#~ msgstr "Статус"
-
-#~ msgid "View details"
-#~ msgstr "Посмотреть подробнее"
-
-#~ msgid "View post"
-#~ msgstr "Посмотреть пост"
-
-#~ msgid "Remove post"
-#~ msgstr "Удалить пост"
-
-#~ msgid "Remove post from ParrotPoster and social networks?"
-#~ msgstr "Удалить пост из ParrotPoster и из социальных сетей?"
-
-#~ msgid "Removed success"
-#~ msgstr "Успешно удалено"
 
 #~ msgid "Social media accounts"
 #~ msgstr "Аккаунты соц. сетей"

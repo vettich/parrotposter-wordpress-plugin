@@ -154,7 +154,7 @@ $conditions_json = json_encode($conditions_data);
 			</div>
 
 			<label class="parrotposter-input parrotposter--utm-param">
-				<span><?php parrotposter_e('Traffic source [utm_source]') ?></span>
+				<span><?php parrotposter_xe('Traffic source', 'utm') ?> [utm_source]</span>
 				<input type="text" name="parrotposter[utm_source]" value="<?php echo $data->utm_source ?>">
 				<div class="parrotposter-input__info">
 					<?php parrotposter_e('You can use {social_code} macro, which will be replaced by a social network code (telegram, facebook, etc) when published') ?>
@@ -162,7 +162,7 @@ $conditions_json = json_encode($conditions_data);
 			</label>
 
 			<label class="parrotposter-input parrotposter--utm-param">
-				<span><?php parrotposter_e('Traffic type [utm_medium]') ?></span>
+				<span><?php parrotposter_xe('Traffic type', 'utm') ?> [utm_medium]</span>
 				<input type="text" name="parrotposter[utm_medium]" value="<?php echo $data->utm_medium ?>">
 				<div class="parrotposter-input__info">
 					<?php parrotposter_e('Identifies what type of link was used, such as cost per click or email. Example: cpc') ?>
@@ -170,7 +170,7 @@ $conditions_json = json_encode($conditions_data);
 			</label>
 
 			<label class="parrotposter-input parrotposter--utm-param">
-				<span><?php parrotposter_e('Campaign name [utm_campaign]') ?></span>
+				<span><?php parrotposter_xe('Campaign name', 'utm') ?> [utm_campaign]</span>
 				<input type="text" name="parrotposter[utm_campaign]" value="<?php echo $data->utm_campaign ?>">
 				<div class="parrotposter-input__info">
 					<?php parrotposter_e('Identifies a specific product promotion or strategic campaign. Example: news') ?>
@@ -178,7 +178,7 @@ $conditions_json = json_encode($conditions_data);
 			</label>
 
 			<label class="parrotposter-input parrotposter--utm-param">
-				<span><?php parrotposter_e('Keyword [utm_term]') ?></span>
+				<span><?php parrotposter_xe('Keyword', 'utm') ?> [utm_term]</span>
 				<input type="text" name="parrotposter[utm_term]" value="<?php echo $data->utm_term ?>">
 				<div class="parrotposter-input__info">
 					<?php parrotposter_e('Identifies search terms') ?>
@@ -186,7 +186,7 @@ $conditions_json = json_encode($conditions_data);
 			</label>
 
 			<label class="parrotposter-input parrotposter--utm-param">
-				<span><?php parrotposter_e('Content type [utm_content]') ?></span>
+				<span><?php parrotposter_xe('Content type', 'utm') ?> [utm_content]</span>
 				<input type="text" name="parrotposter[utm_content]" value="<?php echo $data->utm_content ?>">
 				<div class="parrotposter-input__info">
 					<?php parrotposter_e('Identifies what specifically was clicked to bring the user to the site, such as a banner ad or a text link. It is often used for A/B testing and content-targeted ads') ?>

@@ -43,3 +43,13 @@ if (!function_exists('parrotposter_x')) {
 		return sprintf(_x($msg, $context, 'parrotposter'), ...$values);
 	}
 }
+
+if (!function_exists('parrotposter_xe')) {
+	function parrotposter_xe($msg, $context, ...$values)
+	{
+		foreach ($values as $k => $v) {
+			$values[$k] = esc_html($v);
+		}
+		echo sprintf(_x($msg, $context, 'parrotposter'), ...$values);
+	}
+}

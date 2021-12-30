@@ -11,7 +11,7 @@ class Common
 		$fields = [
 			[
 				'key' => 'title',
-				'label' => parrotposter__('Title'),
+				'label' => parrotposter_x('Title', 'wp_post_field'),
 				'ops' => [
 					'include' => parrotposter_x('Include', 'wp_post_condition'),
 					'not_include' => parrotposter_x('Not include', 'wp_post_condition'),
@@ -20,7 +20,7 @@ class Common
 			],
 			[
 				'key' => 'author',
-				'label' => parrotposter__('Author'),
+				'label' => parrotposter_x('Author', 'wp_post_field'),
 				'ops' => [
 					'equal' => parrotposter_x('Equals one of', 'wp_post_condition'),
 					'not_equal' => parrotposter_x('Not equal to one of', 'wp_post_condition'),

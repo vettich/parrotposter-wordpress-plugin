@@ -15,7 +15,7 @@ class ProductType
 		$fields = [
 			[
 				'key' => 'product_regular_price',
-				'label' => parrotposter__('Product regular price'),
+				'label' => parrotposter_x('Product regular price', 'wp_post_field'),
 				'ops' => [
 					'equal' => parrotposter_x('Equal', 'wp_post_condition'),
 					'not_equal' => parrotposter_x('Not equal', 'wp_post_condition'),
@@ -28,7 +28,7 @@ class ProductType
 			],
 			[
 				'key' => 'product_regular_price_min',
-				'label' => parrotposter__('Product min regular price'),
+				'label' => parrotposter_x('Product min regular price', 'wp_post_field'),
 				'ops' => [
 					'equal' => parrotposter_x('Equal', 'wp_post_condition'),
 					'not_equal' => parrotposter_x('Not equal', 'wp_post_condition'),
@@ -41,7 +41,7 @@ class ProductType
 			],
 			[
 				'key' => 'product_regular_price_max',
-				'label' => parrotposter__('Product max regular price'),
+				'label' => parrotposter_x('Product max regular price', 'wp_post_field'),
 				'ops' => [
 					'equal' => parrotposter_x('Equal', 'wp_post_condition'),
 					'not_equal' => parrotposter_x('Not equal', 'wp_post_condition'),
@@ -54,7 +54,7 @@ class ProductType
 			],
 			[
 				'key' => 'product_sale_price',
-				'label' => parrotposter__('Product sale price'),
+				'label' => parrotposter_x('Product sale price', 'wp_post_field'),
 				'ops' => [
 					'equal' => parrotposter_x('Equal', 'wp_post_condition'),
 					'not_equal' => parrotposter_x('Not equal', 'wp_post_condition'),
@@ -67,7 +67,7 @@ class ProductType
 			],
 			[
 				'key' => 'product_sale_price_min',
-				'label' => parrotposter__('Product min sale price'),
+				'label' => parrotposter_x('Product min sale price', 'wp_post_field'),
 				'ops' => [
 					'equal' => parrotposter_x('Equal', 'wp_post_condition'),
 					'not_equal' => parrotposter_x('Not equal', 'wp_post_condition'),
@@ -80,7 +80,7 @@ class ProductType
 			],
 			[
 				'key' => 'product_sale_price_max',
-				'label' => parrotposter__('Product max sale price'),
+				'label' => parrotposter_x('Product max sale price', 'wp_post_field'),
 				'ops' => [
 					'equal' => parrotposter_x('Equal', 'wp_post_condition'),
 					'not_equal' => parrotposter_x('Not equal', 'wp_post_condition'),
@@ -93,7 +93,7 @@ class ProductType
 			],
 			[
 				'key' => 'product_type',
-				'label' => parrotposter__('Product type'),
+				'label' => parrotposter_x('Product type', 'wp_post_field'),
 				'ops' => [
 					'equal' => parrotposter_x('Equals one of', 'wp_post_condition'),
 					'not_equal' => parrotposter_x('Not equal to one of', 'wp_post_condition'),
