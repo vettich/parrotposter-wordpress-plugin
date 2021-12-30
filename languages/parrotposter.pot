@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2021-12-30 14:19+0500\n"
+"POT-Creation-Date: 2021-12-30 14:51+0500\n"
 "PO-Revision-Date: 2021-08-05 07:14+0500\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -34,16 +34,16 @@ msgstr ""
 msgid "Copied!"
 msgstr ""
 
-#: assets/js/post-detail.js:152
+#: assets/js/post-detail.js:153
 msgid "No result yet"
 msgstr ""
 
-#: assets/js/post-detail.js:155 assets/js/post-meta-box.js:159
+#: assets/js/post-detail.js:156 assets/js/post-meta-box.js:159
 #: views/posts/detail.php:14
 msgid "View post"
 msgstr ""
 
-#: assets/js/post-detail.js:157
+#: assets/js/post-detail.js:158
 msgid "Error:"
 msgstr ""
 
@@ -97,11 +97,11 @@ msgstr ""
 msgid "Token is empty"
 msgstr ""
 
-#: src/AdminAjaxPost.php:517
+#: src/AdminAjaxPost.php:521
 msgid "Need enter a code from SMS or email"
 msgstr ""
 
-#: src/AdminAjaxPost.php:549 views/accounts/index.php:39
+#: src/AdminAjaxPost.php:553 views/accounts/index.php:39
 #, php-format
 msgid "Added %s of %s."
 msgstr ""
@@ -203,7 +203,7 @@ msgstr ""
 
 #: src/AutopostingListTable.php:158 views/accounts/index.php:93
 #: views/posts/detail.php:64 views/posts/index.php:64
-#: views/scheduler/autoposting_form.php:291
+#: views/scheduler/autoposting_form.php:295
 msgid "Cancel"
 msgstr ""
 
@@ -1217,12 +1217,12 @@ msgstr ""
 msgid "This section is in development"
 msgstr ""
 
-#: views/posts/detail.php:23 views/scheduler/autoposting_form.php:197
+#: views/posts/detail.php:23 views/scheduler/autoposting_form.php:199
 msgid "Tags"
 msgstr ""
 
 #: views/posts/detail.php:32 views/posts/publish-post.php:98
-#: views/scheduler/autoposting_form.php:139
+#: views/scheduler/autoposting_form.php:141
 msgid "Link"
 msgstr ""
 
@@ -1257,7 +1257,7 @@ msgstr ""
 msgid "Post data"
 msgstr ""
 
-#: views/posts/publish-post.php:91 views/scheduler/autoposting_form.php:118
+#: views/posts/publish-post.php:91 views/scheduler/autoposting_form.php:120
 msgid "Post text"
 msgstr ""
 
@@ -1269,7 +1269,7 @@ msgstr ""
 msgid "Use drag'n'drop to move images. A maximum of 10 images will be loaded"
 msgstr ""
 
-#: views/posts/publish-post.php:121 views/scheduler/autoposting_form.php:230
+#: views/posts/publish-post.php:121 views/scheduler/autoposting_form.php:234
 msgid "When to publish"
 msgstr ""
 
@@ -1285,7 +1285,7 @@ msgstr ""
 msgid "Enter a specific time"
 msgstr ""
 
-#: views/posts/publish-post.php:136 views/scheduler/autoposting_form.php:249
+#: views/posts/publish-post.php:136 views/scheduler/autoposting_form.php:253
 msgid "Publish with a delay of 1 to 10 minutes"
 msgstr ""
 
@@ -1293,35 +1293,35 @@ msgstr ""
 msgid "Specific time"
 msgstr ""
 
-#: views/posts/publish-post.php:151 views/scheduler/autoposting_form.php:215
+#: views/posts/publish-post.php:151 views/scheduler/autoposting_form.php:219
 msgid "Choice of social networks"
 msgstr ""
 
-#: views/posts/publish-post.php:159 views/scheduler/autoposting_form.php:223
+#: views/posts/publish-post.php:159 views/scheduler/autoposting_form.php:227
 msgid "Images must be in jpg/png/wepb format"
 msgstr ""
 
-#: views/posts/publish-post.php:160 views/scheduler/autoposting_form.php:224
+#: views/posts/publish-post.php:160 views/scheduler/autoposting_form.php:228
 msgid "The weight of one image must not exceed 10MB"
 msgstr ""
 
-#: views/posts/publish-post.php:161 views/scheduler/autoposting_form.php:225
+#: views/posts/publish-post.php:161 views/scheduler/autoposting_form.php:229
 msgid "There can be no more than 10 images in a post"
 msgstr ""
 
-#: views/posts/publish-post.php:162 views/scheduler/autoposting_form.php:226
+#: views/posts/publish-post.php:162 views/scheduler/autoposting_form.php:230
 msgid "Only one image is uploaded to Facebook (the first image in the list)"
 msgstr ""
 
-#: views/posts/publish-post.php:166 views/scheduler/autoposting_form.php:269
+#: views/posts/publish-post.php:166 views/scheduler/autoposting_form.php:273
 msgid "Additional settings for VKontakte"
 msgstr ""
 
-#: views/posts/publish-post.php:171 views/scheduler/autoposting_form.php:274
+#: views/posts/publish-post.php:171 views/scheduler/autoposting_form.php:278
 msgid "Publish a post on behalf of the group"
 msgstr ""
 
-#: views/posts/publish-post.php:176 views/scheduler/autoposting_form.php:279
+#: views/posts/publish-post.php:176 views/scheduler/autoposting_form.php:283
 msgid "Add a signature to the post"
 msgstr ""
 
@@ -1394,90 +1394,95 @@ msgstr ""
 msgid "Custom conditions"
 msgstr ""
 
-#: views/scheduler/autoposting_form.php:108
+#: views/scheduler/autoposting_form.php:107
+#: views/scheduler/autoposting_form.php:211
+msgid "+ Add field"
+msgstr ""
+
+#: views/scheduler/autoposting_form.php:110
 msgid "The post will be published if all conditions are met"
 msgstr ""
 
-#: views/scheduler/autoposting_form.php:114
+#: views/scheduler/autoposting_form.php:116
 msgid "Post template"
 msgstr ""
 
-#: views/scheduler/autoposting_form.php:134
+#: views/scheduler/autoposting_form.php:136
 msgid ""
 "The text of the post in the social networks. Customize the template the way "
 "you need, using substitution macros"
 msgstr ""
 
-#: views/scheduler/autoposting_form.php:142
+#: views/scheduler/autoposting_form.php:144
 msgid ""
 "The link to the site with the news or product. You can delete the macros so "
 "that the link will not be published"
 msgstr ""
 
-#: views/scheduler/autoposting_form.php:149
+#: views/scheduler/autoposting_form.php:151
 msgid "UTM tags"
 msgstr ""
 
-#: views/scheduler/autoposting_form.php:152
+#: views/scheduler/autoposting_form.php:154
 msgid ""
 "If checked, special UTM tags will be added to the end of the link (the "
 "field above) to track traffic in analytics"
 msgstr ""
 
-#: views/scheduler/autoposting_form.php:157
+#: views/scheduler/autoposting_form.php:159
 msgctxt "utm"
 msgid "Traffic source"
 msgstr ""
 
-#: views/scheduler/autoposting_form.php:160
+#: views/scheduler/autoposting_form.php:162
 msgid ""
 "You can use {social_code} macro, which will be replaced by a social network "
 "code (telegram, facebook, etc) when published"
 msgstr ""
 
-#: views/scheduler/autoposting_form.php:165
+#: views/scheduler/autoposting_form.php:167
 msgctxt "utm"
 msgid "Traffic type"
 msgstr ""
 
-#: views/scheduler/autoposting_form.php:168
+#: views/scheduler/autoposting_form.php:170
 msgid ""
 "Identifies what type of link was used, such as cost per click or email. "
 "Example: cpc"
 msgstr ""
 
-#: views/scheduler/autoposting_form.php:173
+#: views/scheduler/autoposting_form.php:175
 msgctxt "utm"
 msgid "Campaign name"
 msgstr ""
 
-#: views/scheduler/autoposting_form.php:176
+#: views/scheduler/autoposting_form.php:178
 msgid ""
 "Identifies a specific product promotion or strategic campaign. Example: news"
 msgstr ""
 
-#: views/scheduler/autoposting_form.php:181
+#: views/scheduler/autoposting_form.php:183
 msgctxt "utm"
 msgid "Keyword"
 msgstr ""
 
-#: views/scheduler/autoposting_form.php:184
+#: views/scheduler/autoposting_form.php:186
 msgid "Identifies search terms"
 msgstr ""
 
-#: views/scheduler/autoposting_form.php:189
+#: views/scheduler/autoposting_form.php:191
 msgctxt "utm"
 msgid "Content type"
 msgstr ""
 
-#: views/scheduler/autoposting_form.php:192
+#: views/scheduler/autoposting_form.php:194
 msgid ""
 "Identifies what specifically was clicked to bring the user to the site, "
 "such as a banner ad or a text link. It is often used for A/B testing and "
 "content-targeted ads"
 msgstr ""
 
-#: views/scheduler/autoposting_form.php:200
+#: views/scheduler/autoposting_form.php:202
 msgid ""
 "Tags (hashtags) will be added to the end of the post text. Tags from this "
 "field will be converted to \"correct\" hashtags for social networks. For "
@@ -1485,18 +1490,18 @@ msgid ""
 "#bestseller\""
 msgstr ""
 
-#: views/scheduler/autoposting_form.php:205
+#: views/scheduler/autoposting_form.php:207
 msgid "Images"
 msgstr ""
 
-#: views/scheduler/autoposting_form.php:210
+#: views/scheduler/autoposting_form.php:214
 msgid ""
 "Images for posting to social networks. You can specify several fields from "
 "which images from the news, products, etc. will be taken. For posting to "
 "Instagram the image is required"
 msgstr ""
 
-#: views/scheduler/autoposting_form.php:244
+#: views/scheduler/autoposting_form.php:248
 msgid ""
 "You can specify the time when the post will be published. Immediately - the "
 "post will be published on social networks at the same time when the news, "
@@ -1504,26 +1509,26 @@ msgid ""
 "a delay of the specified number of minutes"
 msgstr ""
 
-#: views/scheduler/autoposting_form.php:255
+#: views/scheduler/autoposting_form.php:259
 msgid "Additional settings"
 msgstr ""
 
-#: views/scheduler/autoposting_form.php:261
+#: views/scheduler/autoposting_form.php:265
 msgid "Exclude duplicates (within this template)"
 msgstr ""
 
-#: views/scheduler/autoposting_form.php:264
+#: views/scheduler/autoposting_form.php:268
 msgid ""
 "If checked, the same news, product, etc. will not be republished within "
 "this autopublishing template. If not checked, the same post can be "
 "published several times"
 msgstr ""
 
-#: views/scheduler/autoposting_form.php:286
+#: views/scheduler/autoposting_form.php:290
 msgid "Update"
 msgstr ""
 
-#: views/scheduler/autoposting_form.php:288
+#: views/scheduler/autoposting_form.php:292
 msgid "Create"
 msgstr ""
 
