@@ -78,7 +78,11 @@ $tg_note = parrotposter__('Please note!
 			</label>
 		</div>
 		<div class="parrotposter-input__note">
-			<?php echo $insta_note ?>
+			<?php parrotposter_e('Please note!') ?>
+			<ul>
+				<li><?php parrotposter_e('For security reasons, Instagram may reset your password. Before connecting your account, please make sure you have access to the email or phone number on your Instagram profile') ?></li>
+				<li><?php parrotposter_e('If your account doesn\'t connect, try turning off/on two-factor authentication') ?></li>
+			</ul>
 		</div>
 		<button class="button button-primary"><?php parrotposter_e('Connect') ?></button>
 	</div>
@@ -106,7 +110,11 @@ $tg_note = parrotposter__('Please note!
 			</label>
 		</div>
 		<div class="parrotposter-input__note">
-			<?php echo $tg_note ?>
+			<?php parrotposter_e('Please note!') ?>
+			<ul>
+				<li><?php parrotposter_e('Only open groups or channels can be connected') ?></li>
+				<li><?php parrotposter_e('In channels, posts are published on behalf of the channel, and in groups - on behalf of the created bot') ?></li>
+			</ul>
 		</div>
 		<button class="button button-primary"><?php parrotposter_e('Connect') ?></button>
 	</div>

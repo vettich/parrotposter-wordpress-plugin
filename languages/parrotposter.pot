@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2021-12-30 14:51+0500\n"
+"POT-Creation-Date: 2021-12-30 17:57+0500\n"
 "PO-Revision-Date: 2021-08-05 07:14+0500\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -38,7 +38,7 @@ msgstr ""
 msgid "No result yet"
 msgstr ""
 
-#: assets/js/post-detail.js:156 assets/js/post-meta-box.js:159
+#: assets/js/post-detail.js:156 assets/js/post-meta-box.js:146
 #: views/posts/detail.php:14
 msgid "View post"
 msgstr ""
@@ -51,27 +51,27 @@ msgstr ""
 msgid "Posts have not yet been created"
 msgstr ""
 
-#: assets/js/post-meta-box.js:78
+#: assets/js/post-meta-box.js:65
 msgid "Post published at"
 msgstr ""
 
-#: assets/js/post-meta-box.js:82 src/PostsListTable.php:39
+#: assets/js/post-meta-box.js:69 src/PostsListTable.php:39
 msgid "Status"
 msgstr ""
 
-#: assets/js/post-meta-box.js:86
+#: assets/js/post-meta-box.js:73
 msgid "View details"
 msgstr ""
 
-#: assets/js/post-meta-box.js:189
+#: assets/js/post-meta-box.js:176
 msgid "Remove post"
 msgstr ""
 
-#: assets/js/post-meta-box.js:230
+#: assets/js/post-meta-box.js:217
 msgid "Remove post from ParrotPoster and social networks?"
 msgstr ""
 
-#: assets/js/post-meta-box.js:247
+#: assets/js/post-meta-box.js:234
 msgid "Removed success"
 msgstr ""
 
@@ -97,11 +97,11 @@ msgstr ""
 msgid "Token is empty"
 msgstr ""
 
-#: src/AdminAjaxPost.php:521
+#: src/AdminAjaxPost.php:526
 msgid "Need enter a code from SMS or email"
 msgstr ""
 
-#: src/AdminAjaxPost.php:553 views/accounts/index.php:39
+#: src/AdminAjaxPost.php:558 views/accounts/index.php:39
 #, php-format
 msgid "Added %s of %s."
 msgstr ""
@@ -234,15 +234,15 @@ msgstr ""
 msgid "Help"
 msgstr ""
 
-#: src/PP.php:101
+#: src/PP.php:100
 msgid "ParrotPoster settings page"
 msgstr ""
 
-#: src/PP.php:101 views/parrotposter-user-parts.php:83
+#: src/PP.php:100 views/parrotposter-user-parts.php:83
 msgid "ParrotPoster"
 msgstr ""
 
-#: src/PP.php:102 views/parrotposter-auth-parts.php:32
+#: src/PP.php:101 views/parrotposter-auth-parts.php:32
 #: views/parrotposter-auth-parts.php:54
 #: views/parrotposter/forgot_password.php:21 views/parrotposter/index.php:21
 #: views/parrotposter/index.php:27 views/parrotposter/signup.php:21
@@ -656,8 +656,8 @@ msgstr ""
 
 #: views/accounts/connect.php:38 views/accounts/connect.php:39
 #: views/accounts/connect.php:40 views/accounts/connect.php:41
-#: views/accounts/connect.php:42 views/accounts/connect.php:83
-#: views/accounts/connect.php:111
+#: views/accounts/connect.php:42 views/accounts/connect.php:87
+#: views/accounts/connect.php:119
 msgid "Connect"
 msgstr ""
 
@@ -698,16 +698,43 @@ msgstr ""
 msgid "Code"
 msgstr ""
 
-#: views/accounts/connect.php:90
-msgid "Connect Telegram"
+#: views/accounts/connect.php:81 views/accounts/connect.php:113
+msgid "Please note!"
+msgstr ""
+
+#: views/accounts/connect.php:83
+msgid ""
+"For security reasons, Instagram may reset your password. Before connecting "
+"your account, please make sure you have access to the email or phone number "
+"on your Instagram profile"
+msgstr ""
+
+#: views/accounts/connect.php:84
+msgid ""
+"If your account doesn't connect, try turning off/on two-factor "
+"authentication"
 msgstr ""
 
 #: views/accounts/connect.php:94
+msgid "Connect Telegram"
+msgstr ""
+
+#: views/accounts/connect.php:98
 msgid "Telegram bot token"
 msgstr ""
 
-#: views/accounts/connect.php:101
+#: views/accounts/connect.php:105
 msgid "Channel or group link"
+msgstr ""
+
+#: views/accounts/connect.php:115
+msgid "Only open groups or channels can be connected"
+msgstr ""
+
+#: views/accounts/connect.php:116
+msgid ""
+"In channels, posts are published on behalf of the channel, and in groups - "
+"on behalf of the created bot"
 msgstr ""
 
 #: views/accounts/index.php:35
