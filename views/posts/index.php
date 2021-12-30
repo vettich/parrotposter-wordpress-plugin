@@ -26,10 +26,10 @@ $table->prepare_items();
 
 <?php PP::include_view('header', [
 	'title' => parrotposter__('Posts'),
-	'button_link' => empty($table->items) ? false : [
-		'text' => parrotposter__('+ Add a post'),
-		'href' => '?page=parrotposter_posts&view=add',
-	],
+	// 'button_link' => empty($table->items) ? false : [
+	// 	'text' => parrotposter__('+ Add a post'),
+	// 	'href' => '?page=parrotposter_posts&view=add',
+	// ],
 ]) ?>
 <?php PP::include_view('notice') ?>
 
@@ -40,10 +40,8 @@ $table->prepare_items();
 			<?php parrotposter_e('You don\'t have posts yet') ?>
 		</div>
 
-		<div class="parrotposter-empty-block__connect">
-			<a href="admin.php?page=parrotposter_posts&view=add" class="button button-secondary">
-				<?php parrotposter_e('+ Add a post') ?>
-			</a>
+		<div class="parrotposter-empty-block__note">
+			<?php parrotposter_e('Set up auto-posting in the Scheduler or post directly from an article, product, etc') ?>
 		</div>
 	</div>
 

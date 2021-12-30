@@ -18,7 +18,7 @@ $menu = Menu::get_items();
 
 	<div class="parrotposter-header">
 		<div class="parrotposter-header__logo">
-			<img src="<?php echo PP::asset('images/parrotposter-logo-wide.png') ?>" alt="">
+			<img src="<?php echo PP::asset('images/parrotposter-logo-wide-2.svg') ?>" alt="">
 		</div>
 
 		<ul class="parrotposter-header__menu">
