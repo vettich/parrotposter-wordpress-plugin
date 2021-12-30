@@ -26,7 +26,7 @@ jQuery(function($) {
 
 	function noPosts() {
 		$('.parrotposter-meta-box-post-items')
-			.append('<p>'+wp.i18n.__('Posts have not yet been created')+'</p>')
+			.append('<p>'+wp.i18n.__('Posts have not yet been created', 'parrotposter')+'</p>')
 	}
 
 	function loadPostsList() {
@@ -58,19 +58,6 @@ jQuery(function($) {
 				const html_list = []
 				data.response.posts.forEach(function(post_item) {
 
-					// const template = `
-					// <hr/>
-					// <p class="parrotposter-meta-box-post-item" data-post-id="{post_id}">
-					// 	<div><b>`+wp.i18n.__('Post published at', 'parrotposter')+`:</b></div>
-					// 	<div>{publish_at}</div>
-					// 	<div><b>`+wp.i18n.__('Status', 'parrotposter')+`:</b></div>
-					// 	<div>{status}</div>
-					// 	<a class="parrotposter-meta-box-post-view-detail-link" href="#" data-post-id="{post_id}">
-					// 		<b>`+wp.i18n.__('View details', 'parrotposter')+`</b>
-					// 	</a>
-					// </p>
-					// `
-
 					const template = `
 					<hr data-post-id="{post_id}"/>
 					<div class="parrotposter-meta-box-post-item" data-post-id="{post_id}">
@@ -91,7 +78,7 @@ jQuery(function($) {
 					const publish_at = (new Date(post_item['publish_at'])).toLocaleString()
 					const html = template
 						.split('{publish_at}').join(publish_at)
-						.split('{status}').join(post_item['status'])
+						.split('{status}').join(post_item['status_view'])
 						.split('{post_id}').join(post_item['id'])
 					html_list.push(html)
 				})

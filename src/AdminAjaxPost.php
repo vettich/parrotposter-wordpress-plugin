@@ -453,6 +453,11 @@ class AdminAjaxPost
 		];
 
 		$res = Api::list_posts($filter);
+		if (!empty($res['response']['posts'])) {
+			foreach ($res['response']['posts'] as $i => $post) {
+				$res['response']['posts'][$i]['status_view'] = ApiHelpers::get_post_status_text($post['status']);
+			}
+		}
 		echo json_encode($res);
 		exit;
 	}
@@ -462,6 +467,10 @@ class AdminAjaxPost
 		FormHelpers::must_be_right_input_data();
 		$post_id = sanitize_text_field($_POST['parrotposter']['post_id']);
 		list($post, $error) = Api::get_post($post_id);
+		if (empty($error)) {
+			$format = get_option('date_format').' '.get_option('time_format');
+			$post['publish_at_view'] = wp_date($format, ApiHelpers::getTimestamp($item['publish_at']));
+		}
 		echo json_encode([
 			'post' => $post,
 			'error' => $error,

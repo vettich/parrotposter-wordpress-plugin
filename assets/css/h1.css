@@ -3,12 +3,17 @@
 	align-items: center;
 }
 
+.parrotposter-h1 h1 {
+	line-height: 1.1;
+}
+
 .parrotposter-h1__back {
 	display: block;
 	width: 24px;
 	height: 24px;
 	background-image: url(../images/arrow-back.svg);
 	margin-right: 8px;
+	flex-shrink: 0;
 }
 
 .parrotposter-h1__button-link,

@@ -8,7 +8,7 @@ class WpPostHelpers
 {
 	public static function get_images_from_content($content)
 	{
-		$output = preg_match_all('/<img.+src=[\'"](?<src>[^\'"]+)[\'"].*>/i', $content, $matches);
+		$output = preg_match_all('/<img.+?src=[\'"](?<src>[^\'"]+)[\'"].*?>/i', $content, $matches);
 		return $matches['src'];
 	}
 

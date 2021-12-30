@@ -51,5 +51,13 @@ jQuery(function($) {
 	$('input[name="parrotposter[account_ids][]"]').change(checkPublishBtn)
 
 	$('.parrotposter-post-select-images-list').sortable()
+
+	// textarea auto resize
+	$("textarea").each(function () {
+		this.setAttribute("style", "height:" + (this.scrollHeight) + "px;overflow-y:hidden;");
+	}).on("input", function () {
+		this.style.height = "auto";
+		this.style.height = (this.scrollHeight) + "px";
+	});
 })
 

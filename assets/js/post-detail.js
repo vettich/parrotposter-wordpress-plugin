@@ -112,7 +112,8 @@ function parrotposterOpenPostModal(post, deleteFn) {
 		$link.parent().parent().hide()
 	}
 
-	$publishAt.text(new Date(post.publish_at).toLocaleString())
+	// $publishAt.text(new Date(post.publish_at).toLocaleString())
+	$publishAt.text(post.publish_at_view)
 
 	parrotposterLoadAccounts(function() {
 		const results = []

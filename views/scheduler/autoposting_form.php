@@ -103,7 +103,9 @@ $conditions_json = json_encode($conditions_data);
 				<span><?php parrotposter_e('Custom conditions') ?></span>
 				<div class="parrotposter-input__items" data-items="<?php echo esc_attr($conditions_json) ?>">
 				</div>
-				<button class="button parrotposter-input__add-btn">+ Add field</button>
+				<button class="button parrotposter-input__add-btn">
+					<?php parrotposter_e('+ Add field') ?>
+				</button>
 				<div class="parrotposter-input__info">
 					<?php parrotposter_e('The post will be published if all conditions are met') ?>
 				</div>
@@ -205,7 +207,9 @@ $conditions_json = json_encode($conditions_data);
 				<span><?php parrotposter_e('Images') ?></span>
 				<div class="parrotposter-input__items" data-items="<?php echo esc_attr($images_data_json) ?>">
 				</div>
-				<button class="button parrotposter-input__add-btn">+ Add field</button>
+				<button class="button parrotposter-input__add-btn">
+					<?php parrotposter_e('+ Add field') ?>
+				</button>
 				<div class="parrotposter-input__info">
 					<?php parrotposter_e('Images for posting to social networks. You can specify several fields from which images from the news, products, etc. will be taken. For posting to Instagram the image is required') ?>
 				</div>

@@ -54,6 +54,8 @@ class AssetModules
 
 	private static $registered = [];
 
+	private static $enqueue_scripts = [];
+
 	public static function register()
 	{
 		foreach (self::$modules as $m) {
@@ -85,7 +87,15 @@ class AssetModules
 			}
 			if (self::is_registered_js($module)) {
 				wp_enqueue_script("parrotposter-$module");
+				self::$enqueue_scripts[] = "parrotposter-$module";
 			}
+		}
+	}
+
+	public static function enqueue_script_translates()
+	{
+		foreach (self::$registered as $module => $assets) {
+			wp_set_script_translations("parrotposter-$module", 'parrotposter', PARROTPOSTER_PLUGIN_DIR.'languages');
 		}
 	}
 
