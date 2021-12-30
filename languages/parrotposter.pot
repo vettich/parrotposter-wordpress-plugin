@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2021-12-30 02:39+0500\n"
+"POT-Creation-Date: 2021-12-30 14:19+0500\n"
 "PO-Revision-Date: 2021-08-05 07:14+0500\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -228,6 +228,10 @@ msgstr ""
 #: src/Menu.php:36 views/parrotposter-user-parts.php:92
 #: views/profile/index.php:22
 msgid "Profile"
+msgstr ""
+
+#: src/Menu.php:40 views/help/index.php:16
+msgid "Help"
 msgstr ""
 
 #: src/PP.php:101
@@ -727,6 +731,356 @@ msgstr ""
 
 #: views/accounts/index.php:89
 msgid "Are you sure you want to delete \"#account_name#\""
+msgstr ""
+
+#: views/help/index.php:23
+msgctxt "help"
+msgid "About plugin"
+msgstr ""
+
+#: views/help/index.php:26
+msgctxt "help"
+msgid ""
+"ParrotPoster is a cloud-based service for publishing news and products from "
+"your site to social networks."
+msgstr ""
+
+#: views/help/index.php:32
+msgctxt "help"
+msgid "How many posts per day can I publish?"
+msgstr ""
+
+#: views/help/index.php:35
+msgctxt "help"
+msgid ""
+"No limits, but in the social network VKontakte you can publish no more than "
+"50 posts per day, and in other social networks, we recommend publishing no "
+"more than 15-25 posts per day, so that the social network does not block "
+"the account."
+msgstr ""
+
+#: views/help/index.php:41
+msgctxt "help"
+msgid "How long is the trial version and can I change the tariff?"
+msgstr ""
+
+#: views/help/index.php:44
+msgctxt "help"
+msgid ""
+"When you register for the plugin, you get 14 days of free use with the "
+"option to add 3 accounts to test the functionality. If you need more "
+"accounts - you can change the tariff in the \"Tariffs\" section."
+msgstr ""
+
+#: views/help/index.php:50
+msgctxt "help"
+msgid "How many social network accounts can I add?"
+msgstr ""
+
+#: views/help/index.php:53
+msgctxt "help"
+msgid ""
+"It depends on the chosen tariff. The trial version has 3 accounts, on paid "
+"tariffs from 5 to 22 accounts. If you need to add more than 22 accounts, "
+"send us an email at support@parrotposter.com."
+msgstr ""
+
+#: views/help/index.php:59
+msgctxt "help"
+msgid "Why I cannot add a social account?"
+msgstr ""
+
+#: views/help/index.php:63
+msgctxt "help"
+msgid ""
+"You are not an administrator of the group/page or you were not granted any "
+"access rights"
+msgstr ""
+
+#: views/help/index.php:64
+msgctxt "help"
+msgid "Your Instagram username and password are not correct"
+msgstr ""
+
+#: views/help/index.php:65
+msgctxt "help"
+msgid ""
+"You can also try turning two-factor authentication on or off in Instagram, "
+"or changing your password"
+msgstr ""
+
+#: views/help/index.php:66
+msgctxt "help"
+msgid ""
+"You did not specify the Telegram Bot Token for your Telegram group/channel "
+"correctly"
+msgstr ""
+
+#: views/help/index.php:67
+msgctxt "help"
+msgid "You did not specify the Telegram link to your channel/group correctly"
+msgstr ""
+
+#: views/help/index.php:74
+msgctxt "help"
+msgid "Are there any plans to add new social networks?"
+msgstr ""
+
+#: views/help/index.php:77
+msgctxt "help"
+msgid "Yes, we plan to do this in the near future."
+msgstr ""
+
+#: views/help/index.php:83
+msgctxt "help"
+msgid "How do I publish a post?"
+msgstr ""
+
+#: views/help/index.php:87
+msgctxt "help"
+msgid ""
+"Selectively, to do this, you can go to the already created news or product "
+"and click on \"Publish to social networks,\" then on a separate page, fine-"
+"tune the news in social networks and publish the post"
+msgstr ""
+
+#: views/help/index.php:88
+msgctxt "help"
+msgid ""
+"Using the autoposting template, for this you need to configure the "
+"autoposting template in the \"Scheduler\" section"
+msgstr ""
+
+#: views/help/index.php:95
+msgctxt "help"
+msgid "Why aren't the posts published to social networks?"
+msgstr ""
+
+#: views/help/index.php:99
+msgctxt "help"
+msgid "The tariff has expired, renew it in the tab \"Tariffs\""
+msgstr ""
+
+#: views/help/index.php:100
+msgctxt "help"
+msgid ""
+"Token storage from social network has expired, try to reconnect your "
+"account in the \"Accounts\" section"
+msgstr ""
+
+#: views/help/index.php:101
+msgctxt "help"
+msgid ""
+"Social network suspected of publishing news very often, try to reconnect "
+"your account or wait a while (from several hours to several days)"
+msgstr ""
+
+#: views/help/index.php:102
+msgctxt "help"
+msgid "Did not add a bot to your Telegram channel/group"
+msgstr ""
+
+#: views/help/index.php:109
+msgctxt "help"
+msgid "Where can I see the results of publications?"
+msgstr ""
+
+#: views/help/index.php:112
+msgctxt "help"
+msgid ""
+"In the \"Posts\" section, you can click on the View button to see the "
+"results of posts with statuses and links to the posts."
+msgstr ""
+
+#: views/help/index.php:118
+msgctxt "help"
+msgid "How do I set up auto-publication of news or products?"
+msgstr ""
+
+#: views/help/index.php:121
+msgctxt "help"
+msgid ""
+"You need to go to the Scheduler section and click on the Add Autoposting "
+"button, then set up the template."
+msgstr ""
+
+#: views/help/index.php:123
+msgctxt "help"
+msgid "General:"
+msgstr ""
+
+#: views/help/index.php:125
+msgctxt "help"
+msgid ""
+"Template name (for general understanding, e.g. News from \"Latest Trends\" "
+"category)"
+msgstr ""
+
+#: views/help/index.php:126
+msgctxt "help"
+msgid "Enable/disable autoposting"
+msgstr ""
+
+#: views/help/index.php:130
+msgctxt "help"
+msgid "Activation conditions:"
+msgstr ""
+
+#: views/help/index.php:132
+msgctxt "help"
+msgid ""
+"You need to set the conditions under which the post will automatically "
+"publish to social networks, for example:"
+msgstr ""
+
+#: views/help/index.php:134
+msgctxt "help"
+msgid "Wordpress post type: Posts"
+msgstr ""
+
+#: views/help/index.php:135
+msgctxt "help"
+msgid ""
+"Conditions: The category is equal to one of Music Trends, Clothing Trends, "
+"Cooking Trends."
+msgstr ""
+
+#: views/help/index.php:137
+msgctxt "help"
+msgid ""
+"With this condition, the post will be published if the created news will "
+"belong to one of the selected categories."
+msgstr ""
+
+#: views/help/index.php:140
+msgctxt "help"
+msgid "Post template:"
+msgstr ""
+
+#: views/help/index.php:142
+msgctxt "help"
+msgid "You need to configure the text content of the post, for example:"
+msgstr ""
+
+#: views/help/index.php:148
+msgctxt "help"
+msgid ""
+"In this case, the text will take the title of the news and excerpted text "
+"(it can be set in a separate field when creating the news)."
+msgstr ""
+
+#: views/help/index.php:151
+msgctxt "help"
+msgid "Link:"
+msgstr ""
+
+#: views/help/index.php:153
+msgctxt "help"
+msgid ""
+"You can leave the <span class=\"code\">{link}</span> macro to add a link to "
+"the news from the site to the post, if it is not required - just erase the "
+"macro and leave the field empty."
+msgstr ""
+
+#: views/help/index.php:155
+msgctxt "help"
+msgid "You can also set UTM tags."
+msgstr ""
+
+#: views/help/index.php:158
+msgctxt "help"
+msgid "Tags:"
+msgstr ""
+
+#: views/help/index.php:160
+msgctxt "help"
+msgid ""
+"You can leave the <span class=\"code\">{post_tag}</span> macro to have the "
+"tags from the news added to the post, if they are not required - just erase "
+"the macro and leave the field blank."
+msgstr ""
+
+#: views/help/index.php:163
+msgctxt "help"
+msgid "Images:"
+msgstr ""
+
+#: views/help/index.php:165
+msgctxt "help"
+msgid "You can choose which images are required to be added to the post."
+msgstr ""
+
+#: views/help/index.php:168
+msgctxt "help"
+msgid "Select Social Networks:"
+msgstr ""
+
+#: views/help/index.php:170
+msgctxt "help"
+msgid ""
+"Select the accounts to which you want to publish the news according to the "
+"given template."
+msgstr ""
+
+#: views/help/index.php:173
+msgctxt "help"
+msgid "When to publish:"
+msgstr ""
+
+#: views/help/index.php:175
+msgctxt "help"
+msgid ""
+"Choose when to publish, either immediately or with a time delay of 1 to 10 "
+"minutes after publishing the news/products on the site."
+msgstr ""
+
+#: views/help/index.php:178
+msgctxt "help"
+msgid "Additional settings:"
+msgstr ""
+
+#: views/help/index.php:180
+msgctxt "help"
+msgid ""
+"Select Exclude duplicates so that the same news is not published to a "
+"social network by a given template. You can also publish a VKontakte post "
+"on behalf of a group with the author's signature added."
+msgstr ""
+
+#: views/help/index.php:187
+msgctxt "help"
+msgid "Is it possible to pay the tariff under the contract?"
+msgstr ""
+
+#: views/help/index.php:190
+msgctxt "help"
+msgid ""
+"Yes, but only for customers from the Russian Federation. Email us at "
+"support@parrotposter.com to sign a contract."
+msgstr ""
+
+#: views/help/index.php:196
+msgctxt "help"
+msgid ""
+"Is it possible to pay for the tariff using PayPal or other means of "
+"electronic payment?"
+msgstr ""
+
+#: views/help/index.php:199
+msgctxt "help"
+msgid "Yes, contact us at support@parrotposter.com."
+msgstr ""
+
+#: views/help/index.php:205
+msgctxt "help"
+msgid ""
+"Have not found an answer to your question or do you have a suggestion on "
+"how to improve the plugin?"
+msgstr ""
+
+#: views/help/index.php:208
+msgctxt "help"
+msgid "Email us at support@parrotposter.com"
 msgstr ""
 
 #: views/parrotposter-auth-parts.php:34 views/parrotposter-auth-parts.php:55

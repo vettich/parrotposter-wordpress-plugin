@@ -26,6 +26,7 @@ class AssetModules
 		'post-detail',
 		'post-meta-box',
 		'publish-post',
+		'help',
 	];
 
 	private static $libs = [

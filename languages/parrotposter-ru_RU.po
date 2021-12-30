@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-12-30 02:39+0500\n"
-"PO-Revision-Date: 2021-12-30 02:39+0500\n"
+"POT-Creation-Date: 2021-12-30 14:19+0500\n"
+"PO-Revision-Date: 2021-12-30 14:20+0500\n"
 "Last-Translator: Vettich <vetti.ch@mail.ru>\n"
 "Language-Team: \n"
 "Language: ru_RU\n"
@@ -230,6 +230,10 @@ msgstr "Тарифы"
 #: views/profile/index.php:22
 msgid "Profile"
 msgstr "Профиль"
+
+#: src/Menu.php:40 views/help/index.php:16
+msgid "Help"
+msgstr "Помощь"
 
 #: src/PP.php:101
 msgid "ParrotPoster settings page"
@@ -763,6 +767,412 @@ msgstr ""
 msgid "Are you sure you want to delete \"#account_name#\""
 msgstr "Вы действительно хотите удалить \"#account_name#\""
 
+#: views/help/index.php:23
+msgctxt "help"
+msgid "About plugin"
+msgstr "О плагине"
+
+#: views/help/index.php:26
+msgctxt "help"
+msgid ""
+"ParrotPoster is a cloud-based service for publishing news and products from "
+"your site to social networks."
+msgstr ""
+"ParrotPoster – облачный сервис для публикации новостей и товаров с сайта в "
+"социальные сети."
+
+#: views/help/index.php:32
+msgctxt "help"
+msgid "How many posts per day can I publish?"
+msgstr "Сколько постов в день можно публиковать?"
+
+#: views/help/index.php:35
+msgctxt "help"
+msgid ""
+"No limits, but in the social network VKontakte you can publish no more than "
+"50 posts per day, and in other social networks, we recommend publishing no "
+"more than 15-25 posts per day, so that the social network does not block the "
+"account."
+msgstr ""
+"Ограничений нет, но в социальную сеть ВКонтакте можно публиковать не более "
+"50 постов в день, а в остальные социальные сети мы рекомендуем публиковать "
+"не более 15-25 постов в день, чтобы социальная сеть не заблокировала аккаунт."
+
+#: views/help/index.php:41
+msgctxt "help"
+msgid "How long is the trial version and can I change the tariff?"
+msgstr "Какой срок триальной версии и можно ли сменить тариф?"
+
+#: views/help/index.php:44
+msgctxt "help"
+msgid ""
+"When you register for the plugin, you get 14 days of free use with the "
+"option to add 3 accounts to test the functionality. If you need more "
+"accounts - you can change the tariff in the \"Tariffs\" section."
+msgstr ""
+"При регистрации в плагине вы получаете 14 дней бесплатного использования с "
+"возможностью добавления 3ех аккаунтов, чтобы протестировать функционал. Если "
+"вам требуется больше аккаунтов  – вы можете сменить тариф в разделе “Тарифы”."
+
+#: views/help/index.php:50
+msgctxt "help"
+msgid "How many social network accounts can I add?"
+msgstr "Сколько аккаунтов социальных сетей я могу добавить?"
+
+#: views/help/index.php:53
+msgctxt "help"
+msgid ""
+"It depends on the chosen tariff. The trial version has 3 accounts, on paid "
+"tariffs from 5 to 22 accounts. If you need to add more than 22 accounts, "
+"send us an email at support@parrotposter.com."
+msgstr ""
+"Зависит от выбранного тарифа, в триальной версии – 3, на платных тарифах от "
+"5 до 22 аккаунтов. Если требуется добавить свыше 22 аккаунтов, напишите нам "
+"на почту support@parrotposter.com."
+
+#: views/help/index.php:59
+msgctxt "help"
+msgid "Why I cannot add a social account?"
+msgstr "Почему аккаунт социальной сети не добавляется?"
+
+#: views/help/index.php:63
+msgctxt "help"
+msgid ""
+"You are not an administrator of the group/page or you were not granted any "
+"access rights"
+msgstr ""
+"Вы не являетесь администратором группы/страницы или вам не выдали "
+"определенные права доступа"
+
+#: views/help/index.php:64
+msgctxt "help"
+msgid "Your Instagram username and password are not correct"
+msgstr ""
+
+#: views/help/index.php:65
+msgctxt "help"
+msgid ""
+"You can also try turning two-factor authentication on or off in Instagram, "
+"or changing your password"
+msgstr ""
+"Также можете попробовать включить или выключить двухфакторную аутентификацию "
+"в Instagram, или поменять пароль"
+
+#: views/help/index.php:66
+msgctxt "help"
+msgid ""
+"You did not specify the Telegram Bot Token for your Telegram group/channel "
+"correctly"
+msgstr "Вы не верно указали Telegram Bot Token для группы/канала в Telegram"
+
+#: views/help/index.php:67
+msgctxt "help"
+msgid "You did not specify the Telegram link to your channel/group correctly"
+msgstr "Вы не верно указали ссылку на канал/группу в Telegram"
+
+#: views/help/index.php:74
+msgctxt "help"
+msgid "Are there any plans to add new social networks?"
+msgstr "Планируется ли добавление новых социальных сетей?"
+
+#: views/help/index.php:77
+msgctxt "help"
+msgid "Yes, we plan to do this in the near future."
+msgstr "Да, мы планирует это сделать в ближайшее время."
+
+#: views/help/index.php:83
+msgctxt "help"
+msgid "How do I publish a post?"
+msgstr "Как опубликовать пост?"
+
+#: views/help/index.php:87
+msgctxt "help"
+msgid ""
+"Selectively, to do this, you can go to the already created news or product "
+"and click on \"Publish to social networks,\" then on a separate page, fine-"
+"tune the news in social networks and publish the post"
+msgstr ""
+"Выборочно, для этого вы можете перейти в уже созданную новость или товар и "
+"нажать на кнопку “Опубликовать в социальных сетях”, после этого на отдельной "
+"странице донастроить новость в социальные сети и опубликовать пост"
+
+#: views/help/index.php:88
+msgctxt "help"
+msgid ""
+"Using the autoposting template, for this you need to configure the "
+"autoposting template in the \"Scheduler\" section"
+msgstr ""
+"С помощью шаблона автопостинга, для этого вам требуется настроить шаблон "
+"автопостинга в разделе “Планировщик”"
+
+#: views/help/index.php:95
+msgctxt "help"
+msgid "Why aren't the posts published to social networks?"
+msgstr "Почему посты не публикуются в социальные сети?"
+
+#: views/help/index.php:99
+msgctxt "help"
+msgid "The tariff has expired, renew it in the tab \"Tariffs\""
+msgstr "Тариф истек, продлите во вкладке “Тарифы”"
+
+#: views/help/index.php:100
+msgctxt "help"
+msgid ""
+"Token storage from social network has expired, try to reconnect your account "
+"in the \"Accounts\" section"
+msgstr ""
+"Истек срок хранения токена со стороны социальной сети, попробуйте "
+"переподключить аккаунт сначала в разделе “Аккаунты”, а потом шаблонах "
+"автопостинга (если они у вас настроены)"
+
+#: views/help/index.php:101
+msgctxt "help"
+msgid ""
+"Social network suspected of publishing news very often, try to reconnect "
+"your account or wait a while (from several hours to several days)"
+msgstr ""
+"Социальная сеть заподозрила в очень частой публикации новостей, попробуйте "
+"переподключить аккаунтов"
+
+#: views/help/index.php:102
+msgctxt "help"
+msgid "Did not add a bot to your Telegram channel/group"
+msgstr "Не добавили бота в канал/группу в Telegram"
+
+#: views/help/index.php:109
+msgctxt "help"
+msgid "Where can I see the results of publications?"
+msgstr "Где можно увидеть результаты публикаций?"
+
+#: views/help/index.php:112
+msgctxt "help"
+msgid ""
+"In the \"Posts\" section, you can click on the View button to see the "
+"results of posts with statuses and links to the posts."
+msgstr ""
+"В разделе “Посты” вы можете нажать на кнопку Просмотр, чтобы увидеть "
+"результаты публикаций со статусами и ссылками на посты."
+
+#: views/help/index.php:118
+msgctxt "help"
+msgid "How do I set up auto-publication of news or products?"
+msgstr "Как настроить автопубликации новостей и товаров?"
+
+#: views/help/index.php:121
+msgctxt "help"
+msgid ""
+"You need to go to the Scheduler section and click on the Add Autoposting "
+"button, then set up the template."
+msgstr ""
+"Вам требуется зайти в раздел Планировщик и нажать на кнопку Добавить "
+"автопостинг, после этого настройте шаблон."
+
+#: views/help/index.php:123
+msgctxt "help"
+msgid "General:"
+msgstr "Основные:"
+
+#: views/help/index.php:125
+msgctxt "help"
+msgid ""
+"Template name (for general understanding, e.g. News from \"Latest Trends\" "
+"category)"
+msgstr ""
+"Название шаблона (для общего понимания, например Новости из категории "
+"“Последние тренды”)"
+
+#: views/help/index.php:126
+msgctxt "help"
+msgid "Enable/disable autoposting"
+msgstr "Включить/выключить работу автопостинга"
+
+#: views/help/index.php:130
+msgctxt "help"
+msgid "Activation conditions:"
+msgstr "Условия активации:"
+
+#: views/help/index.php:132
+msgctxt "help"
+msgid ""
+"You need to set the conditions under which the post will automatically "
+"publish to social networks, for example:"
+msgstr ""
+"Вам необходимо задать такие условия, при которых пост будет автоматически "
+"публиковаться в социальных сетях, например:"
+
+#: views/help/index.php:134
+msgctxt "help"
+msgid "Wordpress post type: Posts"
+msgstr "Wordpress тип: Посты"
+
+#: views/help/index.php:135
+msgctxt "help"
+msgid ""
+"Conditions: The category is equal to one of Music Trends, Clothing Trends, "
+"Cooking Trends."
+msgstr ""
+"Условия: Категория равна одной из Тренды музыки, Тренды одежды, Тренды "
+"кулинарии."
+
+#: views/help/index.php:137
+msgctxt "help"
+msgid ""
+"With this condition, the post will be published if the created news will "
+"belong to one of the selected categories."
+msgstr ""
+"При таком условии пост будет публиковаться в случае, если созданная новость "
+"будет принадлежать одной из выбранных категорий."
+
+#: views/help/index.php:140
+msgctxt "help"
+msgid "Post template:"
+msgstr "Шаблон поста:"
+
+#: views/help/index.php:142
+msgctxt "help"
+msgid "You need to configure the text content of the post, for example:"
+msgstr "Вам необходимо сконфигурировать текстовое наполнение поста, например:"
+
+#: views/help/index.php:148
+msgctxt "help"
+msgid ""
+"In this case, the text will take the title of the news and excerpted text "
+"(it can be set in a separate field when creating the news)."
+msgstr ""
+"В таком случае для текста будет взят заголовок новости и сокращенный текст "
+"(его можно задавать в отдельном поле при создании новости)."
+
+#: views/help/index.php:151
+msgctxt "help"
+msgid "Link:"
+msgstr "Ссылка:"
+
+#: views/help/index.php:153
+msgctxt "help"
+msgid ""
+"You can leave the <span class=\"code\">{link}</span> macro to add a link to "
+"the news from the site to the post, if it is not required - just erase the "
+"macro and leave the field empty."
+msgstr ""
+"Вы можете оставить макрос <span class=\"code\">{link}</span>, чтобы к посту "
+"добавилась ссылка на новость с сайта, если она не требуется – просто сотрите "
+"макрос и оставьте поле пустым."
+
+#: views/help/index.php:155
+msgctxt "help"
+msgid "You can also set UTM tags."
+msgstr "Также вы можете задать UTM теги."
+
+#: views/help/index.php:158
+msgctxt "help"
+msgid "Tags:"
+msgstr "Tags:"
+
+#: views/help/index.php:160
+msgctxt "help"
+msgid ""
+"You can leave the <span class=\"code\">{post_tag}</span> macro to have the "
+"tags from the news added to the post, if they are not required - just erase "
+"the macro and leave the field blank."
+msgstr ""
+"Вы можете оставить макрос <span class=\"code\">{post_tag}</span>, чтобы к "
+"посту добавились теги из новости, если они не требуются – просто сотрите "
+"макрос и оставьте поле пустым."
+
+#: views/help/index.php:163
+msgctxt "help"
+msgid "Images:"
+msgstr "Изображения:"
+
+#: views/help/index.php:165
+msgctxt "help"
+msgid "You can choose which images are required to be added to the post."
+msgstr "Вы можете выбрать какие изображения требуется добавлять в пост."
+
+#: views/help/index.php:168
+msgctxt "help"
+msgid "Select Social Networks:"
+msgstr "Выбор социальных сетей:"
+
+#: views/help/index.php:170
+msgctxt "help"
+msgid ""
+"Select the accounts to which you want to publish the news according to the "
+"given template."
+msgstr ""
+"Выберите те аккаунты, в которые хотите постить новости по заданному шаблону."
+
+#: views/help/index.php:173
+msgctxt "help"
+msgid "When to publish:"
+msgstr "Когда публиковать:"
+
+#: views/help/index.php:175
+msgctxt "help"
+msgid ""
+"Choose when to publish, either immediately or with a time delay of 1 to 10 "
+"minutes after publishing the news/products on the site."
+msgstr ""
+"Выберите время публикации, либо сразу, либо с задержкой по времени от 1 до "
+"10 минут после публикации новости/товара на сайте."
+
+#: views/help/index.php:178
+msgctxt "help"
+msgid "Additional settings:"
+msgstr "Дополнительные настройки:"
+
+#: views/help/index.php:180
+msgctxt "help"
+msgid ""
+"Select Exclude duplicates so that the same news is not published to a social "
+"network by a given template. You can also publish a VKontakte post on behalf "
+"of a group with the author's signature added."
+msgstr ""
+"Выберите Исключать дубликаты, чтобы одна и та же новость не публиковалась в "
+"социальную сеть по заданному шаблону, а также вы можете публиковать пост "
+"ВКонтакте от имени группы с добавлением подписи автора."
+
+#: views/help/index.php:187
+msgctxt "help"
+msgid "Is it possible to pay the tariff under the contract?"
+msgstr "Возможно ли оплатить тариф по договору?"
+
+#: views/help/index.php:190
+msgctxt "help"
+msgid ""
+"Yes, but only for customers from the Russian Federation. Email us at "
+"support@parrotposter.com to sign a contract."
+msgstr ""
+"Да, но только для клиентов из Российской Федерации. Напишите нам на почту "
+"support@parrotposter.com для заключения договора."
+
+#: views/help/index.php:196
+msgctxt "help"
+msgid ""
+"Is it possible to pay for the tariff using PayPal or other means of "
+"electronic payment?"
+msgstr ""
+"Возможно ли провести оплату за тариф с помощью PayPal или др. средств "
+"электронных платежей?"
+
+#: views/help/index.php:199
+msgctxt "help"
+msgid "Yes, contact us at support@parrotposter.com."
+msgstr "Да, напишите нам на почту support@parrotposter.com."
+
+#: views/help/index.php:205
+msgctxt "help"
+msgid ""
+"Have not found an answer to your question or do you have a suggestion on how "
+"to improve the plugin?"
+msgstr ""
+"Не нашли ответ на свой вопрос или есть предложение по улучшению плагина?"
+
+#: views/help/index.php:208
+msgctxt "help"
+msgid "Email us at support@parrotposter.com"
+msgstr "Напишите нам на support@parrotposter.com"
+
 #: views/parrotposter-auth-parts.php:34 views/parrotposter-auth-parts.php:55
 #: views/parrotposter/forgot_password.php:22 views/parrotposter/index.php:22
 #: views/parrotposter/signup.php:22 views/parrotposter/signup.php:27
@@ -1042,7 +1452,7 @@ msgstr "Автопостинг #1"
 
 #: views/scheduler/autoposting_add.php:39
 msgid "Creating autoposting"
-msgstr "Создание автопубликации"
+msgstr "Создание автопостинга"
 
 #: views/scheduler/autoposting_edit.php:26
 msgid "Edit autoposting"
@@ -1178,7 +1588,7 @@ msgid ""
 msgstr ""
 "Определяет, что именно было нажато, чтобы привести пользователя на сайт, "
 "например, баннерная реклама или текстовая ссылка. Часто используется для A/B-"
-"тестирования и рекламы, нацеленной на контент."
+"тестирования и рекламы, нацеленной на контент"
 
 #: views/scheduler/autoposting_form.php:200
 msgid ""
@@ -1216,7 +1626,7 @@ msgstr ""
 "Вы можете указать время, когда будет опубликован пост. Сразу после "
 "публикации - пост будет опубликован в социальных сетях одновременно с "
 "публикацией новости, продукта и т.д. С задержкой - пост будет опубликован с "
-"задержкой на указанное количество минут."
+"задержкой на указанное количество минут"
 
 #: views/scheduler/autoposting_form.php:255
 msgid "Additional settings"
@@ -1322,6 +1732,22 @@ msgid ""
 msgstr ""
 "При выборе нового тарифа остатки дней по текущему тарифу пересчитаются и "
 "перейдут на новый тариф"
+
+#~ msgctxt "help"
+#~ msgid "Your Instagram username and password are not correct "
+#~ msgstr "Вы не верно указали логин и пароль от Instagram"
+
+#~ msgctxt "help"
+#~ msgid "You can choose which images are required to be added to the post. "
+#~ msgstr "Вы можете выбрать какие изображения требуется добавлять в пост."
+
+#~ msgctxt "help"
+#~ msgid ""
+#~ "Choose when to publish, either immediately or with a time delay of 1 to "
+#~ "10 minutes after creating the news/products on the site."
+#~ msgstr ""
+#~ "Выберите время публикации, либо сразу, либо с задержкой по времени от 1 "
+#~ "до 10 минут после создания новости/товара на сайте."
 
 #~ msgid "Traffic source"
 #~ msgstr "Источник трафика"

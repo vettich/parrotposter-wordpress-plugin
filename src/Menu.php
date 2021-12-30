@@ -35,6 +35,10 @@ class Menu
 				'id' => 'parrotposter_profile',
 				'label' => parrotposter__('Profile'),
 			],
+			[
+				'id' => 'parrotposter_help',
+				'label' => parrotposter__('Help'),
+			],
 		];
 	}
 
