@@ -105,7 +105,7 @@ class Api
 
 	public static function list_tariffs()
 	{
-		$res = self::get('tariffs/all');
+		$res = self::get('tariffs');
 		return $res;
 	}
 
