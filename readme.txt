@@ -1,6 +1,6 @@
 === ParrotPoster - Auto posting to social networks ===
 Contributors: parrotposter
-Tags: auto post, auto publish, autopost, autopublish, social media automation
+Tags: auto post, auto publish, autopost, autopublish, social media automation, автопостинг, автопубликация, vk, telegram, facebook, instagram, ok
 Requires at least: 5.0
 Tested up to: 5.8
 Requires PHP: 7.0
@@ -15,7 +15,7 @@ Auto posting or selective post of news and products from the site to social netw
 **Autoposting of news and products from the site to social networks - fast and convenient!**
 Автопостинг новостей и товаров с сайта в социальные сети – быстро и удобно!
 
-Easy to understand and configure plugin for auto-publishing (auto-posting) news and products to social networks*.
+Easy to understand and configure plugin for auto publishing (auto posting) news and products to social networks*.
 
 = Supported social networks =
 * Facebook
@@ -38,17 +38,17 @@ When posting, you can select multiple social network accounts and ParrotPoster w
 **Unlimited posts 📍**
 The plugin has no limit on the number of posts, publish as many as you need
 
-**Auto-posting with flexible conditions (news, products, pages) 🔧**
-Customize auto-posting templates by post type, selection of certain headings, titles, authors, tags, maximum and minimum product price, with selection of certain social media accounts and publishing time (immediate/time delay after news/product publication)
+**Auto posting with flexible conditions (news, products, pages) 🔧**
+Customize auto posting templates by post type, selection of certain headings, titles, authors, tags, maximum and minimum product price, with selection of certain social media accounts and publishing time (immediate/time delay after news/product publication)
 
-**Easily customize post text template for auto-posting 📄**
+**Easily customize post text template for auto posting 📄**
 Add title, excerpt, full description (content), line breaks, product prices and sizes, currency, weight, link, tags and more to the post text
 
-**Create multiple templates for auto-posting 👍**
+**Create multiple templates for auto posting 👍**
 Create multiple templates with preset settings for specific social networks accounts and with your own posting parameters
 
 **Automatically publish news/products when added to the site 📚**
-When you set up autoposting, the plugin will automatically publish news or products from the site according to your parameters to selected social networks accounts
+When you set up auto posting, the plugin will automatically publish news or products from the site according to your parameters to selected social networks accounts
 
 **Selective posting of news/products from a site 📌**
 On the edit page of the published news or product, you can click on the "Post to social networks" button, customize the post and publish it to social networks
@@ -60,13 +60,13 @@ You can publish the main image, images from content or product galleries. As wel
 You can convert tags from a news or product into hashtags to make them look more succinct on social networks
 
 **Customize the publishing time (Immediately/Delayed/Attempted time) 🕘**
-Customize the time for selective posting or auto-posting, for example selective news can be published at a scheduled time, and in the auto-posting template select to publish the news with a delay of 1-10 minutes
+Customize the time for selective posting or auto posting, for example selective news can be published at a scheduled time, and in the auto posting template select to publish the news with a delay of 1-10 minutes
 
 **Adding UTM tags to links 🔗**
 Add UTM tags (utm_source, utm_medium, utm_campaign, utm_term, utm_content) to links and track traffic in analytics
 
 **Excluding duplicates when posting 😉**
-The plugin allows you to automatically exclude duplicate news and products from the site to social networks on a specific auto-posting template
+The plugin allows you to automatically exclude duplicate news and products from the site to social networks on a specific auto posting template
 
 **View the status of posts💡**
 View results and publication times along with links to social networks posts
@@ -123,7 +123,8 @@ Email us at [support@parrotposter.com](mailto:support@parrotposter.com)
 8. Publishing news/products directly to social networks
 9. Post customization page before publishing
 10. Choice of social networks
-11. Posting results
+11. Posting results (post)
+12. Posting results (product)
 
 == Changelog ==
 
