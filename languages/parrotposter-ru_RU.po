@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-12-31 01:58+0500\n"
-"PO-Revision-Date: 2021-12-31 02:00+0500\n"
+"PO-Revision-Date: 2022-01-03 20:28+0500\n"
 "Last-Translator: Vettich <vetti.ch@mail.ru>\n"
 "Language-Team: \n"
 "Language: ru_RU\n"
@@ -1711,7 +1711,7 @@ msgstr "Автовыгрузка"
 
 #: views/scheduler/index.php:31
 msgid "You don't have autopublications yet"
-msgstr "У вас еще нет ни одно автопубликации"
+msgstr "У вас еще нет ни одной автопубликации"
 
 #: views/tariffs/fail.php:17
 msgid ""
