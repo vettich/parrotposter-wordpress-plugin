@@ -25,7 +25,7 @@ class AutopostingListTable extends WPListTable
 	public function get_columns()
 	{
 		return [
-			'cb' => '<input type="checkbox">',
+			// 'cb' => '<input type="checkbox">',
 			'name' => parrotposter__('Name'),
 			'wp_post_type' => parrotposter__('WP Post type'),
 			'when_publish' => parrotposter__('When publish'),

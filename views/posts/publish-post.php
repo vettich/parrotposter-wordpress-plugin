@@ -4,6 +4,7 @@ use parrotposter\PP;
 use parrotposter\WpPostHelpers;
 use parrotposter\AssetModules;
 use parrotposter\FormHelpers;
+use parrotposter\Tools;
 use parrotposter\fields\Fields;
 
 wp_enqueue_script('jquery-ui-core');
@@ -19,8 +20,6 @@ if (empty($post_id)) {
 $post = get_post($post_id);
 $post_title = parrotposter\Tools::clear_text(apply_filters('the_title', $post->post_title));
 $raw_content = apply_filters('the_content', $post->post_content);
-$content = parrotposter\Tools::clear_text($raw_content);
-$short_content = parrotposter\Tools::clear_text(apply_filters('the_content', $post->post_excerpt));
 
 $post_type = get_post_type($post_id);
 $post_meta = get_post_meta($post_id);
@@ -66,6 +65,7 @@ foreach ($contentImages as $img_url) {
 }
 
 $post_text = implode("\n\n", Fields::get_field_values(['title', 'excerpt'], $post));
+$post_text = Tools::clear_text($post_text);
 
 $back_url = "post.php?post=$post_id&action=edit";
 if (isset($_GET['back_url'])) {

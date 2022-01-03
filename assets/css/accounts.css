@@ -133,6 +133,7 @@
 	position: relative;
 	width: 56px;
 	height: 56px;
+	flex-shrink: 0;
 }
 
 .parrotposter-accounts__list--results .parrotposter-accounts__photo {

@@ -36,7 +36,9 @@ class Tools
 			'&nbsp;' => ' ',
 		];
 		$text = str_replace(array_keys($replaces), array_values($replaces), $text);
-		$text = trim(html_entity_decode(strip_tags($text)));
+		$text = strip_tags($text);
+		$text = html_entity_decode($text, ENT_NOQUOTES | ENT_SUBSTITUTE | ENT_HTML401, 'UTF-8');
+		$text = trim($text);
 		$text = preg_replace("/(?:\r?\n|\r){2,}/", "\n\n", $text);
 		return $text;
 	}

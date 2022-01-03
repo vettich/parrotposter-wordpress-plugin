@@ -32,10 +32,10 @@ class PostsListTable extends WPListTable
 	public function get_columns()
 	{
 		return [
-			'cb' => '<input type="checkbox">',
+			// 'cb' => '<input type="checkbox">',
 			'text' => parrotposter__('Text'),
 			'publish_at' => parrotposter__('Publish at'),
-			'social_networks' => parrotposter__('Accounts'),
+			'social_networks' => parrotposter__('Social networks'),
 			'status' => parrotposter__('Status'),
 		];
 	}

@@ -11,11 +11,10 @@ add_action('admin_init', function () {
 	}
 });
 
-
 function parrotposter_manage_posts_columns($columns)
 {
 	$pp_cols = [
-		'parrotposter_col' => '<span class="parrotposter-logo tips" data-tip="ParrotPoster">ParrotPoster</span>',
+		'parrotposter_col' => '<span class="parrotposter-logo" title="ParrotPoster">ParrotPoster</span>',
 	];
 	return $columns + $pp_cols;
 }
@@ -33,7 +32,7 @@ function parrotposter_manage_posts_custom_column($col_name)
 	);
 
 	printf(
-		'<a class="parrotposter-publish tips" data-tip="%s" href="%s"></a>',
+		'<a class="parrotposter-publish" title="%s" href="%s"></a>',
 		parrotposter__('Publish to social networks'),
 		$link,
 	);
