@@ -34,20 +34,13 @@ class AssetModules
 			'css' => 'lib/flatpickr/flatpickr.min.css',
 			'js' => 'lib/flatpickr/flatpickr.js',
 		],
-		'ultraselect' => [
-			'css' => 'lib/ultraselect/jquery.ultraselect.min.css',
-			'js' => 'lib/ultraselect/jquery.ultraselect.min.js',
-		],
 		'pqselect' => [
 			'css' => [
 				'lib/pqselect/pqselect.min.css',
-				// 'lib/pqselect/jquery-ui-1.11.4.min.css',
 				'lib/pqselect/jquery-ui-1.9.1-smoothness.css',
-				// 'lib/pqselect/bootstrap.3.3.5.min.css',
-				// 'lib/pqselect/pqselect.bootstrap.min.css',
 				'css/lib-pqselect.css',
 			],
-			// 'js_deps' => ['jquery-ui-core', 'jquery-ui-widget'],
+			'js_deps' => ['jquery-ui-core'],
 			'js' => 'lib/pqselect/pqselect.min.js',
 		],
 	];
@@ -114,13 +107,13 @@ class AssetModules
 			return;
 		}
 
+		$deps = isset($assets[$depsKey]) ? $assets[$depsKey] : [];
 		$css = $assets[$key];
 		if (is_array($css)) {
 			if (empty($css)) {
 				return;
 			}
 
-			$deps = isset($assets[$depsKey]) ? $assets[$depsKey] : [];
 			foreach ($css as $k => $v) {
 				if (!PP::isset_asset($v)) {
 					continue;
@@ -131,7 +124,7 @@ class AssetModules
 			}
 			wp_register_style("parrotposter-$module", false, $deps, PARROTPOSTER_VERSION);
 		} elseif (PP::isset_asset($css)) {
-			wp_register_style("parrotposter-$module", PP::asset($css), [], PARROTPOSTER_VERSION);
+			wp_register_style("parrotposter-$module", PP::asset($css), $deps, PARROTPOSTER_VERSION);
 		}
 		self::$registered[$module]['css'] = true;
 	}
@@ -151,13 +144,13 @@ class AssetModules
 			return;
 		}
 
+		$deps = isset($assets[$depsKey]) ? $assets[$depsKey] : [];
 		$js = $assets[$key];
 		if (is_array($js)) {
 			if (empty($js)) {
 				return;
 			}
 
-			$deps = isset($assets[$depsKey]) ? $assets[$depsKey] : [];
 			foreach ($js as $k => $v) {
 				if (!PP::isset_asset($v)) {
 					continue;
@@ -168,7 +161,7 @@ class AssetModules
 			}
 			wp_register_script("parrotposter-$module", false, $deps, PARROTPOSTER_VERSION);
 		} elseif (PP::isset_asset($js)) {
-			wp_register_script("parrotposter-$module", PP::asset($js), [], PARROTPOSTER_VERSION);
+			wp_register_script("parrotposter-$module", PP::asset($js), $deps, PARROTPOSTER_VERSION);
 		}
 		self::$registered[$module]['js'] = true;
 	}

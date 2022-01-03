@@ -96,6 +96,9 @@ class AutopostingListTable extends WPListTable
 	public function column_wp_post_type($item)
 	{
 		$wp_pt = get_post_type_object($item['wp_post_type']);
+		if (empty($wp_pt)) {
+			return '-';
+		}
 		return $wp_pt->label;
 	}
 

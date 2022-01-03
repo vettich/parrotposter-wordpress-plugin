@@ -10,7 +10,7 @@ use parrotposter\ArrayWrap;
 use parrotposter\fields\Fields;
 use parrotposter\fields\conditions\Conditions;
 
-AssetModules::enqueue(['block', 'input', 'nav-tab', 'autoposting_form', 'ultraselect', 'pqselect']);
+AssetModules::enqueue(['block', 'input', 'nav-tab', 'autoposting_form', 'pqselect']);
 
 $data = new ArrayWrap($view_args['data']);
 
