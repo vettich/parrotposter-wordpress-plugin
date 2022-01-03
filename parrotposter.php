@@ -1,11 +1,11 @@
 <?php
 /**
- * Plugin Name: ParrotPoster
+ * Plugin Name: ParrotPoster - Auto posting to social networks
  * Plugin URI: https://parrotposter.com
- * Description: Plugin of service posting in the social networks ParrotPoster.
+ * Description: Auto posting or selective post of news and products from the site to social networks Facebook, Instagram, Telegram, VK, OK.
  * Author: Selen
- * Version: 1.0.0
  * Author URI: http://selen.digital
+ * Version: 1.0.0
  * Text Domain: parrotposter
  * Domain Path: /languages
  * License: GPLv3
@@ -23,7 +23,6 @@ define('PARROTPOSTER_PLUGIN_DIR', plugin_dir_path(__FILE__));
 
 // register autoloaders
 require_once PARROTPOSTER_PLUGIN_DIR.'src/autoloader.php';
-//require_once PARROTPOSTER_PLUGIN_DIR.'vendor/autoloader.php';
 
 // include includes
 require_once PARROTPOSTER_PLUGIN_DIR.'includes/language.php';
