@@ -34,7 +34,7 @@ $back_url = add_query_arg([
 <?php PP::include_view('notice') ?>
 
 <div class="parrotposter-block parrotposter-block--min">
-	<h2><?php parrotposter_e('Reset password') ?></h2>
+	<h2><?php _e('Reset password', 'parrotposter') ?></h2>
 
 	<form action="<?php echo esc_url(admin_url('admin-post.php')) ?>" method="post">
 		<?php FormHelpers::the_nonce() ?>
@@ -44,17 +44,17 @@ $back_url = add_query_arg([
 
 		<div class="parrotposter-input__group">
 			<label class="parrotposter-input">
-				<span><?php parrotposter_e('Password') ?></span>
+				<span><?php _e('Password', 'parrotposter') ?></span>
 				<input type="password" name="parrotposter[password]">
 			</label>
 
 			<label class="parrotposter-input">
-				<span><?php parrotposter_e('Confirm password') ?></span>
+				<span><?php _e('Confirm password', 'parrotposter') ?></span>
 				<input type="password" name="parrotposter[confirm_password]">
 			</label>
 
 			<div class="parrotposter-input parrotposter-input--footer">
-				<input class="button button-primary" type="submit" name="submit" value="<?php parrotposter_e('Save') ?>">
+				<input class="button button-primary" type="submit" name="submit" value="<?php _e('Save', 'parrotposter') ?>">
 			</div>
 		</div>
 	</form>

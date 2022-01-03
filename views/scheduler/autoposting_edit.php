@@ -23,7 +23,7 @@ if ($data !== false) {
 ?>
 
 <?php PP::include_view('header', [
-	'title' => parrotposter__('Edit autoposting'),
+	'title' => __('Edit autoposting', 'parrotposter'),
 	'back_url' => 'admin.php?page=parrotposter_scheduler'
 ]) ?>
 <?php PP::include_view('notice') ?>

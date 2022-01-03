@@ -33,19 +33,19 @@ foreach ($tariffs as $tariffs_k => $tariff) {
 
 <?php PP::include_view('header') ?>
 
-<h1><?php parrotposter_e('Tariffs') ?></h1>
+<h1><?php _e('Tariffs', 'parrotposter') ?></h1>
 
 <div class="parrotposter-block parrotposter-block--horizontal">
 	<div class="parrotposter-block__group">
-		<div class="parrotposter-block__label"><?php parrotposter_e('Your tariff') ?></div>
+		<div class="parrotposter-block__label"><?php _e('Your tariff', 'parrotposter') ?></div>
 		<div class="parrotposter-block__value"><?php echo esc_html($profile['tariff']['name']) ?></div>
 	</div>
 	<div class="parrotposter-block__group">
-		<div class="parrotposter-block__label"><?php parrotposter_e('Added accounts') ?></div>
-		<div class="parrotposter-block__value"><?php parrotposter_e('%s of %s', $accounts_cur_cnt, $accounts_cnt) ?></div>
+		<div class="parrotposter-block__label"><?php _e('Added accounts', 'parrotposter') ?></div>
+		<div class="parrotposter-block__value"><?php printf(__('%1$d of %2$d', 'parrotposter'), $accounts_cur_cnt, $accounts_cnt) ?></div>
 	</div>
 	<div class="parrotposter-block__group">
-		<div class="parrotposter-block__label"><?php parrotposter_e('Tariff expired at') ?></div>
+		<div class="parrotposter-block__label"><?php _e('Tariff expired at', 'parrotposter') ?></div>
 		<div class="parrotposter-block__value">
 			<?php echo wp_date(get_option('date_format'), strtotime($profile['user']['tariff']['expiry_at'])) ?>
 			<?php echo esc_attr($profile['left']) ?>
@@ -78,36 +78,36 @@ foreach ($tariffs as $tariffs_k => $tariff) {
 	<div class="parrotposter-tariffs__item <?php echo $tariff['is_current'] ? 'parrotposter-tariffs__item--current' : '' ?>" data-id="<?php echo esc_attr($tariff['id']) ?>">
 		<div class="parrotposter-tariffs__name">
 			<?php echo esc_attr($tariff['name']) ?>
-			<div class="parrotposter-tariffs__current"><?php parrotposter_e('Current') ?></div>
+			<div class="parrotposter-tariffs__current"><?php _e('Current', 'parrotposter') ?></div>
 		</div>
 		<div class="parrotposter-tariffs__price">
 			<span class="parrotposter-tariffs__price-value"><?php echo esc_attr(Tariffs::get_period_price($tariff, 1)) ?></span> ₽
 			<div class="parrotposter-tariffs__period">
-				<?php parrotposter_e('per month') ?>
+				<?php _e('per month', 'parrotposter') ?>
 			</div>
 		</div>
 		<div class="parrotposter-tariffs__price-usd">
 			~$<span class="parrotposter-tariffs__price-usd-value"><?php echo esc_attr(Tariffs::rub_to_dollar(Tariffs::get_period_price($tariff, 1))) ?></span>
 		</div>
 		<div class="parrotposter-tariffs__limit">
-			<?php parrotposter_e('Unlimited posts') ?>
+			<?php _e('Unlimited posts', 'parrotposter') ?>
 		</div>
 		<div class="parrotposter-tariffs__limit">
-			<?php parrotposter_e('%s accounts of social networks', $tariff['limits']['accounts_cnt']) ?>
+			<?php printf(_n('%d account of social network', '%d accounts of social networks', $tariff['limits']['accounts_cnt'], 'parrotposter'), $tariff['limits']['accounts_cnt']) ?>
 		</div>
 		<div>
 			<br>
 			<?php if (!Tariffs::is_active($profile['tariff']['code'], $profile['user']['tariff']['expiry_at'])): ?>
 			<button class="button button-primary">
-				<?php parrotposter_e('Select and pay') ?>
+				<?php _e('Select and pay', 'parrotposter') ?>
 			</button>
 			<?php elseif ($tariff['is_current']): ?>
 			<button class="button button-primary">
-				<?php parrotposter_e('Prolong') ?>
+				<?php _e('Prolong', 'parrotposter') ?>
 			</button>
 			<?php else: ?>
 			<button class="button">
-				<?php parrotposter_e('Select and pay') ?>**
+				<?php _e('Select and pay', 'parrotposter') ?>**
 			</button>
 			<?php endif ?>
 		</div>
@@ -118,12 +118,12 @@ foreach ($tariffs as $tariffs_k => $tariff) {
 <br>
 
 <div class="parrotposter-tariffs__ps">
-	* <?php parrotposter_e('The price in dollars is calculated on the basis of the Bank of Russia exchange rate') ?>
+	* <?php _e('The price in dollars is calculated on the basis of the Bank of Russia exchange rate', 'parrotposter') ?>
 </div>
 
 <?php if (Tariffs::is_active($profile['tariff']['code'], $profile['user']['tariff']['expiry_at'])): ?>
 <div class="parrotposter-tariffs__ps">
-	** <?php parrotposter_e('If you select a new tariff, the remaining days at the current tariff will be recalculated and transferred to the new tariff') ?>
+	** <?php _e('If you select a new tariff, the remaining days at the current tariff will be recalculated and transferred to the new tariff', 'parrotposter') ?>
 </div>
 <?php endif ?>
 

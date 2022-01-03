@@ -11,15 +11,15 @@ class PostsListTable extends WPListTable
 		global $status, $page;
 
 		parent::__construct([
-			'singular' => parrotposter__('Post'),
-			'plural' => parrotposter__('Posts'),
+			'singular' => __('Post', 'parrotposter'),
+			'plural' => __('Posts', 'parrotposter'),
 			'ajax' => false,
 		]);
 	}
 
 	public function no_items()
 	{
-		parrotposter_e('No posts found');
+		_e('No posts found', 'parrotposter');
 	}
 
 	public function column_default($item, $column_name)
@@ -33,10 +33,10 @@ class PostsListTable extends WPListTable
 	{
 		return [
 			// 'cb' => '<input type="checkbox">',
-			'text' => parrotposter__('Text'),
-			'publish_at' => parrotposter__('Publish at'),
-			'social_networks' => parrotposter__('Social networks'),
-			'status' => parrotposter__('Status'),
+			'text' => __('Text', 'parrotposter'),
+			'publish_at' => __('Publish at', 'parrotposter'),
+			'social_networks' => __('Social networks', 'parrotposter'),
+			'status' => __('Status', 'parrotposter'),
 		];
 	}
 
@@ -55,12 +55,12 @@ class PostsListTable extends WPListTable
 			'view' => sprintf(
 				'<a class="parrotposter-post-view" href="#" data-id="%s">%s</a>',
 				$item['id'],
-				parrotposter__('View')
+				__('View', 'parrotposter')
 			),
 			'delete' => sprintf(
 				'<a class="parrotposter-post-delete" href="#" data-id="%s">%s</a>',
 				$item['id'],
-				parrotposter__('Delete')
+				__('Delete', 'parrotposter')
 			),
 		];
 

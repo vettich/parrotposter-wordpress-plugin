@@ -13,7 +13,7 @@ AssetModules::enqueue(['block', 'input', 'flatpickr', 'publish-post']);
 
 $post_id = (int) $_GET['post_id'];
 if (empty($post_id)) {
-	parrotposter_e('Error post_id');
+	_e('Error post_id', 'parrotposter');
 	return;
 }
 
@@ -74,7 +74,7 @@ if (isset($_GET['back_url'])) {
 ?>
 
 <?php PP::include_view('header', [
-	'title' => parrotposter__('Publish: %s', esc_attr($post_title)),
+	'title' => sprintf(__('Publish: %s', 'parrotposter'), esc_attr($post_title)),
 	'back_url' => $back_url,
 ]) ?>
 <?php PP::include_view('notice') ?>
@@ -87,24 +87,24 @@ if (isset($_GET['back_url'])) {
 
 	<div class="parrotposter-block parrotposter-block--scheduler-edit">
 
-		<div class="parrotposter-block__title"><?php parrotposter_e('Post data') ?></div>
+		<div class="parrotposter-block__title"><?php _e('Post data', 'parrotposter') ?></div>
 
 		<div class="parrotposter-input__group">
 			<label class="parrotposter-input parrotposter-input--wide">
-				<span><?php parrotposter_e('Post text') ?></span>
+				<span><?php _e('Post text', 'parrotposter') ?></span>
 				<div class="parrotposter-input__row">
 					<textarea name="parrotposter[post_text]"><?php echo $post_text ?></textarea>
 				</div>
 			</label>
 
 			<label class="parrotposter-input">
-				<span><?php parrotposter_e('Link') ?></span>
+				<span><?php _e('Link', 'parrotposter') ?></span>
 				<input type="text" name="parrotposter[post_link]" value="<?php echo $post_link ?>">
 			</label>
 
 			<?php if (!empty($images)): ?>
 			<label class="parrotposter-input">
-				<span><?php parrotposter_e('Select post images') ?></span>
+				<span><?php _e('Select post images', 'parrotposter') ?></span>
 				<div class="parrotposter-post-select-images-list">
 				<?php foreach ($images as $attachment_id => $img_url): ?>
 					<label class="parrotposter-post-select-images-item">
@@ -115,34 +115,34 @@ if (isset($_GET['back_url'])) {
 				<?php endforeach ?>
 				</div>
 				<div class="parrotposter-input__info">
-					<?php parrotposter_e('Use drag\'n\'drop to move images. A maximum of 10 images will be loaded') ?>
+					<?php _e('Use drag\'n\'drop to move images. A maximum of 10 images will be loaded', 'parrotposter') ?>
 				</div>
 			</label>
 			<?php endif ?>
 		</div>
 
-		<div class="parrotposter-block__title"><?php parrotposter_e('When to publish') ?></div>
+		<div class="parrotposter-block__title"><?php _e('When to publish', 'parrotposter') ?></div>
 
 		<div class="parrotposter-input__group">
 			<label class="parrotposter-input">
 				<select name="parrotposter[when_publish]">
-					<option value="now"><?php parrotposter_e('Now') ?></option>
+					<option value="now"><?php _e('Now', 'parrotposter') ?></option>
 					<?php if (date('c') < get_the_date('c', $post_id)): ?>
-					<option value="post_date"><?php parrotposter_e('Post date') ?></option>
+					<option value="post_date"><?php _e('Post date', 'parrotposter') ?></option>
 					<?php endif ?>
-					<option value="delay"><?php parrotposter_e('With a delay') ?></option>
-					<option value="custom"><?php parrotposter_e('Enter a specific time') ?></option>
+					<option value="delay"><?php _e('With a delay', 'parrotposter') ?></option>
+					<option value="custom"><?php _e('Enter a specific time', 'parrotposter') ?></option>
 				</select>
 			</label>
 
 			<label class="parrotposter-input parrotposter--delay">
-				<span><?php parrotposter_e('Publish with a delay of 1 to 10 minutes') ?></span>
+				<span><?php _e('Publish with a delay of 1 to 10 minutes', 'parrotposter') ?></span>
 				<input type="number" name="parrotposter[publish_delay]" min="1" max="10" step="1"
 					value="3">
 			</label>
 
 			<label class="parrotposter-input parrotposter--specific-time">
-				<span><?php parrotposter_e('Specific time') ?></span>
+				<span><?php _e('Specific time', 'parrotposter') ?></span>
 				<div class="parrotposter-post-pick-row">
 					<input id="pick-publication-time" type="text" name="parrotposter[specific_time]">
 					<input id="pick-publication-time-fmt" type="text" readonly>
@@ -151,7 +151,7 @@ if (isset($_GET['back_url'])) {
 
 		</div>
 
-		<div class="parrotposter-block__title"><?php parrotposter_e('Choice of social networks') ?></div>
+		<div class="parrotposter-block__title"><?php _e('Choice of social networks', 'parrotposter') ?></div>
 		<?php PP::include_view('accounts/choice_list', [
 			'account_ids' => [],
 			'input_name' => 'parrotposter[account_ids][]',
@@ -159,36 +159,36 @@ if (isset($_GET['back_url'])) {
 
 		<div class="parrotposter-input__note">
 			<ul>
-				<li><?php parrotposter_e('Images must be in jpg/png/wepb format') ?>
-				<li><?php parrotposter_e('The weight of one image must not exceed 10MB') ?>
-				<li><?php parrotposter_e('There can be no more than 10 images in a post') ?>
-				<li><?php parrotposter_e('Only one image is uploaded to Facebook (the first image in the list)') ?>
+				<li><?php _e('Images must be in jpg/png/wepb format', 'parrotposter') ?>
+				<li><?php _e('The weight of one image must not exceed 10MB', 'parrotposter') ?>
+				<li><?php _e('There can be no more than 10 images in a post', 'parrotposter') ?>
+				<li><?php _e('Only one image is uploaded to Facebook (the first image in the list)', 'parrotposter') ?>
 			</ul>
 		</div>
 
-		<div class="parrotposter-block__title"><?php parrotposter_e('Additional settings for VKontakte') ?></div>
+		<div class="parrotposter-block__title"><?php _e('Additional settings for VKontakte', 'parrotposter') ?></div>
 
 		<div class="parrotposter-input__group">
 			<label class="parrotposter-input parrotposter-input--checkbox">
 				<?php FormHelpers::render_checkbox('parrotposter[extra_vk_from_group]', 1) ?>
-				<span><?php parrotposter_e('Publish a post on behalf of the group') ?></span>
+				<span><?php _e('Publish a post on behalf of the group', 'parrotposter') ?></span>
 			</label>
 
 			<label class="parrotposter-input parrotposter-input--checkbox">
 				<?php FormHelpers::render_checkbox('parrotposter[extra_vk_signed]', 0) ?>
-				<span><?php parrotposter_e('Add a signature to the post') ?></span>
+				<span><?php _e('Add a signature to the post', 'parrotposter') ?></span>
 			</label>
 		</div>
 
 		<br>
 		<p id="parrotposter-publish-note">
-			<?php parrotposter_e('1. You need to fill in the text or choose pictures.') ?> <br>
-			<?php parrotposter_e('2. Select at least one social network account') ?>
+			<?php _e('1. You need to fill in the text or choose pictures.', 'parrotposter') ?> <br>
+			<?php _e('2. Select at least one social network account', 'parrotposter') ?>
 		</p>
 
 		<div class="parrotposter-input__group">
 			<div class="parrotposter-input parrotposter-input--footer parrotposter-input--row">
-				<input class="button button-primary" type="submit" name="submit" value="<?php parrotposter_e('Publish') ?>" disabled>
+				<input class="button button-primary" type="submit" name="submit" value="<?php _e('Publish', 'parrotposter') ?>" disabled>
 			</div>
 		</div>
 	</div>

@@ -11,26 +11,26 @@ class AutopostingListTable extends WPListTable
 		global $status, $page;
 
 		parent::__construct([
-			'singular' => parrotposter__('Autoposting'),
-			'plural' => parrotposter__('Autopostings'),
+			'singular' => __('Autoposting', 'parrotposter'),
+			'plural' => __('Autopostings', 'parrotposter'),
 			'ajax' => false,
 		]);
 	}
 
 	public function no_items()
 	{
-		parrotposter_e('No autoposting found');
+		_e('No autoposting found', 'parrotposter');
 	}
 
 	public function get_columns()
 	{
 		return [
 			// 'cb' => '<input type="checkbox">',
-			'name' => parrotposter__('Name'),
-			'wp_post_type' => parrotposter__('WP Post type'),
-			'when_publish' => parrotposter__('When publish'),
-			'social_networks' => parrotposter__('Social networks'),
-			'enable' => parrotposter__('Enable'),
+			'name' => __('Name', 'parrotposter'),
+			'wp_post_type' => __('WP Post type', 'parrotposter'),
+			'when_publish' => __('When publish', 'parrotposter'),
+			'social_networks' => __('Social networks', 'parrotposter'),
+			'enable' => __('Enable', 'parrotposter'),
 		];
 	}
 
@@ -49,7 +49,7 @@ class AutopostingListTable extends WPListTable
 				'autoposting_edit',
 				$item['id'],
 				// label
-				parrotposter__('Edit')
+				__('Edit', 'parrotposter')
 			),
 			'delete' => sprintf(
 				'<a href="?page=%s&action=%s&id=%s" onclick="%s(event, %s)">%s</a>',
@@ -61,7 +61,7 @@ class AutopostingListTable extends WPListTable
 				'parrotposter_autoposting_delete',
 				$item['id'],
 				// label
-				parrotposter__('Delete')
+				__('Delete', 'parrotposter')
 			),
 		];
 
@@ -106,9 +106,9 @@ class AutopostingListTable extends WPListTable
 	{
 		switch ($item['when_publish']) {
 		case 'immediately':
-			return parrotposter__('Immediately upon publishing the post');
+			return __('Immediately upon publishing the post', 'parrotposter');
 		case 'delay':
-			return sprintf('%s: %d min', parrotposter__('With a delay'), $item['publish_delay']);
+			return sprintf('%s: %d min', __('With a delay', 'parrotposter'), $item['publish_delay']);
 		}
 	}
 
@@ -119,7 +119,7 @@ class AutopostingListTable extends WPListTable
 		}
 		$text = ApiHelpers::list_social_network_names($item['account_ids']);
 		if (empty($text)) {
-			$text = esc_html(parrotposter__('<Not selected>'));
+			$text = esc_html(__('<Not selected>', 'parrotposter'));
 			$text = "<span style=\"color: #d63638\">$text</span>";
 		}
 		return $text;
@@ -151,14 +151,14 @@ class AutopostingListTable extends WPListTable
 				<div class="parrotposter-modal__container">
 					<div class="parrotposter-modal__close"></div>
 					<div class="parrotposter-modal__title"
-						data-title="<?php parrotposter_e('Are you sure you want to delete {autoposting_name}?') ?>">
+						data-title="<?php _e('Are you sure you want to delete {autoposting_name}?', 'parrotposter') ?>">
 					</div>
 					<div class="parrotposter-modal__footer">
 						<button class="button button-primary parrotposter-button--delete"
 							onclick="parrotposter_autoposting_delete_confirm(event)">
-							<?php parrotposter_e('Delete') ?>
+							<?php _e('Delete', 'parrotposter') ?>
 						</button>
-						<button class="button parrotposter-js-close"><?php parrotposter_e('Cancel') ?></button>
+						<button class="button parrotposter-js-close"><?php _e('Cancel', 'parrotposter') ?></button>
 					</div>
 				</div>
 			</div>

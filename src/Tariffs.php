@@ -11,22 +11,22 @@ class Tariffs
 		return [
 			[
 				'period' => 1,
-				'label' => parrotposter__('1 month'),
+				'label' => _x('1 month', 'tariff period', 'parrotposter'),
 				'discount' => 0,
 			],
 			[
 				'period' => 3,
-				'label' => parrotposter__('3 month'),
+				'label' => _x('3 month', 'tariff period', 'parrotposter'),
 				'discount' => 4,
 			],
 			[
 				'period' => 6,
-				'label' => parrotposter__('6 month'),
+				'label' => _x('6 month', 'tariff period', 'parrotposter'),
 				'discount' => 10,
 			],
 			[
 				'period' => 12,
-				'label' => parrotposter__('1 year'),
+				'label' => _x('1 year', 'tariff period', 'parrotposter'),
 				'discount' => 22,
 			],
 		];

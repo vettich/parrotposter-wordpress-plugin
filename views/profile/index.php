@@ -19,7 +19,7 @@ if (!empty($profile['user'])) {
 
 ?>
 
-<?php PP::include_view('header', ['title' => parrotposter__('Profile')]) ?>
+<?php PP::include_view('header', ['title' => __('Profile', 'parrotposter')]) ?>
 
 <?php if (!empty($profile['error'])): ?>
 	<div class="notice notice-error">
@@ -30,28 +30,28 @@ if (!empty($profile['user'])) {
 <div class="parrotposter-block parrotposter-block--min">
 	<?php if (!empty($profile['user']['name'])): ?>
 		<div class="parrotposter-block__group">
-			<div class="parrotposter-block__label"><?php parrotposter_e('Your name') ?></div>
+			<div class="parrotposter-block__label"><?php _e('Your name', 'parrotposter') ?></div>
 			<div class="parrotposter-block__value"><?php echo esc_attr($profile['user']['name']) ?></div>
 		</div>
 	<?php endif ?>
 
 	<div class="parrotposter-block__group">
-		<div class="parrotposter-block__label"><?php parrotposter_e('Email') ?></div>
+		<div class="parrotposter-block__label"><?php _e('Email', 'parrotposter') ?></div>
 		<div class="parrotposter-block__value"><?php echo esc_attr($profile['user']['username']) ?></div>
 	</div>
 
 	<div class="parrotposter-block__group">
-		<div class="parrotposter-block__label"><?php parrotposter_e('Tariff') ?></div>
+		<div class="parrotposter-block__label"><?php _e('Tariff', 'parrotposter') ?></div>
 		<div class="parrotposter-block__value"><?php echo esc_attr($profile['tariff']['name']) ?></div>
 	</div>
 
 	<div class="parrotposter-block__group">
-		<div class="parrotposter-block__label"><?php parrotposter_e('Accounts') ?></div>
-		<div class="parrotposter-block__value"><?php parrotposter_e('%s of %s', $accounts_cur_cnt, $accounts_cnt) ?></div>
+		<div class="parrotposter-block__label"><?php _e('Accounts', 'parrotposter') ?></div>
+		<div class="parrotposter-block__value"><?php printf(__('%1$d of %2$d', 'parrotposter'), $accounts_cur_cnt, $accounts_cnt) ?></div>
 	</div>
 
 	<div class="parrotposter-block__group">
-		<div class="parrotposter-block__label"><?php parrotposter_e('Expiry at') ?></div>
+		<div class="parrotposter-block__label"><?php _e('Expiry at', 'parrotposter') ?></div>
 		<div class="parrotposter-block__value">
 			<?php echo wp_date(get_option('date_format'), strtotime($profile['user']['tariff']['expiry_at'])) ?>
 			<?php echo esc_attr($profile['left']) ?>
@@ -63,7 +63,7 @@ if (!empty($profile['user'])) {
 			<?php FormHelpers::the_nonce() ?>
 			<input type="hidden" name="action" value="parrotposter_logout">
 			<input type="hidden" name="back_url" value="admin.php?page=parrotposter">
-			<input class="button button-secondary" type="submit" name="submit" value="<?php parrotposter_e('Logout') ?>">
+			<input class="button button-secondary" type="submit" name="submit" value="<?php _e('Logout', 'parrotposter') ?>">
 		</form>
 	</div>
 </div>

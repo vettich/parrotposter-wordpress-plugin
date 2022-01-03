@@ -22,10 +22,10 @@ list(
 <div class="parrotposter-accounts__no-list">
 	<div class="parrotposter-accounts__no-list-pic"></div>
 	<div class="parrotposter-accounts__no-list-title">
-		<?php parrotposter_e('You have no accounts connected') ?>
+		<?php _e('You have no accounts connected', 'parrotposter') ?>
 	</div>
 	<div class="parrotposter-accounts__no-list-subtitle">
-		<?php parrotposter_e('To connect, go to <a href="%s">Accounts</a>', 'admin.php?page=parrotposter_accounts') ?>
+		<?php sprintf(__('To connect, go to <a href="%s">Accounts</a>', 'parrotposter'), 'admin.php?page=parrotposter_accounts') ?>
 	</div>
 </div>
 

@@ -28,12 +28,12 @@ $table->prepare_items();
 
 	<div class="parrotposter-empty-block">
 		<div class="parrotposter-empty-block__title">
-			<?php parrotposter_e('You don\'t have autopublications yet') ?>
+			<?php _e('You don\'t have autopublications yet', 'parrotposter') ?>
 		</div>
 
 		<div class="parrotposter-empty-block__connect">
 			<a href="admin.php?page=parrotposter_scheduler&view=autoposting_add" class="button button-secondary">
-				<?php parrotposter_e('+ Add autoposting') ?>
+				<?php _e('+ Add autoposting', 'parrotposter') ?>
 			</a>
 		</div>
 	</div>

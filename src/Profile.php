@@ -20,13 +20,13 @@ class Profile
 
 			$interval = (new \DateTime('now'))->diff(new \DateTime($user['tariff']['expiry_at']));
 			if ($interval->invert) {
-				$left = parrotposter__('(expired)');
+				$left = _x('(expired)', 'tariff expired', 'parrotposter');
 			} elseif ($interval->y > 0) {
-				$left = parrotposter_n('(left %s year)', '(left %s years)', $interval->y, $interval->y);
+				$left = sprintf(_n('(left %s year)', '(left %s years)', $interval->y, 'parrotposter'), $interval->y);
 			} elseif ($interval->m > 0) {
-				$left = parrotposter_n('(left %s month)', '(left %s months)', $interval->m, $interval->m);
+				$left = sprintf(_n('(left %s month)', '(left %s months)', $interval->m, 'parrotposter'), $interval->m);
 			} elseif ($interval->d > 0) {
-				$left = parrotposter_n('(left %s day)', '(left %s days)', $interval->d, $interval->d);
+				$left = sprintf(_n('(left %s day)', '(left %s days)', $interval->d, 'parrotposter'), $interval->d);
 			}
 		}
 

@@ -16,8 +16,8 @@ class Taxonomies
 					'key' => $tax->name,
 					'label' => $tax->label,
 					'ops' => [
-						'equal' => parrotposter_x('Equals one of', 'wp_post_condition'),
-						'not_equal' => parrotposter_x('Not equal to one of', 'wp_post_condition'),
+						'equal' => _x('Equals one of', 'wp_post_condition', 'parrotposter'),
+						'not_equal' => _x('Not equal to one of', 'wp_post_condition', 'parrotposter'),
 					],
 					'input' => 'select',
 					'values' => self::get_terms($tax->name),

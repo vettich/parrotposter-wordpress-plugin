@@ -98,15 +98,15 @@ class ApiHelpers
 		list($user_id, $type, $network_id) = explode(':', $account_id);
 		switch ($type) {
 		case 'vk':
-			return parrotposter__('VKontakte');
+			return __('VKontakte', 'parrotposter');
 		case 'fb':
-			return parrotposter__('Facebook');
+			return __('Facebook', 'parrotposter');
 		case 'ok':
-			return parrotposter__('Odnoklassniki');
+			return __('Odnoklassniki', 'parrotposter');
 		case 'tg':
-			return parrotposter__('Telegram');
+			return __('Telegram', 'parrotposter');
 		case 'insta':
-			return parrotposter__('Instagram');
+			return __('Instagram', 'parrotposter');
 		}
 		return '';
 	}
@@ -127,13 +127,13 @@ class ApiHelpers
 	{
 		switch ($status) {
 		case 'success':
-			return parrotposter__('Published');
+			return __('Published', 'parrotposter');
 		case 'fail':
-			return parrotposter__('Published with error');
+			return __('Published with error', 'parrotposter');
 		case 'ready':
-			return parrotposter__('In queue');
+			return __('In queue', 'parrotposter');
 		case 'queue':
-			return parrotposter__('Publishing in progress');
+			return __('Publishing in progress', 'parrotposter');
 		}
 	}
 }

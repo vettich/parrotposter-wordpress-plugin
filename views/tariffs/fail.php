@@ -14,11 +14,11 @@ AssetModules::enqueue(['block']);
 
 <div class="parrotposter-block parrotposter-block--fail">
 	<div class="parrotposter-block__value">
-		<?php parrotposter_e('There was an error making the payment, try again! Or report it to support@parrotposter.com') ?>
+		<?php _e('There was an error making the payment, try again! Or report it to support@parrotposter.com', 'parrotposter') ?>
 	</div>
 	<div>
 		<a class="button button-primary" href="admin.php?page=parrotposter_tariffs">
-			<?php parrotposter_e('Back to tariffs') ?>
+			<?php _e('Back to tariffs', 'parrotposter') ?>
 		</a>
 	</div>
 </div>

@@ -7,12 +7,12 @@ if (!defined('ABSPATH')) {
 use parrotposter\PP;
 
 $button_link = [
-	'text' => parrotposter__('+ Add autoposting'),
+	'text' => __('+ Add autoposting', 'parrotposter'),
 	'href' => '?page=parrotposter_scheduler&view=autoposting_add',
 ];
 if ($view_args['tab'] == 'unload') {
 	$button_link = [
-		'text' => parrotposter__('+ Add autounloading'),
+		'text' => __('+ Add autounloading', 'parrotposter'),
 		'href' => '?page=parrotposter_scheduler&view=unload_add',
 	];
 }
@@ -20,7 +20,7 @@ if ($view_args['tab'] == 'unload') {
 ?>
 
 <?php PP::include_view('header', [
-	'title' => parrotposter__('Scheduler'),
+	'title' => __('Scheduler', 'parrotposter'),
 	'button_link' => $view_args['show_button'] ? $button_link : false,
 ]) ?>
 <?php PP::include_view('notice') ?>
@@ -30,13 +30,13 @@ if ($view_args['tab'] == 'unload') {
 		class="parrotposter-nav-tab__item <?php if ($view_args['tab'] == 'autoposting') {
 	echo 'active';
 } ?>">
-		<?php parrotposter_e('Autoposting') ?>
+		<?php _e('Autoposting', 'parrotposter') ?>
 	</a>
 	<a href="?page=parrotposter_scheduler&view=unload"
 		class="parrotposter-nav-tab__item <?php if ($view_args['tab'] == 'unload') {
 	echo 'active';
 } ?>">
-		<?php parrotposter_e('Autounloading') ?>
+		<?php _e('Autounloading', 'parrotposter') ?>
 	</a>
 </nav>
 

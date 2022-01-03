@@ -28,19 +28,19 @@ class CommonType
 		$fields = [
 			[
 				'key' => '{br}',
-				'label' => parrotposter_x('Break line', 'wp_post_field'),
+				'label' => _x('Break line', 'wp_post_field', 'parrotposter'),
 			],
 			[
 				'key' => '{title}',
-				'label' => parrotposter_x('Title', 'wp_post_field'),
+				'label' => _x('Title', 'wp_post_field', 'parrotposter'),
 			],
 			[
 				'key' => '{content}',
-				'label' => parrotposter_x('Content', 'wp_post_field'),
+				'label' => _x('Content', 'wp_post_field', 'parrotposter'),
 			],
 			[
 				'key' => '{excerpt}',
-				'label' => parrotposter_x('Excerpt', 'wp_post_field'),
+				'label' => _x('Excerpt', 'wp_post_field', 'parrotposter'),
 			],
 		];
 		return $fields;
@@ -51,7 +51,7 @@ class CommonType
 		$fields = [
 			[
 				'key' => '{link}',
-				'label' => parrotposter_x('Link', 'wp_post_field'),
+				'label' => _x('Link', 'wp_post_field', 'parrotposter'),
 			],
 		];
 		return $fields;
@@ -62,7 +62,7 @@ class CommonType
 		$fields = [
 			[
 				'key' => '{date}',
-				'label' => parrotposter_x('Date', 'wp_post_field'),
+				'label' => _x('Date', 'wp_post_field', 'parrotposter'),
 			],
 		];
 		return $fields;
@@ -73,11 +73,11 @@ class CommonType
 		$fields = [
 			[
 				'key' => '{featured_image}',
-				'label' => parrotposter_x('Featured image', 'wp_post_field'),
+				'label' => _x('Featured image', 'wp_post_field', 'parrotposter'),
 			],
 			[
 				'key' => '{images_in_content}',
-				'label' => parrotposter_x('Images in content', 'wp_post_field'),
+				'label' => _x('Images in content', 'wp_post_field', 'parrotposter'),
 			],
 		];
 		return $fields;

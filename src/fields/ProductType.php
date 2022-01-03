@@ -30,47 +30,47 @@ class ProductType
 		$fields = [
 			[
 				'key' => '{product_title}',
-				'label' => parrotposter_x('Product title', 'wp_post_field'),
+				'label' => _x('Product title', 'wp_post_field', 'parrotposter'),
 			],
 			[
 				'key' => '{product_short_description}',
-				'label' => parrotposter_x('Product short description', 'wp_post_field'),
+				'label' => _x('Product short description', 'wp_post_field', 'parrotposter'),
 			],
 			[
 				'key' => '{product_description}',
-				'label' => parrotposter_x('Product description', 'wp_post_field'),
+				'label' => _x('Product description', 'wp_post_field', 'parrotposter'),
 			],
 			// [
 			// 	'key' => '{product_price}',
-			// 	'label' => parrotposter_x('Price', 'wp_post_field'),
+			// 	'label' => _x('Price', 'wp_post_field', 'parrotposter'),
 			// ],
 			[
 				'key' => '{product_regular_price}',
-				'label' => parrotposter_x('Regular price', 'wp_post_field'),
+				'label' => _x('Regular price', 'wp_post_field', 'parrotposter'),
 			],
 			[
 				'key' => '{product_sale_price}',
-				'label' => parrotposter_x('Sale price', 'wp_post_field'),
+				'label' => _x('Sale price', 'wp_post_field', 'parrotposter'),
 			],
 			[
 				'key' => '{product_currency}',
-				'label' => parrotposter_x('Product currency', 'wp_post_field'),
+				'label' => _x('Product currency', 'wp_post_field', 'parrotposter'),
 			],
 			[
 				'key' => '{product_height}',
-				'label' => parrotposter_x('Height', 'wp_post_field'),
+				'label' => _x('Height', 'wp_post_field', 'parrotposter'),
 			],
 			[
 				'key' => '{product_length}',
-				'label' => parrotposter_x('Length', 'wp_post_field'),
+				'label' => _x('Length', 'wp_post_field', 'parrotposter'),
 			],
 			[
 				'key' => '{product_width}',
-				'label' => parrotposter_x('Width', 'wp_post_field'),
+				'label' => _x('Width', 'wp_post_field', 'parrotposter'),
 			],
 			[
 				'key' => '{product_weight}',
-				'label' => parrotposter_x('Weight', 'wp_post_field'),
+				'label' => _x('Weight', 'wp_post_field', 'parrotposter'),
 			],
 		];
 		return $fields;
@@ -81,7 +81,7 @@ class ProductType
 		$fields = [
 			[
 				'key' => '{product_link}',
-				'label' => parrotposter_x('Product link', 'wp_post_field'),
+				'label' => _x('Product link', 'wp_post_field', 'parrotposter'),
 			],
 		];
 		return $fields;
@@ -99,11 +99,11 @@ class ProductType
 		$fields = [
 			[
 				'key' => '{product_image}',
-				'label' => parrotposter_x('Product image', 'wp_post_field'),
+				'label' => _x('Product image', 'wp_post_field', 'parrotposter'),
 			],
 			[
 				'key' => '{product_gallery}',
-				'label' => parrotposter_x('Product gallery', 'wp_post_field'),
+				'label' => _x('Product gallery', 'wp_post_field', 'parrotposter'),
 			],
 		];
 		return $fields;

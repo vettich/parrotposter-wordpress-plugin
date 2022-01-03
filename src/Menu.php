@@ -17,27 +17,27 @@ class Menu
 		self::$items = [
 			[
 				'id' => 'parrotposter_posts',
-				'label' => parrotposter__('Posts'),
+				'label' => _x('Posts', 'menu', 'parrotposter'),
 			],
 			[
 				'id' => 'parrotposter_accounts',
-				'label' => parrotposter__('Accounts'),
+				'label' => _x('Accounts', 'menu', 'parrotposter'),
 			],
 			[
 				'id' => 'parrotposter_scheduler',
-				'label' => parrotposter__('Scheduler'),
+				'label' => _x('Scheduler', 'menu', 'parrotposter'),
 			],
 			[
 				'id' => 'parrotposter_tariffs',
-				'label' => parrotposter__('Tariffs'),
+				'label' => _x('Tariffs', 'menu', 'parrotposter'),
 			],
 			[
 				'id' => 'parrotposter_profile',
-				'label' => parrotposter__('Profile'),
+				'label' => _x('Profile', 'menu', 'parrotposter'),
 			],
 			[
 				'id' => 'parrotposter_help',
-				'label' => parrotposter__('Help'),
+				'label' => _x('Help', 'menu', 'parrotposter'),
 			],
 		];
 	}

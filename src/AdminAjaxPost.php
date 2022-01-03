@@ -95,11 +95,11 @@ class AdminAjaxPost
 		$password = sanitize_text_field($_POST['parrotposter']['password']);
 
 		if (empty($username)) {
-			FormHelpers::post_error(parrotposter__('Email is empty'));
+			FormHelpers::post_error(__('Email is empty', 'parrotposter'));
 		}
 
 		if (empty($password)) {
-			FormHelpers::post_error(parrotposter__('Password is empty'));
+			FormHelpers::post_error(__('Password is empty', 'parrotposter'));
 		}
 
 		$res = Api::login($username, $password);
@@ -120,14 +120,14 @@ class AdminAjaxPost
 		$confirm_password = sanitize_text_field($_POST['parrotposter']['confirm_password']);
 
 		if (empty($username)) {
-			FormHelpers::post_error(parrotposter__('Email is empty'));
+			FormHelpers::post_error(__('Email is empty', 'parrotposter'));
 		}
 
 		if (empty($password)) {
-			FormHelpers::post_error(parrotposter__('Password is empty'));
+			FormHelpers::post_error(__('Password is empty', 'parrotposter'));
 		}
 		if ($password != $confirm_password) {
-			FormHelpers::post_error(parrotposter__('Passwords do not match'));
+			FormHelpers::post_error(__('Passwords do not match', 'parrotposter'));
 		}
 
 		$res = Api::signup($name, $username, $password);
@@ -145,7 +145,7 @@ class AdminAjaxPost
 		$username = sanitize_text_field($_POST['parrotposter']['username']);
 
 		if (empty($username)) {
-			FormHelpers::post_error(parrotposter__('Email is empty'));
+			FormHelpers::post_error(__('Email is empty', 'parrotposter'));
 		}
 
 		$callback_url = add_query_arg([
@@ -158,7 +158,7 @@ class AdminAjaxPost
 		if (!empty($res['error'])) {
 			FormHelpers::post_error($res['error']);
 		}
-		FormHelpers::post_success(parrotposter__('An email with a link to recover your password was sent to your email.'));
+		FormHelpers::post_success(__('An email with a link to recover your password was sent to your email.', 'parrotposter'));
 	}
 
 	public function reset_password()
@@ -171,14 +171,14 @@ class AdminAjaxPost
 		$confirm_password = sanitize_text_field($_POST['parrotposter']['confirm_password']);
 
 		if (empty($token)) {
-			FormHelpers::post_error(parrotposter__('Token is empty'));
+			FormHelpers::post_error(__('Token is empty', 'parrotposter'));
 		}
 
 		if (empty($password)) {
-			FormHelpers::post_error(parrotposter__('Password is empty'));
+			FormHelpers::post_error(__('Password is empty', 'parrotposter'));
 		}
 		if ($password != $confirm_password) {
-			FormHelpers::post_error(parrotposter__('Passwords do not match'));
+			FormHelpers::post_error(__('Passwords do not match', 'parrotposter'));
 		}
 
 		$res = Api::reset_password($token, $password);
@@ -516,7 +516,7 @@ class AdminAjaxPost
 			$fields['bot_token'] = sanitize_text_field($_POST['parrotposter']['bot_token']);
 		}
 		$res = Api::connect($type, $fields);
-		$res['need_challenge_txt'] = parrotposter__('Need enter a code from SMS or email');
+		$res['need_challenge_txt'] = __('Need enter a code from SMS or email', 'parrotposter');
 		echo json_encode($res);
 		exit;
 	}
@@ -548,7 +548,7 @@ class AdminAjaxPost
 		self::api_response([
 			'user' => $user,
 			'connect_btn_disabled' => $connect_disabled,
-			'accounts_badge_txt' => parrotposter__('Added %s of %s.', $accounts_cur_cnt, $accounts_cnt),
+			'accounts_badge_txt' => sprintf(__('Added %1$d of %2$d.', 'parrotposter'), $accounts_cur_cnt, $accounts_cnt),
 		]);
 	}
 

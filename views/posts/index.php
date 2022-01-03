@@ -25,9 +25,9 @@ $table->prepare_items();
 ?>
 
 <?php PP::include_view('header', [
-	'title' => parrotposter__('Posts'),
+	'title' => __('Posts', 'parrotposter'),
 	// 'button_link' => empty($table->items) ? false : [
-	// 	'text' => parrotposter__('+ Add a post'),
+	// 	'text' => __('+ Add a post', 'parrotposter'),
 	// 	'href' => '?page=parrotposter_posts&view=add',
 	// ],
 ]) ?>
@@ -37,11 +37,11 @@ $table->prepare_items();
 
 	<div class="parrotposter-empty-block">
 		<div class="parrotposter-empty-block__title">
-			<?php parrotposter_e('You don\'t have posts yet') ?>
+			<?php _e('You don\'t have posts yet', 'parrotposter') ?>
 		</div>
 
 		<div class="parrotposter-empty-block__note">
-			<?php parrotposter_e('Set up auto-posting in the Scheduler or post directly from an article, product, etc') ?>
+			<?php _e('Set up auto-posting in the Scheduler or post directly from an article, product, etc', 'parrotposter') ?>
 		</div>
 	</div>
 
@@ -57,11 +57,11 @@ $table->prepare_items();
 		<div class="parrotposter-modal__container">
 			<div class="parrotposter-modal__close"></div>
 			<div class="parrotposter-modal__title">
-				<?php parrotposter_e('Are you sure you want to delete post from ParrotPoster?') ?>
+				<?php _e('Are you sure you want to delete post from ParrotPoster?', 'parrotposter') ?>
 			</div>
 			<div class="parrotposter-modal__footer">
-				<button class="button button-primary parrotposter-button--delete"><?php parrotposter_e('Delete') ?></button>
-				<button class="button parrotposter-js-close"><?php parrotposter_e('Cancel') ?></button>
+				<button class="button button-primary parrotposter-button--delete"><?php _e('Delete', 'parrotposter') ?></button>
+				<button class="button parrotposter-js-close"><?php _e('Cancel', 'parrotposter') ?></button>
 			</div>
 		</div>
 	</div>

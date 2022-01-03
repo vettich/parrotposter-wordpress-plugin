@@ -45,7 +45,7 @@ class PP
 
 	public function register()
 	{
-		add_action('init', [$this, 'load_textdomain']);
+		add_action('plugins_loaded', [$this, 'load_textdomain']);
 
 		add_action('admin_enqueue_scripts', [$this, 'register_scripts']);
 		add_action('admin_enqueue_scripts', [$this, 'enqueue_admin_translates'], 100);
@@ -97,8 +97,8 @@ class PP
 	public function admin_menu()
 	{
 		if (empty(Options::user_id())) {
-			add_menu_page(parrotposter__('ParrotPoster settings page'), parrotposter__('ParrotPoster'), 'manage_options', 'parrotposter', [$this, 'admin_page'], self::asset('images/icon.png'), 100);
-			add_submenu_page('parrotposter', parrotposter__('Authorization'), parrotposter__('Authorization'), 'manage_options', 'parrotposter', [$this, 'admin_page']);
+			add_menu_page(__('ParrotPoster settings page', 'parrotposter'), __('ParrotPoster', 'parrotposter'), 'manage_options', 'parrotposter', [$this, 'admin_page'], self::asset('images/icon.png'), 100);
+			add_submenu_page('parrotposter', __('Authorization', 'parrotposter'), __('Authorization', 'parrotposter'), 'manage_options', 'parrotposter', [$this, 'admin_page']);
 			return;
 		}
 

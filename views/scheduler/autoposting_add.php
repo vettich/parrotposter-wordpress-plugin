@@ -11,7 +11,7 @@ $data = get_transient('parrotposter_autoposting_add_data');
 if ($data !== false) {
 	delete_transient('parrotposter_autoposting_add_data');
 } else {
-	$name = parrotposter__('Autoposting #1');
+	$name = __('Autoposting #1', 'parrotposter');
 	$increment = get_option('parrotposter_autoposting_n', 0);
 	$increment++;
 	$name = str_replace('#1', "#$increment", $name);
@@ -36,7 +36,7 @@ if ($data !== false) {
 ?>
 
 <?php PP::include_view('header', [
-	'title' => parrotposter__('Creating autoposting'),
+	'title' => __('Creating autoposting', 'parrotposter'),
 	'back_url' => 'admin.php?page=parrotposter_scheduler'
 ]) ?>
 <?php PP::include_view('notice') ?>

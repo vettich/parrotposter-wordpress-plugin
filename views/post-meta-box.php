@@ -20,14 +20,14 @@ AssetModules::enqueue(['loading', 'post-meta-box']);
 
 <p>
 	<a class="button button-primary" href="admin.php?page=parrotposter_posts&view=publish-post&post_id=<?php echo esc_attr($post_id) ?>">
-		<?php parrotposter_e('Publish to socials network') ?>
+		<?php _e('Publish to socials network', 'parrotposter') ?>
 	</a>
 </p>
 
 <p>
 	<a class="parrotposter-meta-box__show-posts-btn" href="#">
-		<span class="parrotposter-meta-box__text-show"><?php parrotposter_e('Show published posts on social networks') ?></span>
-		<span class="parrotposter-meta-box__text-hide"><?php parrotposter_e('Hide') ?></span>
+		<span class="parrotposter-meta-box__text-show"><?php _e('Show published posts on social networks', 'parrotposter') ?></span>
+		<span class="parrotposter-meta-box__text-hide"><?php _e('Hide', 'parrotposter') ?></span>
 	</a>
 </p>
 

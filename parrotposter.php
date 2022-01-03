@@ -25,7 +25,6 @@ define('PARROTPOSTER_PLUGIN_DIR', plugin_dir_path(__FILE__));
 require_once PARROTPOSTER_PLUGIN_DIR.'src/autoloader.php';
 
 // include includes
-require_once PARROTPOSTER_PLUGIN_DIR.'includes/language.php';
 require_once PARROTPOSTER_PLUGIN_DIR.'includes/posts_custom_column.php';
 
 use parrotposter\PP;

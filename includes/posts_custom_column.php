@@ -33,7 +33,7 @@ function parrotposter_manage_posts_custom_column($col_name)
 
 	printf(
 		'<a class="parrotposter-publish" title="%s" href="%s"></a>',
-		parrotposter__('Publish to social networks'),
+		__('Publish to social networks', 'parrotposter'),
 		$link,
 	);
 }

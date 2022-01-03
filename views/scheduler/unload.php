@@ -19,7 +19,7 @@ AssetModules::enqueue(['block', 'input', 'nav-tab']);
 
 	<div class="parrotposter-empty-block parrotposter-empty-block--in-development">
 		<div class="parrotposter-empty-block__title">
-			<?php parrotposter_e('This section is in development') ?>
+			<?php _e('This section is in development', 'parrotposter') ?>
 		</div>
 	</div>
 

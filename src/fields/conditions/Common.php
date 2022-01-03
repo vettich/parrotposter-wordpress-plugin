@@ -11,19 +11,19 @@ class Common
 		$fields = [
 			[
 				'key' => 'title',
-				'label' => parrotposter_x('Title', 'wp_post_field'),
+				'label' => _x('Title', 'wp_post_field', 'parrotposter'),
 				'ops' => [
-					'include' => parrotposter_x('Include', 'wp_post_condition'),
-					'not_include' => parrotposter_x('Not include', 'wp_post_condition'),
+					'include' => _x('Include', 'wp_post_condition', 'parrotposter'),
+					'not_include' => _x('Not include', 'wp_post_condition', 'parrotposter'),
 				],
 				'input' => 'text',
 			],
 			[
 				'key' => 'author',
-				'label' => parrotposter_x('Author', 'wp_post_field'),
+				'label' => _x('Author', 'wp_post_field', 'parrotposter'),
 				'ops' => [
-					'equal' => parrotposter_x('Equals one of', 'wp_post_condition'),
-					'not_equal' => parrotposter_x('Not equal to one of', 'wp_post_condition'),
+					'equal' => _x('Equals one of', 'wp_post_condition', 'parrotposter'),
+					'not_equal' => _x('Not equal to one of', 'wp_post_condition', 'parrotposter'),
 				],
 				'input' => 'select',
 				'values' => self::get_users_list(),
