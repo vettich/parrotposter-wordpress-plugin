@@ -128,5 +128,9 @@ Email us at [support@parrotposter.com](mailto:support@parrotposter.com)
 
 == Changelog ==
 
+= 1.0.1 =
+* Fixed jquery-ui loading
+* Updated translate files
+
 = 1.0.0 =
 * Plugin created
