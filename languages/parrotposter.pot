@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2021-12-31 01:58+0500\n"
+"POT-Creation-Date: 2022-01-04 05:06+0500\n"
 "PO-Revision-Date: 2021-08-05 07:14+0500\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -14,9 +14,9 @@ msgstr ""
 "X-Poedit-Basepath: ..\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Poedit-SourceCharset: UTF-8\n"
-"X-Poedit-KeywordsList: parrotposter__;parrotposter_e;parrotposter_n:1,2;"
-"parrotposter_x:1,2c;parrotposter_xe:1,2c;__\n"
+"X-Poedit-KeywordsList: __;_e;_n:1,2;_x:1,2c;_ex:1,2c\n"
 "X-Poedit-SearchPath-0: .\n"
+"X-Poedit-SearchPathExcluded-0: src/WPListTable.php\n"
 
 #: assets/js/autoposting_form.js:167
 msgid "Select value(s)"
@@ -75,7 +75,7 @@ msgstr ""
 msgid "Removed success"
 msgstr ""
 
-#: includes/posts_custom_column.php:37
+#: includes/posts_custom_column.php:36
 msgid "Publish to social networks"
 msgstr ""
 
@@ -107,7 +107,7 @@ msgstr ""
 
 #: src/AdminAjaxPost.php:551 views/accounts/index.php:39
 #, php-format
-msgid "Added %s of %s."
+msgid "Added %1$d of %2$d."
 msgstr ""
 
 #: src/ApiHelpers.php:101
@@ -170,7 +170,7 @@ msgstr ""
 msgid "When publish"
 msgstr ""
 
-#: src/AutopostingListTable.php:32
+#: src/AutopostingListTable.php:32 src/PostsListTable.php:38
 msgid "Social networks"
 msgstr ""
 
@@ -182,59 +182,62 @@ msgstr ""
 msgid "Edit"
 msgstr ""
 
-#: src/AutopostingListTable.php:64 src/AutopostingListTable.php:156
+#: src/AutopostingListTable.php:64 src/AutopostingListTable.php:159
 #: src/PostsListTable.php:63 views/accounts/index.php:92
 #: views/posts/detail.php:63 views/posts/index.php:63
 msgid "Delete"
 msgstr ""
 
-#: src/AutopostingListTable.php:106 views/scheduler/autoposting_form.php:20
+#: src/AutopostingListTable.php:109 views/scheduler/autoposting_form.php:20
 msgid "Immediately upon publishing the post"
 msgstr ""
 
-#: src/AutopostingListTable.php:108 views/posts/publish-post.php:133
+#: src/AutopostingListTable.php:111 views/posts/publish-post.php:133
 #: views/scheduler/autoposting_form.php:21
 msgid "With a delay"
 msgstr ""
 
-#: src/AutopostingListTable.php:119
+#: src/AutopostingListTable.php:122
 msgid "<Not selected>"
 msgstr ""
 
-#: src/AutopostingListTable.php:151
+#: src/AutopostingListTable.php:154
 msgid "Are you sure you want to delete {autoposting_name}?"
 msgstr ""
 
-#: src/AutopostingListTable.php:158 views/accounts/index.php:93
+#: src/AutopostingListTable.php:161 views/accounts/index.php:93
 #: views/posts/detail.php:64 views/posts/index.php:64
 #: views/scheduler/autoposting_form.php:295
 msgid "Cancel"
 msgstr ""
 
-#: src/Menu.php:20 src/PostsListTable.php:15 views/posts.php:1
-#: views/posts/index.php:28
+#: src/Menu.php:20
+msgctxt "menu"
 msgid "Posts"
 msgstr ""
 
-#: src/Menu.php:24 src/PostsListTable.php:38 views/profile/index.php:49
+#: src/Menu.php:24
+msgctxt "menu"
 msgid "Accounts"
 msgstr ""
 
-#: src/Menu.php:28 views/scheduler/header.php:23
+#: src/Menu.php:28
+msgctxt "menu"
 msgid "Scheduler"
 msgstr ""
 
-#: src/Menu.php:32 views/parrotposter-user-parts.php:93
-#: views/tariffs/index.php:36
+#: src/Menu.php:32
+msgctxt "menu"
 msgid "Tariffs"
 msgstr ""
 
-#: src/Menu.php:36 views/parrotposter-user-parts.php:92
-#: views/profile/index.php:22
+#: src/Menu.php:36
+msgctxt "menu"
 msgid "Profile"
 msgstr ""
 
-#: src/Menu.php:40 views/help/index.php:16
+#: src/Menu.php:40
+msgctxt "menu"
 msgid "Help"
 msgstr ""
 
@@ -242,19 +245,22 @@ msgstr ""
 msgid "ParrotPoster settings page"
 msgstr ""
 
-#: src/PP.php:100 views/parrotposter-user-parts.php:83
+#: src/PP.php:100
 msgid "ParrotPoster"
 msgstr ""
 
-#: src/PP.php:101 views/parrotposter-auth-parts.php:32
-#: views/parrotposter-auth-parts.php:54
-#: views/parrotposter/forgot_password.php:21 views/parrotposter/index.php:21
-#: views/parrotposter/index.php:27 views/parrotposter/signup.php:21
+#: src/PP.php:101 views/parrotposter/forgot_password.php:21
+#: views/parrotposter/index.php:21 views/parrotposter/index.php:27
+#: views/parrotposter/signup.php:21
 msgid "Authorization"
 msgstr ""
 
 #: src/PostsListTable.php:14
 msgid "Post"
+msgstr ""
+
+#: src/PostsListTable.php:15 views/posts/index.php:28
+msgid "Posts"
 msgstr ""
 
 #: src/PostsListTable.php:22
@@ -274,6 +280,7 @@ msgid "View"
 msgstr ""
 
 #: src/Profile.php:23
+msgctxt "tariff expired"
 msgid "(expired)"
 msgstr ""
 
@@ -299,84 +306,23 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: src/Tariffs.php:14
+msgctxt "tariff period"
 msgid "1 month"
 msgstr ""
 
 #: src/Tariffs.php:19
+msgctxt "tariff period"
 msgid "3 month"
 msgstr ""
 
 #: src/Tariffs.php:24
+msgctxt "tariff period"
 msgid "6 month"
 msgstr ""
 
 #: src/Tariffs.php:29
+msgctxt "tariff period"
 msgid "1 year"
-msgstr ""
-
-#: src/WPListTable.php:174
-msgid "Compact view"
-msgstr ""
-
-#: src/WPListTable.php:175
-msgid "Extended view"
-msgstr ""
-
-#: src/WPListTable.php:506
-msgid "Select bulk action"
-msgstr ""
-
-#: src/WPListTable.php:508
-msgid "Bulk actions"
-msgstr ""
-
-#: src/WPListTable.php:529
-msgid "Apply"
-msgstr ""
-
-#: src/WPListTable.php:590 src/WPListTable.php:1514
-msgid "Show more details"
-msgstr ""
-
-#: src/WPListTable.php:687
-#, php-format
-msgid "%1$s %2$d"
-msgstr ""
-
-#: src/WPListTable.php:764 src/WPListTable.php:794 src/WPListTable.php:817
-msgid "No comments"
-msgstr ""
-
-#: src/WPListTable.php:794
-msgid "No approved comments"
-msgstr ""
-
-#: src/WPListTable.php:817
-msgid "No pending comments"
-msgstr ""
-
-#: src/WPListTable.php:951
-msgid "First page"
-msgstr ""
-
-#: src/WPListTable.php:962
-msgid "Previous page"
-msgstr ""
-
-#: src/WPListTable.php:969 src/WPListTable.php:973
-msgid "Current Page"
-msgstr ""
-
-#: src/WPListTable.php:992
-msgid "Next page"
-msgstr ""
-
-#: src/WPListTable.php:1003
-msgid "Last page"
-msgstr ""
-
-#: src/WPListTable.php:1238
-msgid "Select All"
 msgstr ""
 
 #: src/fields/CommonType.php:31
@@ -618,124 +564,126 @@ msgid "To connect, go to <a href=\"%s\">Accounts</a>"
 msgstr ""
 
 #: views/accounts/connect.php:15
-msgid ""
-"1. Create your telegram bot <br>\n"
-"1.1. Start chat with <a href=\"https://t.me/BotFather\" class="
-"\"parrotposter-external-link\" target=\"_blank\">@BotFather</a> <br>\n"
-"1.2. Send the command <span class=\"parrotposter-copy\">/newbot</span> and "
-"follow @BotFather's instructions <br>\n"
-"2. Send the command <span class=\"parrotposter-copy\">/token</span> to bot "
-"@BotFather to generate a token <br>\n"
-"3. Copy your bot's token here"
-msgstr ""
-
-#: views/accounts/connect.php:21
-msgid ""
-"1. Copy to here your channel or group link. Example: https://t.me/"
-"your_channel <br>\n"
-"2. Make sure you add the created bot to your channel or group"
-msgstr ""
-
-#: views/accounts/connect.php:24
-msgid ""
-"Please note!\n"
-"<ul>\n"
-"\t<li>For security reasons, Instagram may reset your password. Before "
-"connecting your account, please make sure you have access to the email or "
-"phone number on your Instagram profile</li>\n"
-"\t<li>If your account doesn't connect, try turning off/on two-factor "
-"authentication</li>\n"
-"</ul>"
-msgstr ""
-
-#: views/accounts/connect.php:30
-msgid ""
-"Please note!\n"
-"<ul>\n"
-"\t<li>Only open groups or channels can be connected</li>\n"
-"\t<li>In channels, posts are published on behalf of the channel, and in "
-"groups - on behalf of the created bot</li>\n"
-"</ul>"
-msgstr ""
-
-#: views/accounts/connect.php:38 views/accounts/connect.php:39
-#: views/accounts/connect.php:40 views/accounts/connect.php:41
-#: views/accounts/connect.php:42 views/accounts/connect.php:87
-#: views/accounts/connect.php:119
+msgctxt "connect account button"
 msgid "Connect"
 msgstr ""
 
-#: views/accounts/connect.php:48
+#: views/accounts/connect.php:30
 msgid "Connect Instagram"
 msgstr ""
 
-#: views/accounts/connect.php:52
+#: views/accounts/connect.php:34
 msgctxt "Connect Instagram"
 msgid "Username"
 msgstr ""
 
-#: views/accounts/connect.php:54
+#: views/accounts/connect.php:36
 msgid "Your Instagram username: @example or example"
 msgstr ""
 
-#: views/accounts/connect.php:60 views/parrotposter-auth-parts.php:75
-#: views/parrotposter-auth-parts.php:105 views/parrotposter/index.php:42
+#: views/accounts/connect.php:42 views/parrotposter/index.php:42
 #: views/parrotposter/reset_password.php:47 views/parrotposter/signup.php:47
 msgid "Password"
 msgstr ""
 
-#: views/accounts/connect.php:62
+#: views/accounts/connect.php:44
 msgid "We do not store passwords anywhere"
 msgstr ""
 
-#: views/accounts/connect.php:68
+#: views/accounts/connect.php:50
 msgid "Proxy (optional)"
 msgstr ""
 
-#: views/accounts/connect.php:70
+#: views/accounts/connect.php:52
 msgid ""
 "You can enter a proxy for Instagram connection. Proxy format: https://user:"
 "password@domain_or_ip:port"
 msgstr ""
 
-#: views/accounts/connect.php:76
+#: views/accounts/connect.php:58
 msgid "Code"
 msgstr ""
 
-#: views/accounts/connect.php:81 views/accounts/connect.php:113
+#: views/accounts/connect.php:63 views/accounts/connect.php:100
 msgid "Please note!"
 msgstr ""
 
-#: views/accounts/connect.php:83
+#: views/accounts/connect.php:65
 msgid ""
 "For security reasons, Instagram may reset your password. Before connecting "
 "your account, please make sure you have access to the email or phone number "
 "on your Instagram profile"
 msgstr ""
 
-#: views/accounts/connect.php:84
+#: views/accounts/connect.php:66
 msgid ""
 "If your account doesn't connect, try turning off/on two-factor "
 "authentication"
 msgstr ""
 
-#: views/accounts/connect.php:94
+#: views/accounts/connect.php:76
 msgid "Connect Telegram"
 msgstr ""
 
-#: views/accounts/connect.php:98
+#: views/accounts/connect.php:80
 msgid "Telegram bot token"
 msgstr ""
 
-#: views/accounts/connect.php:105
+#: views/accounts/connect.php:82
+msgctxt "telegram bot token instruction"
+msgid "1. Create your telegram bot"
+msgstr ""
+
+#: views/accounts/connect.php:83
+msgctxt "telegram bot token instruction"
+msgid ""
+"1.1. Start chat with <a href=\"https://t.me/BotFather\" class="
+"\"parrotposter-external-link\" target=\"_blank\">@BotFather</a>"
+msgstr ""
+
+#: views/accounts/connect.php:84
+msgctxt "telegram bot token instruction"
+msgid ""
+"1.2. Send the command <span class=\"parrotposter-copy\">/newbot</span> and "
+"follow @BotFather's instructions"
+msgstr ""
+
+#: views/accounts/connect.php:85
+msgctxt "telegram bot token instruction"
+msgid ""
+"2. Send the command <span class=\"parrotposter-copy\">/token</span> to bot "
+"@BotFather to generate a token"
+msgstr ""
+
+#: views/accounts/connect.php:86
+msgctxt "telegram bot token instruction"
+msgid "3. Copy your bot's token here"
+msgstr ""
+
+#: views/accounts/connect.php:91
+msgctxt "telegram"
 msgid "Channel or group link"
 msgstr ""
 
-#: views/accounts/connect.php:115
+#: views/accounts/connect.php:93
+msgctxt "telegram channel/group link instruction"
+msgid ""
+"1. Copy to here your channel or group link. Example: https://t.me/"
+"your_channel"
+msgstr ""
+
+#: views/accounts/connect.php:94
+msgctxt "telegram channel/group link instruction"
+msgid "2. Make sure you add the created bot to your channel or group"
+msgstr ""
+
+#: views/accounts/connect.php:102
+msgctxt "telegram"
 msgid "Only open groups or channels can be connected"
 msgstr ""
 
-#: views/accounts/connect.php:116
+#: views/accounts/connect.php:103
+msgctxt "telegram"
 msgid ""
 "In channels, posts are published on behalf of the channel, and in groups - "
 "on behalf of the created bot"
@@ -762,6 +710,11 @@ msgstr ""
 
 #: views/accounts/index.php:89
 msgid "Are you sure you want to delete \"#account_name#\""
+msgstr ""
+
+#: views/help/index.php:16
+msgctxt "help"
+msgid "Help"
 msgstr ""
 
 #: views/help/index.php:23
@@ -1114,114 +1067,48 @@ msgctxt "help"
 msgid "Email us at support@parrotposter.com"
 msgstr ""
 
-#: views/parrotposter-auth-parts.php:34 views/parrotposter-auth-parts.php:55
 #: views/parrotposter/forgot_password.php:22 views/parrotposter/index.php:22
 #: views/parrotposter/signup.php:22 views/parrotposter/signup.php:27
 msgid "Registration"
 msgstr ""
 
-#: views/parrotposter-auth-parts.php:36
-#: views/parrotposter-reset-password-part.php:33
-#: views/parrotposter/reset_password.php:37
-msgid "Reset password"
-msgstr ""
-
-#: views/parrotposter-auth-parts.php:56
 #: views/parrotposter/forgot_password.php:23
 #: views/parrotposter/forgot_password.php:27 views/parrotposter/index.php:23
 #: views/parrotposter/signup.php:23
 msgid "Forgot password?"
 msgstr ""
 
-#: views/parrotposter-auth-parts.php:69 views/parrotposter-auth-parts.php:99
-#: views/parrotposter-auth-parts.php:129
 #: views/parrotposter/forgot_password.php:36 views/parrotposter/index.php:37
 #: views/parrotposter/signup.php:42 views/profile/index.php:39
 msgid "Email"
 msgstr ""
 
-#: views/parrotposter-auth-parts.php:81 views/parrotposter/index.php:47
-msgid "Login"
-msgstr ""
-
-#: views/parrotposter-auth-parts.php:93 views/parrotposter/signup.php:37
-#: views/profile/index.php:33
-msgid "Your name"
-msgstr ""
-
-#: views/parrotposter-auth-parts.php:111
-#: views/parrotposter-reset-password-part.php:54
-#: views/parrotposter/reset_password.php:52 views/parrotposter/signup.php:52
-msgid "Confirm password"
-msgstr ""
-
-#: views/parrotposter-auth-parts.php:117 views/parrotposter/signup.php:57
-msgid "Sign up"
-msgstr ""
-
-#: views/parrotposter-auth-parts.php:135
 #: views/parrotposter/forgot_password.php:41
 msgid "Send"
 msgstr ""
 
-#: views/parrotposter-reset-password-part.php:48
-msgid "New password"
+#: views/parrotposter/index.php:47
+msgid "Login"
 msgstr ""
 
-#: views/parrotposter-reset-password-part.php:60
-msgid "Submit"
+#: views/parrotposter/reset_password.php:37
+msgid "Reset password"
 msgstr ""
 
-#: views/parrotposter-tariff-payed.php:2
-msgid "Payment in ParrotPoster"
-msgstr ""
-
-#: views/parrotposter-tariff-payed.php:6 views/tariffs/success.php:17
-msgid "You paid successfully. Thank you!"
-msgstr ""
-
-#: views/parrotposter-tariff-payed.php:12
-msgid ""
-"There was an error making the payment, try again! Or report it to tech "
-"support."
-msgstr ""
-
-#: views/parrotposter-tariff-payed.php:16
-msgid "Go back to plugin"
-msgstr ""
-
-#: views/parrotposter-user-parts.php:101
-#, php-format
-msgid "Name: %s"
-msgstr ""
-
-#: views/parrotposter-user-parts.php:103
-#, php-format
-msgid "Email: %s"
-msgstr ""
-
-#: views/parrotposter-user-parts.php:104
-#, php-format
-msgid "Current tariff: %s (%s/%s accounts)"
-msgstr ""
-
-#: views/parrotposter-user-parts.php:105
-#, php-format
-msgid "Expiry at %s"
-msgstr ""
-
-#: views/parrotposter-user-parts.php:112 views/profile/index.php:66
-msgid "Logout"
-msgstr ""
-
-#: views/parrotposter-user-parts.php:120
-msgid ""
-"You can change the tariff and pay through the web-application by following "
-"the link"
+#: views/parrotposter/reset_password.php:52 views/parrotposter/signup.php:52
+msgid "Confirm password"
 msgstr ""
 
 #: views/parrotposter/reset_password.php:57
 msgid "Save"
+msgstr ""
+
+#: views/parrotposter/signup.php:37 views/profile/index.php:33
+msgid "Your name"
+msgstr ""
+
+#: views/parrotposter/signup.php:57
+msgid "Sign up"
 msgstr ""
 
 #: views/post-meta-box.php:23
@@ -1234,10 +1121,6 @@ msgstr ""
 
 #: views/post-meta-box.php:30
 msgid "Hide"
-msgstr ""
-
-#: views/posts.php:4
-msgid "To view your posts go to web app:"
 msgstr ""
 
 #: views/posts/add.php:16
@@ -1275,7 +1158,7 @@ msgid ""
 "product, etc"
 msgstr ""
 
-#: views/posts/publish-post.php:15
+#: views/posts/publish-post.php:16
 msgid "Error post_id"
 msgstr ""
 
@@ -1368,17 +1251,29 @@ msgstr ""
 msgid "Publish"
 msgstr ""
 
+#: views/profile/index.php:22
+msgid "Profile"
+msgstr ""
+
 #: views/profile/index.php:44
 msgid "Tariff"
 msgstr ""
 
+#: views/profile/index.php:49
+msgid "Accounts"
+msgstr ""
+
 #: views/profile/index.php:50 views/tariffs/index.php:45
 #, php-format
-msgid "%s of %s"
+msgid "%1$d of %2$d"
 msgstr ""
 
 #: views/profile/index.php:54
 msgid "Expiry at"
+msgstr ""
+
+#: views/profile/index.php:66
+msgid "Logout"
 msgstr ""
 
 #: views/scheduler/autoposting_add.php:14
@@ -1455,6 +1350,7 @@ msgid "UTM tags"
 msgstr ""
 
 #: views/scheduler/autoposting_form.php:154
+msgctxt "utm_enable"
 msgid ""
 "If checked, special UTM tags will be added to the end of the link (the "
 "field above) to track traffic in analytics"
@@ -1488,6 +1384,7 @@ msgid "Campaign name"
 msgstr ""
 
 #: views/scheduler/autoposting_form.php:178
+msgctxt "utm campaign"
 msgid ""
 "Identifies a specific product promotion or strategic campaign. Example: news"
 msgstr ""
@@ -1498,6 +1395,7 @@ msgid "Keyword"
 msgstr ""
 
 #: views/scheduler/autoposting_form.php:186
+msgctxt "utm term"
 msgid "Identifies search terms"
 msgstr ""
 
@@ -1507,6 +1405,7 @@ msgid "Content type"
 msgstr ""
 
 #: views/scheduler/autoposting_form.php:194
+msgctxt "utm content"
 msgid ""
 "Identifies what specifically was clicked to bring the user to the site, "
 "such as a banner ad or a text link. It is often used for A/B testing and "
@@ -1514,6 +1413,7 @@ msgid ""
 msgstr ""
 
 #: views/scheduler/autoposting_form.php:202
+msgctxt "post tags help info"
 msgid ""
 "Tags (hashtags) will be added to the end of the post text. Tags from this "
 "field will be converted to \"correct\" hashtags for social networks. For "
@@ -1526,6 +1426,7 @@ msgid "Images"
 msgstr ""
 
 #: views/scheduler/autoposting_form.php:214
+msgctxt "post images help info"
 msgid ""
 "Images for posting to social networks. You can specify several fields from "
 "which images from the news, products, etc. will be taken. For posting to "
@@ -1571,6 +1472,10 @@ msgstr ""
 msgid "+ Add autounloading"
 msgstr ""
 
+#: views/scheduler/header.php:23
+msgid "Scheduler"
+msgstr ""
+
 #: views/scheduler/header.php:39
 msgid "Autounloading"
 msgstr ""
@@ -1587,6 +1492,10 @@ msgstr ""
 
 #: views/tariffs/fail.php:21 views/tariffs/success.php:21
 msgid "Back to tariffs"
+msgstr ""
+
+#: views/tariffs/index.php:36
+msgid "Tariffs"
 msgstr ""
 
 #: views/tariffs/index.php:40
@@ -1615,8 +1524,10 @@ msgstr ""
 
 #: views/tariffs/index.php:96
 #, php-format
-msgid "%s accounts of social networks"
-msgstr ""
+msgid "%d account of social network"
+msgid_plural "%d accounts of social networks"
+msgstr[0] ""
+msgstr[1] ""
 
 #: views/tariffs/index.php:102 views/tariffs/index.php:110
 msgid "Select and pay"
@@ -1636,4 +1547,8 @@ msgstr ""
 msgid ""
 "If you select a new tariff, the remaining days at the current tariff will "
 "be recalculated and transferred to the new tariff"
+msgstr ""
+
+#: views/tariffs/success.php:17
+msgid "You paid successfully. Thank you!"
 msgstr ""
