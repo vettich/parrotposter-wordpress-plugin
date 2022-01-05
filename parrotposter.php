@@ -5,7 +5,7 @@
  * Description: Auto posting or selective post of news and products from the site to social networks Facebook, Instagram, Telegram, VK, OK.
  * Author: Selen
  * Author URI: http://selen.digital
- * Version: 1.0.1
+ * Version: 1.0.2
  * Text Domain: parrotposter
  * Domain Path: /languages
  * License: GPLv3
@@ -16,7 +16,7 @@ if (!defined('ABSPATH')) {
 	die;
 }
 
-define('PARROTPOSTER_VERSION', '1.0.1');
+define('PARROTPOSTER_VERSION', '1.0.2');
 define('PARROTPOSTER_DB_VERSION', '1.0.7');
 define('PARROTPOSTER_PLUGIN_FILE', __FILE__);
 define('PARROTPOSTER_PLUGIN_DIR', plugin_dir_path(__FILE__));

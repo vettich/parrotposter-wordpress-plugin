@@ -1,14 +1,14 @@
-=== ParrotPoster - Auto posting to social networks ===
+=== ParrotPoster - Auto post to social networks ===
 Contributors: parrotposter
 Tags: auto post, auto publish, autopost, autopublish, social media automation, автопостинг, автопубликация, vk, telegram, facebook, instagram, ok
 Requires at least: 5.0
 Tested up to: 5.8
 Requires PHP: 7.0
-Stable tag: 1.0.1
+Stable tag: 1.0.2
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
-Auto posting or selective post of news and products from the site to social networks Facebook, Instagram, Telegram, VK, OK. 
+Auto post or selective post of news and products from the site to social networks (media) Facebook, Instagram, Telegram, VK, OK (autoposting, autopost).
 
 == Description ==
 
@@ -127,6 +127,9 @@ Email us at [support@parrotposter.com](mailto:support@parrotposter.com)
 12. Posting results (product)
 
 == Changelog ==
+
+= 1.0.2 =
+* Fixed ui multiselect field in custom conditions
 
 = 1.0.1 =
 * Fixed jquery-ui loading
