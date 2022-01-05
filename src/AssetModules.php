@@ -40,7 +40,7 @@ class AssetModules
 				'lib/pqselect/jquery-ui-1.9.1-smoothness.css',
 				'css/lib-pqselect.css',
 			],
-			'js_deps' => ['jquery-ui-core'],
+			'js_deps' => ['jquery-ui-core', 'jquery-ui-position'],
 			'js' => 'lib/pqselect/pqselect.min.js',
 		],
 	];
