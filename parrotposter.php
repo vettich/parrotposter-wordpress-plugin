@@ -1,8 +1,8 @@
 <?php
 /**
- * Plugin Name: ParrotPoster - Auto posting to social networks
+ * Plugin Name: ParrotPoster - Auto Post to Social Media
  * Plugin URI: https://parrotposter.com
- * Description: Auto posting or selective post of news and products from the site to social networks Facebook, Instagram, Telegram, VK, OK.
+ * Description: Auto post or selective post of news and products from the site to social networks (media) Facebook, Instagram, Telegram, VK, OK (autoposting, autopost).
  * Author: Selen
  * Author URI: http://selen.digital
  * Version: 1.0.2

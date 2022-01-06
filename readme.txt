@@ -1,4 +1,4 @@
-=== ParrotPoster - Auto post to social networks ===
+=== ParrotPoster - Auto Post to Social Media ===
 Contributors: parrotposter
 Tags: auto post, auto publish, autopost, autopublish, social media automation, автопостинг, автопубликация, vk, telegram, facebook, instagram, ok
 Requires at least: 5.0
