@@ -128,6 +128,9 @@ Email us at [support@parrotposter.com](mailto:support@parrotposter.com)
 
 == Changelog ==
 
+= 1.0.3 =
+* Added support mobile resolution
+
 = 1.0.2 =
 * Fixed ui multiselect field in custom conditions
 
