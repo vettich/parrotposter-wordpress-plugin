@@ -15,6 +15,11 @@
 .parrotposter-modal--open {
 	display: grid;
 }
+@media screen and (max-width: 500px) {
+	.parrotposter-modal--open {
+		display: block;
+	}
+}
 
 .parrotposter-modal__body-overflow {
 	overflow: hidden;
@@ -37,6 +42,14 @@
 	width: 600px;
 }
 
+@media screen and (max-width: 500px) {
+	.parrotposter-modal__container {
+		margin: 0;
+		width: calc(100% - 2em * 2) !important;
+		min-height: calc(100vh - 2em * 2);
+	}
+}
+
 .parrotposter-modal__content {
 	display: flex;
 	flex-direction: column;
@@ -47,11 +60,18 @@
 	cursor: pointer;
 	height: 32px;
 	width: 32px;
-	background: center / cover url(../images/close.svg);
+	background: center / 32px no-repeat url(../images/close.svg);
 	display: block;
 	position: absolute;
 	right: calc(-8px - 32px);
 	top: 0;
+}
+@media screen and (max-width: 500px) {
+	.parrotposter-modal__close {
+		background-image: url(../images/close-black.svg);
+		right: 0;
+		padding: 1em;
+	}
 }
 
 .parrotposter-modal__title {

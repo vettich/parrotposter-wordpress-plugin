@@ -6,6 +6,11 @@
 	align-items: center;
 	width: calc(100% - 20px);
 }
+@media screen and (max-width: 768px) {
+	.parrotposter-accounts__header {
+		flex-wrap: wrap;
+	}
+}
 .parrotposter-accounts__badge {
 	display: inline-block;
 	border-radius: 16px;
@@ -84,6 +89,12 @@
 	width: 188px;
 	position: relative;
 	transition: opacity 0.3s;
+}
+
+@media screen and (max-width: 460px) {
+	.parrotposter-accounts__item {
+		width: calc(100% - 60px);
+	}
 }
 
 .parrotposter-accounts__item--input {

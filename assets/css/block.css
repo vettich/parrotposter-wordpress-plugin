@@ -57,6 +57,7 @@
 	gap: 12px;
 	padding: 24px;
 	margin: 24px 0;
+	max-width: calc(100% - 10px - 24px * 2);
 	background-color: #FFFFFF;
 }
 
@@ -65,19 +66,23 @@
 	gap: 24px;
 }
 
+@media screen and (max-width: 768px) {
+	.parrotposter-block--column-mobile {
+		flex-direction: column;
+		gap: 12px;
+	}
+}
+
 .parrotposter-block--min {
-	min-width: 300px;
-	max-width: 100%;
+	width: 300px;
 }
 
 .parrotposter-block--min2 {
-	min-width: 600px;
-	max-width: 100%;
+	width: 600px;
 }
 
 .parrotposter-block--scheduler-edit {
 	width: 600px;
-	max-width: 100%;
 }
 
 .parrotposter-block--success:before,

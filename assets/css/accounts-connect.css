@@ -1,11 +1,18 @@
 .parrotposter-accounts-connect {
 	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+}
+
+@media screen and (max-width: 768px) {
+	.parrotposter-accounts-connect {
+		justify-content: center;
+	}
 }
 
 .parrotposter-accounts-connect__btn {
 	color: #FFFFFF;
 	padding: 6px 12px;
-	margin-right: 8px;
 	display: flex;
 	align-items: center;
 	cursor: pointer;

@@ -4,15 +4,23 @@
 	background-color: #FFFFFF;
 	display: flex;
 }
+@media screen and (max-width: 768px) {
+	.parrotposter-header {
+		display: none;
+	}
+}
+
 .parrotposter-header__logo img {
 	max-height: 32px;
 }
+
 .parrotposter-header__menu {
 	width: 100%;
 	display: flex;
 	margin: 0;
 	justify-content: center;
 }
+
 .parrotposter-header__menu li {
 	display: flex;
 	align-items: center;
@@ -20,15 +28,18 @@
 	margin: 0;
 	margin-right: 24px;
 }
+
 .parrotposter-header__menu li:last-child {
 	margin-right: 0;
 }
+
 .parrotposter-header__menu li a {
 	display: inline-block;
 	color: #787C82;
 	font-weight: 600;
 	text-decoration: none;
 }
+
 .parrotposter-header__menu li.active a {
 	display: inline-block;
 	color: #007CBA;

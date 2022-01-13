@@ -9,6 +9,12 @@
 	max-width: 100%;
 }
 
+@media screen and (max-width: 768px) {
+	.parrotposter-help__block {
+		width: calc(100% - 10px);
+	}
+}
+
 .parrotposter-help__item {
 	background-color: #FFFFFF;
 }
@@ -21,10 +27,6 @@
 	padding: 16px;
 	cursor: pointer;
 	transition: all 0.2s ease-in-out;
-}
-
-.parrotposter-help__item--open .parrotposter-help__title {
-	/* padding-bottom: 8px; */
 }
 
 .parrotposter-help__description {

@@ -2,6 +2,7 @@
 	display: flex;
 	background-color: #FFFFFF;
 	width: max-content;
+	max-width: calc(100% - 10px);
 }
 
 .parrotposter-tariffs-period__wrap input {
@@ -17,6 +18,12 @@
 	border: 1px solid #BBBBBB;
 	margin-right: -1px;
 	height: calc(100% - 22px);
+}
+
+@media screen and (max-width: 500px) {
+	.parrotposter-tariffs-period__label {
+		flex-direction: column;
+	}
 }
 
 .parrotposter-tariffs-period__wrap input:checked + .parrotposter-tariffs-period__label {
@@ -60,7 +67,8 @@
 	flex-direction: column;
 	background-color: #FFFFFF;
 	padding: 24px;
-	min-width: 350px;
+	width: 350px;
+	max-width: calc(100% - 24px * 2 - 10px);
 	position: relative;
 }
 

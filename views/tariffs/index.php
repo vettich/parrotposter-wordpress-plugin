@@ -35,7 +35,7 @@ foreach ($tariffs as $tariffs_k => $tariff) {
 
 <h1><?php _e('Tariffs', 'parrotposter') ?></h1>
 
-<div class="parrotposter-block parrotposter-block--horizontal">
+<div class="parrotposter-block parrotposter-block--horizontal parrotposter-block--column-mobile">
 	<div class="parrotposter-block__group">
 		<div class="parrotposter-block__label"><?php _e('Your tariff', 'parrotposter') ?></div>
 		<div class="parrotposter-block__value"><?php echo esc_html($profile['tariff']['name']) ?></div>

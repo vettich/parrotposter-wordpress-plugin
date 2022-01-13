@@ -8,6 +8,8 @@ jQuery(function($) {
 			parrotposter_modal_close('.parrotposter-modal')
 		}
 	})
+
+	$('.parrotposter-modal').appendTo('body')
 })
 
 const parrotposter_modal_stack = [];
