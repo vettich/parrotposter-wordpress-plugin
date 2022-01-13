@@ -30,7 +30,7 @@ AssetModules::enqueue(['block', 'input', 'nav-tab']);
 		<?php FormHelpers::the_nonce() ?>
 		<input type="hidden" name="action" value="parrotposter_signup">
 		<input type="hidden" name="back_url" value="admin.php?page=parrotposter&view=signup">
-		<input type="hidden" name="success_url" value="admin.php?page=parrotposter_profile">
+		<input type="hidden" name="success_url" value="admin.php?page=parrotposter_accounts">
 
 		<div class="parrotposter-input__group">
 			<label class="parrotposter-input">
