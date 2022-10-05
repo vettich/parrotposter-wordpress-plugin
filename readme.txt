@@ -4,7 +4,7 @@ Tags: auto post, auto publish, autopost, autopublish, social media automation, Ð
 Requires at least: 5.0
 Tested up to: 5.8
 Requires PHP: 7.0
-Stable tag: 1.0.3
+Stable tag: 1.0.4
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -127,6 +127,9 @@ Email us at [support@parrotposter.com](mailto:support@parrotposter.com)
 12. Posting results (product)
 
 == Changelog ==
+
+= 1.0.4 =
+* Improved truncate excerpt of post
 
 = 1.0.3 =
 * Added support mobile resolution

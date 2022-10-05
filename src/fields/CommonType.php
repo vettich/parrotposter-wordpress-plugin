@@ -4,6 +4,7 @@ namespace parrotposter\fields;
 
 defined('ABSPATH') || exit;
 
+use parrotposter\Tools;
 use parrotposter\WpPostHelpers;
 
 class CommonType
@@ -112,8 +113,9 @@ class CommonType
 	{
 		$excerpt = $post->post_excerpt;
 		if (empty($excerpt)) {
-			$excerpt = wp_trim_excerpt('', $post);
-			$excerpt = str_replace('[&hellip;]', '', $excerpt);
+			$content = self::get_field_value_content($post);
+			$excerpt = Tools::clear_text($content);
+			$excerpt = Tools::truncate_text($content, 360, '...');
 		}
 		return $excerpt;
 	}

@@ -34,12 +34,30 @@ class Tools
 	{
 		$replaces = [
 			'&nbsp;' => ' ',
+			'<br>' => "\n",
+			'<br/>' => "\n",
 		];
 		$text = str_replace(array_keys($replaces), array_values($replaces), $text);
 		$text = strip_tags($text);
 		$text = html_entity_decode($text, ENT_NOQUOTES | ENT_SUBSTITUTE | ENT_HTML401, 'UTF-8');
 		$text = trim($text);
 		$text = preg_replace("/(?:\r?\n|\r){2,}/", "\n\n", $text);
+		return $text;
+	}
+
+	public static function truncate_text($text, $length = 100, $more = '...') {
+		$text = trim($text);
+		if (strlen($text) <= $length) {
+			return $text;
+		}
+
+		$text = substr($text, 0, $length);
+		$end = strrpos($text, ' ', strlen($more) * -1);
+		if ($end !== false) {
+			$text = substr($text, 0, $end).' ';
+		}
+		$text .= $more;
+
 		return $text;
 	}
 

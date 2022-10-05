@@ -7,7 +7,7 @@ defined('ABSPATH') || exit;
 class Api
 {
 	const API_URL = 'https://parrotposter.com/api/v1/';
-	// const API_URL = 'http://188.225.45.58:8010/api/v1/';
+	// const API_URL = 'http://localhost:8000/';
 	const FROM = 'wordpress';
 	const USER_AGENT = 'ParrotPoster WP Plugin';
 
