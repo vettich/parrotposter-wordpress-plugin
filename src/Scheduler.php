@@ -9,6 +9,7 @@ use parrotposter\fields\conditions\Conditions;
 class Scheduler
 {
 	private static $_instance;
+	private $posts = [];
 
 	public static function get_instance()
 	{
@@ -26,11 +27,13 @@ class Scheduler
 	private function __construct()
 	{
 		add_action('wp_after_insert_post', [$this, 'wp_after_insert_post_handler'], 10, 4);
+		add_action('shutdown', [$this, 'shutdown_handler'], 300);
 	}
 
 	public function wp_after_insert_post_handler($post_id, $post, $updated, $post_before)
 	{
 		if (wp_is_post_revision($post_id)) {
+			PP::log(['wp_after_insert_post_handler', $post_id, 'post is revision, skip']);
 			return;
 		}
 
@@ -41,7 +44,19 @@ class Scheduler
 
 		PP::log(['post published', $post->post_status, $post_before->post_status, $post]);
 
-		self::publish_post($post);
+		$this->posts[] = $post;
+	}
+
+	public function shutdown_handler()
+	{
+		if (empty($this->posts)) {
+			return;
+		}
+
+		foreach ($this->posts as $post) {
+			self::publish_post($post);
+		}
+		$this->posts = [];
 	}
 
 	public function publish_post($wp_post)

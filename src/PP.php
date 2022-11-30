@@ -31,9 +31,9 @@ class PP
 
 	public static function log($data)
 	{
-		// if (!Options::log_enabled()) {
-		// 	return;
-		// }
+		if (!Options::log_enabled()) {
+			return;
+		}
 
 		$log = [
 			'at' => date(DATE_ATOM),
