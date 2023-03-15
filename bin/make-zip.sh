@@ -2,7 +2,7 @@
 #
 # Build a installable plugin zip
 
-ZIP_FILE=$1
+ZIP_FILE=${1:-parrotposter.zip}
 
 rm "${ZIP_FILE}"
 
