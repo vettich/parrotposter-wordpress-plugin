@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2022-01-04 05:06+0500\n"
+"POT-Creation-Date: 2023-03-16 01:02+0500\n"
 "PO-Revision-Date: 2021-08-05 07:14+0500\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -10,9 +10,9 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 3.0\n"
-"X-Poedit-Basepath: ..\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 3.2.2\n"
+"X-Poedit-Basepath: ..\n"
 "X-Poedit-SourceCharset: UTF-8\n"
 "X-Poedit-KeywordsList: __;_e;_n:1,2;_x:1,2c;_ex:1,2c\n"
 "X-Poedit-SearchPath-0: .\n"
@@ -325,42 +325,42 @@ msgctxt "tariff period"
 msgid "1 year"
 msgstr ""
 
-#: src/fields/CommonType.php:31
+#: src/fields/CommonType.php:32
 msgctxt "wp_post_field"
 msgid "Break line"
 msgstr ""
 
-#: src/fields/CommonType.php:35 src/fields/conditions/Common.php:14
+#: src/fields/CommonType.php:36 src/fields/conditions/Common.php:14
 msgctxt "wp_post_field"
 msgid "Title"
 msgstr ""
 
-#: src/fields/CommonType.php:39
+#: src/fields/CommonType.php:40
 msgctxt "wp_post_field"
 msgid "Content"
 msgstr ""
 
-#: src/fields/CommonType.php:43
+#: src/fields/CommonType.php:44
 msgctxt "wp_post_field"
 msgid "Excerpt"
 msgstr ""
 
-#: src/fields/CommonType.php:54
+#: src/fields/CommonType.php:55
 msgctxt "wp_post_field"
 msgid "Link"
 msgstr ""
 
-#: src/fields/CommonType.php:65
+#: src/fields/CommonType.php:66
 msgctxt "wp_post_field"
 msgid "Date"
 msgstr ""
 
-#: src/fields/CommonType.php:76
+#: src/fields/CommonType.php:77
 msgctxt "wp_post_field"
 msgid "Featured image"
 msgstr ""
 
-#: src/fields/CommonType.php:80
+#: src/fields/CommonType.php:81
 msgctxt "wp_post_field"
 msgid "Images in content"
 msgstr ""
@@ -604,85 +604,95 @@ msgstr ""
 msgid "Code"
 msgstr ""
 
-#: views/accounts/connect.php:63 views/accounts/connect.php:100
-msgid "Please note!"
+#: views/accounts/connect.php:63
+msgid "❗️Attention"
 msgstr ""
 
-#: views/accounts/connect.php:65
+#: views/accounts/connect.php:64
 msgid ""
-"For security reasons, Instagram may reset your password. Before connecting "
-"your account, please make sure you have access to the email or phone number "
-"on your Instagram profile"
+"Instagram recognizes login from an unusual location. Confirm login through "
+"the Instagram app or email. Then come back here, and click Connect again."
 msgstr ""
 
 #: views/accounts/connect.php:66
-msgid ""
-"If your account doesn't connect, try turning off/on two-factor "
-"authentication"
+msgid "❓If it was unable to connect:"
 msgstr ""
 
-#: views/accounts/connect.php:76
+#: views/accounts/connect.php:68
+msgid ""
+"Try enabling two-factor authentication (or disable it if you had it enabled)"
+msgstr ""
+
+#: views/accounts/connect.php:69
+msgid "Try changing the password"
+msgstr ""
+
+#: views/accounts/connect.php:81
 msgid "Connect Telegram"
 msgstr ""
 
-#: views/accounts/connect.php:80
+#: views/accounts/connect.php:85
 msgid "Telegram bot token"
 msgstr ""
 
-#: views/accounts/connect.php:82
+#: views/accounts/connect.php:87
 msgctxt "telegram bot token instruction"
 msgid "1. Create your telegram bot"
 msgstr ""
 
-#: views/accounts/connect.php:83
+#: views/accounts/connect.php:88
 msgctxt "telegram bot token instruction"
 msgid ""
-"1.1. Start chat with <a href=\"https://t.me/BotFather\" class="
-"\"parrotposter-external-link\" target=\"_blank\">@BotFather</a>"
+"1.1. Start chat with <a href=\"https://t.me/BotFather\" "
+"class=\"parrotposter-external-link\" target=\"_blank\">@BotFather</a>"
 msgstr ""
 
-#: views/accounts/connect.php:84
+#: views/accounts/connect.php:89
 msgctxt "telegram bot token instruction"
 msgid ""
 "1.2. Send the command <span class=\"parrotposter-copy\">/newbot</span> and "
 "follow @BotFather's instructions"
 msgstr ""
 
-#: views/accounts/connect.php:85
+#: views/accounts/connect.php:90
 msgctxt "telegram bot token instruction"
 msgid ""
 "2. Send the command <span class=\"parrotposter-copy\">/token</span> to bot "
 "@BotFather to generate a token"
 msgstr ""
 
-#: views/accounts/connect.php:86
+#: views/accounts/connect.php:91
 msgctxt "telegram bot token instruction"
 msgid "3. Copy your bot's token here"
 msgstr ""
 
-#: views/accounts/connect.php:91
+#: views/accounts/connect.php:96
 msgctxt "telegram"
 msgid "Channel or group link"
 msgstr ""
 
-#: views/accounts/connect.php:93
+#: views/accounts/connect.php:98
 msgctxt "telegram channel/group link instruction"
 msgid ""
 "1. Copy to here your channel or group link. Example: https://t.me/"
 "your_channel"
 msgstr ""
 
-#: views/accounts/connect.php:94
+#: views/accounts/connect.php:99
 msgctxt "telegram channel/group link instruction"
 msgid "2. Make sure you add the created bot to your channel or group"
 msgstr ""
 
-#: views/accounts/connect.php:102
+#: views/accounts/connect.php:105
+msgid "Please note!"
+msgstr ""
+
+#: views/accounts/connect.php:107
 msgctxt "telegram"
 msgid "Only open groups or channels can be connected"
 msgstr ""
 
-#: views/accounts/connect.php:103
+#: views/accounts/connect.php:108
 msgctxt "telegram"
 msgid ""
 "In channels, posts are published on behalf of the channel, and in groups - "

@@ -76,7 +76,7 @@ View results and publication times along with links to social networks posts
 * English
 
 
-\* The solution "ParrotPoster - Auto posting to social networks" works on the basis of cloud API service [parrotposter.com](https://parrotposter.com) and has built-in payment functions. The trial period is 14 days, after that - from 300 rubles (~$4) per month.
+\* The solution "ParrotPoster - Auto posting to social networks" works on the basis of cloud API service [parrotposter.com](https://parrotposter.com) and has built-in payment functions. The trial period is 14 days, after that - from 450 rubles (~$6) per month.
 
 ✉️ Technical support: [support@parrotposter.com](mailto:support@parrotposter.com)
 🌐 Service site: [parrotposter.com](https://parrotposter.com)

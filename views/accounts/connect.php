@@ -60,11 +60,16 @@ $connect_txt = _x('Connect', 'connect account button', 'parrotposter');
 			</label>
 		</div>
 		<div class="parrotposter-input__note">
-			<?php _e('Please note!', 'parrotposter') ?>
+			<h4><?php _e('❗️Attention', 'parrotposter') ?></h4>
+			<?php _e('Instagram recognizes login from an unusual location. Confirm login through the Instagram app or email. Then come back here, and click Connect again.', 'parrotposter') ?>
+
+			<h4><?php _e('❓If it was unable to connect:', 'parrotposter') ?></h4>
 			<ul>
-				<li><?php _e('For security reasons, Instagram may reset your password. Before connecting your account, please make sure you have access to the email or phone number on your Instagram profile', 'parrotposter') ?></li>
-				<li><?php _e('If your account doesn\'t connect, try turning off/on two-factor authentication', 'parrotposter') ?></li>
+				<li><?php _e('Try enabling two-factor authentication (or disable it if you had it enabled)', 'parrotposter') ?></li>
+				<li><?php _e('Try changing the password', 'parrotposter') ?></li>
 			</ul>
+
+			<br>
 		</div>
 		<button class="button button-primary"><?php echo $connect_txt ?></button>
 	</div>
