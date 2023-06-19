@@ -2,9 +2,9 @@
 Contributors: parrotposter
 Tags: auto post, auto publish, autopost, autopublish, social media automation, автопостинг, автопубликация, vk, telegram, facebook, instagram, ok
 Requires at least: 5.0
-Tested up to: 6.1.1
+Tested up to: 6.2
 Requires PHP: 7.0
-Stable tag: 1.0.6
+Stable tag: 1.0.7
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
