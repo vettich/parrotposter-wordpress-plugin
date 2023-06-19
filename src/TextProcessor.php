@@ -27,11 +27,12 @@ class TextProcessor
 
 	public static function replace_post_text($post, $text)
 	{
+		$text = do_shortcode($text);
 		$text = str_replace(["\n", "\r"], '', $text);
 		$keys = self::parse_keys($text);
 		$values = Fields::get_field_values($keys, $post);
 		foreach ($values as $key => $v) {
-			$text = str_replace('{'.$key.'}', $v, $text);
+			$text = str_replace('{' . $key . '}', $v, $text);
 		}
 		return $text;
 	}
