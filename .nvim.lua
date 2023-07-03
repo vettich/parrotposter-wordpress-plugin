@@ -5,7 +5,8 @@ if ok then
 			intelephense = {
 				environment = {
 					includePaths = {
-						"../../../wp-includes"
+						"../../../wp-includes",
+						"../../../wp-content/plugins/woocommerce",
 					}
 				}
 			},

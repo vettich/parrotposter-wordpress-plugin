@@ -264,25 +264,25 @@ class AdminAjaxPost
 
 		$when_publish = sanitize_text_field($_POST['parrotposter']['when_publish']);
 		switch ($when_publish) {
-		case 'now':
-			$publish_at = ApiHelpers::datetimeFormat('now');
-			break;
-		case 'post_date':
-			$publish_at = ApiHelpers::datetimeFormat(get_the_date('c', $post_id));
-			break;
-		case 'delay':
-			$delay = intval($_POST['parrotposter']['publish_delay']);
-			if ($delay < 1) {
-				$delay = 1;
-			} elseif ($delay > 10) {
-				$delay = 10;
-			}
-			$publish_at = ApiHelpers::datetimeFormat("+{$delay} minutes");
-			break;
-		case 'custom':
-			$specific_time = sanitize_text_field($_POST['parrotposter']['specific_time']);
-			$publish_at = ApiHelpers::datetimeFormat($specific_time);
-			break;
+			case 'now':
+				$publish_at = ApiHelpers::datetimeFormat('now');
+				break;
+			case 'post_date':
+				$publish_at = ApiHelpers::datetimeFormat(get_the_date('c', $post_id));
+				break;
+			case 'delay':
+				$delay = intval($_POST['parrotposter']['publish_delay']);
+				if ($delay < 1) {
+					$delay = 1;
+				} elseif ($delay > 10) {
+					$delay = 10;
+				}
+				$publish_at = ApiHelpers::datetimeFormat("+{$delay} minutes");
+				break;
+			case 'custom':
+				$specific_time = sanitize_text_field($_POST['parrotposter']['specific_time']);
+				$publish_at = ApiHelpers::datetimeFormat($specific_time);
+				break;
 		}
 
 		$account_ids = $_POST['parrotposter']['account_ids'];
@@ -461,7 +461,7 @@ class AdminAjaxPost
 		$post_id = sanitize_text_field($_POST['parrotposter']['post_id']);
 		list($post, $error) = Api::get_post($post_id);
 		if (empty($error)) {
-			$format = get_option('date_format').' '.get_option('time_format');
+			$format = get_option('date_format') . ' ' . get_option('time_format');
 			$post['publish_at_view'] = wp_date($format, ApiHelpers::getTimestamp($post['publish_at']));
 		}
 		echo json_encode([

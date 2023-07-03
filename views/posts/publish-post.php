@@ -1,7 +1,6 @@
 <?php
 
 use parrotposter\PP;
-use parrotposter\WpPostHelpers;
 use parrotposter\AssetModules;
 use parrotposter\FormHelpers;
 use parrotposter\Tools;
@@ -65,6 +64,7 @@ foreach ($contentImages as $img_url) {
 }
 
 $post_text = implode("\n\n", Fields::get_field_values(['title', 'excerpt'], $post));
+$post_text = do_shortcode($post_text);
 $post_text = Tools::clear_text($post_text);
 
 $back_url = "post.php?post=$post_id&action=edit";
@@ -102,22 +102,22 @@ if (isset($_GET['back_url'])) {
 				<input type="text" name="parrotposter[post_link]" value="<?php echo $post_link ?>">
 			</label>
 
-			<?php if (!empty($images)): ?>
-			<label class="parrotposter-input">
-				<span><?php _e('Select post images', 'parrotposter') ?></span>
-				<div class="parrotposter-post-select-images-list">
-				<?php foreach ($images as $attachment_id => $img_url): ?>
-					<label class="parrotposter-post-select-images-item">
-						<input type="checkbox" name="parrotposter[images_ids][]" value="<?php echo esc_attr($attachment_id) ?>" checked>
-						<img src="<?php echo esc_url($img_url) ?>" alt="">
-						<span class="parrotposter-post-select-images-label"></span>
-					</label>
-				<?php endforeach ?>
-				</div>
-				<div class="parrotposter-input__info">
-					<?php _e('Use drag\'n\'drop to move images. A maximum of 10 images will be loaded', 'parrotposter') ?>
-				</div>
-			</label>
+			<?php if (!empty($images)) : ?>
+				<label class="parrotposter-input">
+					<span><?php _e('Select post images', 'parrotposter') ?></span>
+					<div class="parrotposter-post-select-images-list">
+						<?php foreach ($images as $attachment_id => $img_url) : ?>
+							<label class="parrotposter-post-select-images-item">
+								<input type="checkbox" name="parrotposter[images_ids][]" value="<?php echo esc_attr($attachment_id) ?>" checked>
+								<img src="<?php echo esc_url($img_url) ?>" alt="">
+								<span class="parrotposter-post-select-images-label"></span>
+							</label>
+						<?php endforeach ?>
+					</div>
+					<div class="parrotposter-input__info">
+						<?php _e('Use drag\'n\'drop to move images. A maximum of 10 images will be loaded', 'parrotposter') ?>
+					</div>
+				</label>
 			<?php endif ?>
 		</div>
 
@@ -127,8 +127,8 @@ if (isset($_GET['back_url'])) {
 			<label class="parrotposter-input">
 				<select name="parrotposter[when_publish]">
 					<option value="now"><?php _e('Now', 'parrotposter') ?></option>
-					<?php if (date('c') < get_the_date('c', $post_id)): ?>
-					<option value="post_date"><?php _e('Post date', 'parrotposter') ?></option>
+					<?php if (date('c') < get_the_date('c', $post_id)) : ?>
+						<option value="post_date"><?php _e('Post date', 'parrotposter') ?></option>
 					<?php endif ?>
 					<option value="delay"><?php _e('With a delay', 'parrotposter') ?></option>
 					<option value="custom"><?php _e('Enter a specific time', 'parrotposter') ?></option>
@@ -137,8 +137,7 @@ if (isset($_GET['back_url'])) {
 
 			<label class="parrotposter-input parrotposter--delay">
 				<span><?php _e('Publish with a delay of 1 to 10 minutes', 'parrotposter') ?></span>
-				<input type="number" name="parrotposter[publish_delay]" min="1" max="10" step="1"
-					value="3">
+				<input type="number" name="parrotposter[publish_delay]" min="1" max="10" step="1" value="3">
 			</label>
 
 			<label class="parrotposter-input parrotposter--specific-time">
