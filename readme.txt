@@ -128,7 +128,7 @@ Email us at [support@parrotposter.com](mailto:support@parrotposter.com)
 
 == Changelog ==
 
-= 1.0.8 =
+= 1.0.9 =
 * Added support shortcodes in post text/tags/link
 
 = 1.0.5 =
