@@ -50,13 +50,11 @@ if (function_exists('wc_get_product')) {
 	}
 }
 
-$contentImages = parrotposter\WpPostHelpers::get_images_from_content($raw_content);
-foreach ($contentImages as $img_url) {
-	$attachment_id = parrotposter\WpPostHelpers::get_attachment_id($img_url);
-	if (empty($attachment_id)) {
-		continue;
-	}
-
+$contentImagesIds = parrotposter\WpPostHelpers::get_image_ids_from_content(
+	// search in before and after filtered content
+	[$post->post_content, $raw_content]
+);
+foreach ($contentImagesIds as $attachment_id) {
 	$img_url = wp_get_attachment_url($attachment_id);
 	if (!empty($img_url)) {
 		$images[$attachment_id] = $img_url;

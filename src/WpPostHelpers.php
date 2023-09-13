@@ -8,8 +8,15 @@ class WpPostHelpers
 {
 	public static function get_images_from_content($content)
 	{
-		$output = preg_match_all('/<img.+?src=[\'"](?<src>[^\'"]+)[\'"].*?>/i', $content, $matches);
-		return $matches['src'];
+		if (!is_array($content)) {
+			$content = [$content];
+		}
+		$srcList = [];
+		foreach ($content as $c) {
+			preg_match_all('/<img.+?src=[\'"](?<src>[^\'"]+)[\'"].*?>/i', $c, $matches);
+			$srcList = array_merge($srcList, $matches['src']);
+		}
+		return $srcList;
 	}
 
 	public static function get_image_ids_from_content($content)
@@ -23,7 +30,7 @@ class WpPostHelpers
 			}
 			$ids[] = $id;
 		}
-		return $ids;
+		return array_unique($ids);
 	}
 
 	public static function get_post_types($output = 'names')
@@ -64,7 +71,7 @@ class WpPostHelpers
 		$file_host = str_ireplace('www.', '', parse_url($url, PHP_URL_HOST));
 
 		// Return nothing if there aren't any $url parts or if the current host and $url host do not match
-		if (! isset($parsed_url[1]) || empty($parsed_url[1]) || ($this_host != $file_host)) {
+		if (!isset($parsed_url[1]) || empty($parsed_url[1]) || ($this_host != $file_host)) {
 			return;
 		}
 
@@ -92,7 +99,7 @@ class WpPostHelpers
 		$dir = wp_upload_dir();
 
 		// baseurl never has a trailing slash
-		if (false === strpos($url, $dir['baseurl'] . '/')) {
+		if (static::is_external_url($url, $dir['baseurl'])) {
 			// URL points to a place outside of upload directory
 			return false;
 		}
@@ -113,7 +120,7 @@ class WpPostHelpers
 		// query attachments
 		$ids = get_posts($query);
 
-		if (! empty($ids)) {
+		if (!empty($ids)) {
 			foreach ($ids as $id) {
 
 				// first entry of returned array is the URL
@@ -137,8 +144,8 @@ class WpPostHelpers
 			$meta = wp_get_attachment_metadata($id);
 
 			foreach ($meta['sizes'] as $size => $values) {
-				$img_src = wp_get_attachment_image_src($id, $size);
-				if ($values['file'] === $file && $url === array_shift($img_src)) {
+				$img_src_url = static::normalize_url(array_shift($img_src));
+				if ($values['file'] === $file && static::normalize_url($url) === $img_src_url) {
 					return $id;
 				}
 			}
@@ -167,5 +174,17 @@ class WpPostHelpers
 			$wp_domain = strstr($wp_domain, '/', true);
 		}
 		return $wp_domain;
+	}
+
+	private static function is_external_url($url, $base_url)
+	{
+		$url = static::normalize_url($url);
+		$base_url = static::normalize_url($base_url);
+		return false === strpos($url, $base_url);
+	}
+
+	private static function normalize_url($url)
+	{
+		return str_replace('http://', 'https://', $url);
 	}
 }

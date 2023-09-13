@@ -147,6 +147,9 @@ class CommonType
 	private static function get_field_value_images_in_content($post)
 	{
 		$content = apply_filters('the_content', $post->post_content);
-		return WpPostHelpers::get_image_ids_from_content($content);
+		return WpPostHelpers::get_image_ids_from_content(
+			// search in before and after filtered content
+			[$post->post_content, $content]
+		);
 	}
 }
