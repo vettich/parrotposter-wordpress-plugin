@@ -4,7 +4,7 @@ Tags: auto post, auto publish, autopost, autopublish, social media automation, Ð
 Requires at least: 5.0
 Tested up to: 6.3
 Requires PHP: 7.0
-Stable tag: 1.0.10
+Stable tag: 1.0.110
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 

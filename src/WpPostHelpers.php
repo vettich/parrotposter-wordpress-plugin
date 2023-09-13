@@ -144,6 +144,7 @@ class WpPostHelpers
 			$meta = wp_get_attachment_metadata($id);
 
 			foreach ($meta['sizes'] as $size => $values) {
+				$img_src = wp_get_attachment_image_src($id, $size);
 				$img_src_url = static::normalize_url(array_shift($img_src));
 				if ($values['file'] === $file && static::normalize_url($url) === $img_src_url) {
 					return $id;
