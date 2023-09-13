@@ -128,7 +128,7 @@ Email us at [support@parrotposter.com](mailto:support@parrotposter.com)
 
 == Changelog ==
 
-= 1.0.10 =
+= 1.0.11 =
 * Fixed parse images from content, when a third-party plugin adding CDN is enabled
 
 = 1.0.9 =
