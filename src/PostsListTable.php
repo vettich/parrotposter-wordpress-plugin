@@ -8,8 +8,6 @@ class PostsListTable extends WPListTable
 {
 	public function __construct()
 	{
-		global $status, $page;
-
 		parent::__construct([
 			'singular' => __('Post', 'parrotposter'),
 			'plural' => __('Posts', 'parrotposter'),
@@ -42,7 +40,7 @@ class PostsListTable extends WPListTable
 
 	public function column_cb($item)
 	{
-		return '<input type="checkbox" name="parrotposter[items][]" value="'.$item['id'].'" />';
+		return '<input type="checkbox" name="parrotposter[items][]" value="' . $item['id'] . '" />';
 	}
 
 	public function column_text($item)
@@ -92,14 +90,12 @@ class PostsListTable extends WPListTable
 		if (!isset($item['publish_at'])) {
 			return;
 		}
-		$format = get_option('date_format').' '.get_option('time_format');
+		$format = get_option('date_format') . ' ' . get_option('time_format');
 		return wp_date($format, ApiHelpers::getTimestamp($item['publish_at']));
 	}
 
 	public function prepare_items()
 	{
-		global $wpdb;
-
 		$columns = $this->get_columns();
 		$this->_column_headers = [$columns, [], []];
 

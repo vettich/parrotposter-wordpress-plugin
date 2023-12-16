@@ -26,7 +26,7 @@ class PP
 
 	public static function isset_asset($filename)
 	{
-		return file_exists(PARROTPOSTER_PLUGIN_DIR."/assets/$filename");
+		return file_exists(PARROTPOSTER_PLUGIN_DIR . "/assets/$filename");
 	}
 
 	public static function log($data)
@@ -40,7 +40,7 @@ class PP
 			'data' => $data,
 		];
 		$s = print_r($log, true);
-		error_log($s, 3, PARROTPOSTER_PLUGIN_DIR.'var.log');
+		error_log($s, 3, PARROTPOSTER_PLUGIN_DIR . 'var.log');
 	}
 
 	public function register()
@@ -75,7 +75,7 @@ class PP
 
 	public function load_textdomain()
 	{
-		load_plugin_textdomain('parrotposter', false, dirname(plugin_basename(PARROTPOSTER_PLUGIN_FILE)).'/languages');
+		load_plugin_textdomain('parrotposter', false, dirname(plugin_basename(PARROTPOSTER_PLUGIN_FILE)) . '/languages');
 	}
 
 	public function register_scripts()
@@ -115,7 +115,7 @@ class PP
 
 	public function admin_page()
 	{
-		$page = isset($_GET['page']) ? sanitize_text_field($_GET['page']): 'parrotposter';
+		$page = isset($_GET['page']) ? sanitize_text_field($_GET['page']) : 'parrotposter';
 		$view = isset($_GET['view']) ? sanitize_text_field($_GET['view']) : 'index';
 		$prefix = 'parrotposter_';
 		if (substr($page, 0, strlen($prefix)) == $prefix) {
@@ -128,7 +128,7 @@ class PP
 	public static function include_view($name, $view_args = [])
 	{
 		wp_enqueue_script('parrotposter-main-script');
-		require_once PARROTPOSTER_PLUGIN_DIR."views/$name.php";
+		require_once PARROTPOSTER_PLUGIN_DIR . "views/$name.php";
 	}
 
 	public function post_meta_box()

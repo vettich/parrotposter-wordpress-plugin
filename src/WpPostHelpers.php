@@ -23,14 +23,16 @@ class WpPostHelpers
 	{
 		$urls = self::get_images_from_content($content);
 		$ids = [];
+		$other_urls = [];
 		foreach ($urls as $url) {
 			$id = self::get_attachment_id($url);
 			if (empty($id)) {
+				$other_urls[] = $url;
 				continue;
 			}
 			$ids[] = $id;
 		}
-		return array_unique($ids);
+		return array_merge(array_unique($ids), array_unique($other_urls));
 	}
 
 	public static function get_post_types($output = 'names')
@@ -98,13 +100,11 @@ class WpPostHelpers
 	{
 		$dir = wp_upload_dir();
 
-		// baseurl never has a trailing slash
-		if (static::is_external_url($url, $dir['baseurl'])) {
-			// URL points to a place outside of upload directory
-			return false;
+		$file = $url;
+		if (!static::is_external_url($url, $dir['baseurl'])) {
+			$file = basename($url);
 		}
 
-		$file = basename($url);
 		$query = [
 			'post_type' => 'attachment',
 			'fields' => 'ids',

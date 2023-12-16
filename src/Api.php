@@ -213,7 +213,7 @@ class Api
 		$payload .= "Content-Type: $content_type\r\n";
 		$payload .= "\r\n";
 		$payload .= file_get_contents($filepath);
-		$payload .= "\r\n--${boundary}--\r\n";
+		$payload .= "\r\n--{$boundary}--\r\n";
 
 		$params = [
 			'method' => 'POST',

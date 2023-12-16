@@ -58,7 +58,7 @@ class DBAutopostingTable
 	{
 		global $wpdb;
 		$data = DB::autoposting_to_db($data);
-		$res = $wpdb->insert($wpdb->prefix.'parrotposter_autoposting', $data, $format);
+		$res = $wpdb->insert($wpdb->prefix . 'parrotposter_autoposting', $data, $format);
 		if ($res === false) {
 			return $wpdb->last_error;
 		}
@@ -70,7 +70,7 @@ class DBAutopostingTable
 		global $wpdb;
 		$data = DB::autoposting_to_db($data);
 		$res = $wpdb->update(
-			$wpdb->prefix.'parrotposter_autoposting',
+			$wpdb->prefix . 'parrotposter_autoposting',
 			$data,
 			['id' => intval($id)],
 			$format,
@@ -89,7 +89,7 @@ class DBAutopostingTable
 		$format = ['%d'];
 		$where = ['id' => intval($id)];
 		$where_format = ['%d'];
-		$wpdb->update($wpdb->prefix.'parrotposter_autoposting', $data, $where, $format, $where_format);
+		$res = $wpdb->update($wpdb->prefix . 'parrotposter_autoposting', $data, $where, $format, $where_format);
 		if ($res === false) {
 			return $wpdb->last_error;
 		}
@@ -99,7 +99,7 @@ class DBAutopostingTable
 	public static function delete($id)
 	{
 		global $wpdb;
-		$res = $wpdb->delete($wpdb->prefix.'parrotposter_autoposting', ['id' => intval($id)], ['%d']);
+		$res = $wpdb->delete($wpdb->prefix . 'parrotposter_autoposting', ['id' => intval($id)], ['%d']);
 		if ($res === false) {
 			return $wpdb->last_error;
 		}

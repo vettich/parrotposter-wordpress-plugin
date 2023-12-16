@@ -26,6 +26,7 @@ class AssetModules
 		'post-detail',
 		'post-meta-box',
 		'publish-post',
+		'publish-via-template',
 		'help',
 	];
 
@@ -45,9 +46,9 @@ class AssetModules
 		],
 	];
 
-	private static $registered = [];
+	public static $registered = [];
 
-	private static $enqueue_scripts = [];
+	public static $enqueue_scripts = [];
 
 	public static function register()
 	{
@@ -88,7 +89,7 @@ class AssetModules
 	public static function enqueue_script_translates()
 	{
 		foreach (self::$registered as $module => $assets) {
-			wp_set_script_translations("parrotposter-$module", 'parrotposter', PARROTPOSTER_PLUGIN_DIR.'languages');
+			wp_set_script_translations("parrotposter-$module", 'parrotposter', PARROTPOSTER_PLUGIN_DIR . 'languages');
 		}
 	}
 

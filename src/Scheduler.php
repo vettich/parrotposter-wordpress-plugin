@@ -61,8 +61,6 @@ class Scheduler
 
 	public function publish_post($wp_post)
 	{
-		global $wpdb;
-
 		$autopostings = WpPostHelpers::list_autoposting_by_post($wp_post);
 		if (empty($autopostings)) {
 			return;
@@ -76,81 +74,79 @@ class Scheduler
 				continue;
 			}
 
-			if ($item['exclude_duplicates']) {
-				$cnt = $wpdb->get_var($wpdb->prepare(
-					"SELECT count(*)
-					FROM {$wpdb->prefix}parrotposter_posts
-					WHERE wp_post_id = %d AND autoposting_id = %d",
-					$wp_post->ID,
-					$item['id'],
-				));
+			$this->publish_post_by_template_without_check($wp_post, $item, true);
+		}
+	}
 
-				if ($cnt > 0) {
-					continue;
-				}
-			}
+	public function publish_post_by_template_without_check($wp_post, $template, $exclude_duplicates)
+	{
+		global $wpdb;
 
-			$post_text = TextProcessor::replace_post_text($wp_post, $item['post_text']);
-			$post_text = Tools::clear_text($post_text);
+		if ($exclude_duplicates && $template['exclude_duplicates'] && self::has_duplicate($wp_post->ID, $template['id'])) {
+			return;
+		}
 
-			$post_tags = TextProcessor::replace_post_text($wp_post, $item['post_tags']);
-			$post_tags = Tools::clear_text($post_tags);
+		$post_text = TextProcessor::replace_post_text($wp_post, $template['post_text']);
+		$post_text = Tools::clear_text($post_text);
 
-			$image_ids = self::upload_wp_images($wp_post, $item['post_images']);
+		$post_tags = TextProcessor::replace_post_text($wp_post, $template['post_tags']);
+		$post_tags = Tools::clear_text($post_tags);
 
-			$post_fields = [
-				'text' => $post_text,
-				'tags' => $post_tags,
-				'link' => TextProcessor::replace_post_text($wp_post, $item['post_link']),
-				'images' => $image_ids,
-				'extra' => [
-					'wp_post_id' => $wp_post->ID,
-					'wp_site_domain' => WpPostHelpers::get_site_domain(),
-					'vk_signed' => !!$item['extra_vk_signed'],
-					'vk_from_group' => !!$item['extra_vk_from_group'],
-				],
+		list($image_ids, $image_urls) = self::upload_wp_images($wp_post, $template['post_images']);
+
+		$post_fields = [
+			'text' => $post_text,
+			'tags' => $post_tags,
+			'link' => TextProcessor::replace_post_text($wp_post, $template['post_link']),
+			'images' => $image_ids,
+			'image_urls' => $image_urls,
+			'extra' => [
+				'wp_post_id' => $wp_post->ID,
+				'wp_site_domain' => WpPostHelpers::get_site_domain(),
+				'vk_signed' => !!$template['extra_vk_signed'],
+				'vk_from_group' => !!$template['extra_vk_from_group'],
+			],
+		];
+
+		if ($template['utm_enable']) {
+			$post_fields['need_utm'] = true;
+			$post_fields['utm_params'] = [
+				'utm_source' => TextProcessor::replace_post_text($wp_post, $template['utm_source']),
+				'utm_medium' => TextProcessor::replace_post_text($wp_post, $template['utm_medium']),
+				'utm_content' => TextProcessor::replace_post_text($wp_post, $template['utm_content']),
+				'utm_term' => TextProcessor::replace_post_text($wp_post, $template['utm_term']),
+				'utm_campaign' => TextProcessor::replace_post_text($wp_post, $template['utm_campaign']),
 			];
+		}
 
-			if ($item['utm_enable']) {
-				$post_fields['need_utm'] = true;
-				$post_fields['utm_params'] = [
-					'utm_source' => TextProcessor::replace_post_text($wp_post, $item['utm_source']),
-					'utm_medium' => TextProcessor::replace_post_text($wp_post, $item['utm_medium']),
-					'utm_content' => TextProcessor::replace_post_text($wp_post, $item['utm_content']),
-					'utm_term' => TextProcessor::replace_post_text($wp_post, $item['utm_term']),
-					'utm_campaign' => TextProcessor::replace_post_text($wp_post, $item['utm_campaign']),
-				];
-			}
-
-			switch ($item['when_publish']) {
+		switch ($template['when_publish']) {
 			case 'immediately':
 				$publish_at = ApiHelpers::datetimeFormat('now');
 				break;
 			case 'delay':
-				$publish_at = ApiHelpers::datetimeFormat("+{$item['publish_delay']} minutes");
+				$publish_at = ApiHelpers::datetimeFormat("+{$template['publish_delay']} minutes");
 				break;
-			}
+		}
 
-			$pp_post = [
-				'fields' => $post_fields,
-				'publish_at' => $publish_at,
-				'networks' => [
-					'accounts' => $item['account_ids'],
-				]
-			];
+		$pp_post = [
+			'fields' => $post_fields,
+			'publish_at' => $publish_at,
+			'networks' => [
+				'accounts' => $template['account_ids'],
+			]
+		];
 
-			$res = Api::create_post($pp_post);
-			if (empty($res['error'])) {
-				$wpdb->insert(
-					$wpdb->prefix.'parrotposter_posts',
-					[
-						'wp_post_id' => $wp_post->ID,
-						'post_id' => $res['response']['post_id'],
-						'autoposting_id' => $item['id'],
-					],
-					['%d', '%s', '%d'],
-				);
-			}
+		$res = Api::create_post($pp_post);
+		if (empty($res['error'])) {
+			$wpdb->insert(
+				$wpdb->prefix . 'parrotposter_posts',
+				[
+					'wp_post_id' => $wp_post->ID,
+					'post_id' => $res['response']['post_id'],
+					'autoposting_id' => $template['id'],
+				],
+				['%d', '%s', '%d'],
+			);
 		}
 	}
 
@@ -159,11 +155,16 @@ class Scheduler
 		$images_txt = implode('', $images_txt_keys);
 		$wp_images_ids = TextProcessor::replace_post_image_text_to_ids($wp_post, $images_txt);
 		$image_ids = [];
+		$image_urls = [];
 		$wp_images_processed = [];
 		foreach ($wp_images_ids as $id) {
+			$url = $id;
 			$id = sanitize_text_field($id);
 			$attached_file = get_attached_file($id);
 			if (empty($attached_file) || isset($wp_images_processed[$id])) {
+				if (str_starts_with($url, 'http')) {
+					$image_urls[] = $url;
+				}
 				continue;
 			}
 			$wp_images_processed[$id] = true;
@@ -175,6 +176,21 @@ class Scheduler
 			}
 			$image_ids[] = $file_id;
 		}
-		return $image_ids;
+		return [$image_ids, $image_urls];
+	}
+
+	public static function has_duplicate($wp_post_id, $template_id)
+	{
+		global $wpdb;
+
+		$cnt = $wpdb->get_var($wpdb->prepare(
+			"SELECT count(*)
+					FROM {$wpdb->prefix}parrotposter_posts
+					WHERE wp_post_id = %d AND autoposting_id = %d",
+			$wp_post_id,
+			$template_id,
+		));
+
+		return $cnt > 0;
 	}
 }

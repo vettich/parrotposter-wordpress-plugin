@@ -8,7 +8,8 @@
 	overflow: hidden auto;
 	justify-content: center;
 	align-items: center;
-	background-color: rgba(0, 0, 0, 0.5);
+	background-color: rgba(0, 0, 0, 0.7);
+	backdrop-filter: blur(6px);
 	z-index: 9999999;
 }
 
@@ -89,15 +90,58 @@
 
 
 
-
-
-.parrotposter-modal-footer {
-	border-top: 1px solid gray;
-	padding-top: 1em;
+.parrotposter-modal__template-wrap {
 	display: flex;
-	justify-content: right;
-	align-items: center;
+	flex-direction: column;
+	gap: 1em;
 }
+
+#parrotposter-wait-loading {
+	width: 28px;
+	height: 28px;
+	display: inline-block;
+	margin-left: 1em;
+}
+
+.parrotposter-modal__template-list {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: start;
+	gap: 1em;
+}
+
+.parrotposter-modal__template-item {
+	display: flex;
+	flex-direction: column;
+	width: 260px;
+	max-width: 100%;
+	padding: 1em;
+	border: gray 1px solid;
+	border-radius: 6px;
+}
+
+.parrotposter-modal__template-item--selected {
+	border-color: transparent;
+	box-shadow: 0 0 12px #1fa2ffba;
+}
+
+.parrotposter-modal__template-name {
+	font-size: 140%;
+	margin-bottom: 12px;
+}
+
+.parrotposter-modal__template-post-already-exist {
+	display: none;
+	padding-top: 6px;
+	color: #F68634;
+}
+
+.parrotposter-modal__template-manually-footer {
+	display: flex;
+	flex-direction: column;
+	gap: 1em;
+}
+
 
 .parrotposter-modal-post-text {
 	white-space: pre-wrap;

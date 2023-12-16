@@ -19,7 +19,7 @@ AssetModules::enqueue(['loading', 'post-meta-box']);
 ?>
 
 <p>
-	<a class="button button-primary" href="admin.php?page=parrotposter_posts&view=publish-post&post_id=<?php echo esc_attr($post_id) ?>">
+	<a class="button button-primary parrotposter-meta-box__publish-btn" href="admin.php?page=parrotposter_posts&view=publish-post&post_id=<?php echo esc_attr($post_id) ?>" data-wp-post-id="<?php echo esc_attr($post_id) ?>">
 		<?php _e('Publish to socials network', 'parrotposter') ?>
 	</a>
 </p>
@@ -35,7 +35,7 @@ AssetModules::enqueue(['loading', 'post-meta-box']);
 </p>
 
 <?php PP::include_view('posts/detail') ?>
-
+<?php PP::include_view('posts/publish-via-template') ?>
 
 <script>
 	const parrotposter_post_id = <?php echo json_encode(esc_attr($post_id)) ?>;

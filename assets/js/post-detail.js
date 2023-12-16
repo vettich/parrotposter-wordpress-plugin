@@ -26,7 +26,6 @@ jQuery(function($) {
 	$('#parrotposter-view-post-delete-confirm .button-primary').click(function(event) {
 		event.preventDefault()
 		parrotposter_modal_close('#parrotposter-view-post-delete-confirm')
-		const elem = $(event.target)
 		const id = $('#parrotposter-view-post-delete-confirm').data('id')
 		const rootItem = $(modalId + ' .parrotposter-button--delete')
 		rootItem.addClass('parrotposter-loading');
@@ -49,7 +48,7 @@ function parrotposterLoadPost(postId, loadingSelector, deleteFn) {
 		'parrotposter': {
 			'post_id': postId,
 		}
-	}, function (data) {
+	}, function(data) {
 		$(loadingSelector).removeClass('parrotposter-loading')
 
 		data = JSON.parse(data)
@@ -141,7 +140,7 @@ function parrotposterOpenPostModal(post, deleteFn) {
 		}
 
 		const hasAccounts = Object.prototype.toString.call(post.networks.accounts) === '[object Array]'
-		hasAccounts && post.networks.accounts.forEach(function (id) {
+		hasAccounts && post.networks.accounts.forEach(function(id) {
 			const acc = findAccount(id)
 			if (!acc) {
 				return
@@ -187,7 +186,7 @@ function parrotposterLoadAccounts(successCb) {
 
 	jQuery.post(ajaxurl, {
 		'action': 'parrotposter_api_list_accounts',
-	}, function (data) {
+	}, function(data) {
 		data = JSON.parse(data)
 		if (data.accounts) {
 			parrotposter_accounts = data.accounts

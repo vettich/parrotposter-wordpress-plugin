@@ -8,8 +8,6 @@ class AutopostingListTable extends WPListTable
 {
 	public function __construct()
 	{
-		global $status, $page;
-
 		parent::__construct([
 			'singular' => __('Autoposting', 'parrotposter'),
 			'plural' => __('Autopostings', 'parrotposter'),
@@ -36,7 +34,7 @@ class AutopostingListTable extends WPListTable
 
 	public function column_cb($item)
 	{
-		return '<input type="checkbox" name="parrotposter[items][]" value="'.$item['id'].'" />';
+		return '<input type="checkbox" name="parrotposter[items][]" value="' . $item['id'] . '" />';
 	}
 
 	public function column_name($item)
@@ -84,10 +82,10 @@ class AutopostingListTable extends WPListTable
 	{
 		$js_onclick = "parrotposter_autoposting_enable(event, '{$item['id']}')";
 		ob_start(); ?>
-			<label class="parrotposter-input parrotposter-input--toggle">
-				<?php FormHelpers::render_checkbox('', $item['enable'], $js_onclick) ?>
-			</label>
-		<?php
+		<label class="parrotposter-input parrotposter-input--toggle">
+			<?php FormHelpers::render_checkbox('', $item['enable'], $js_onclick) ?>
+		</label>
+	<?php
 		$content = ob_get_contents();
 		ob_end_clean();
 		return $content;
@@ -104,31 +102,16 @@ class AutopostingListTable extends WPListTable
 
 	public function column_when_publish($item)
 	{
-		switch ($item['when_publish']) {
-		case 'immediately':
-			return __('Immediately upon publishing the post', 'parrotposter');
-		case 'delay':
-			return sprintf('%s: %d min', __('With a delay', 'parrotposter'), $item['publish_delay']);
-		}
+		return AutopostingHelpers::label_when_publish($item);
 	}
 
 	public function column_social_networks($item)
 	{
-		if (!isset($item['account_ids'])) {
-			return;
-		}
-		$text = ApiHelpers::list_social_network_names($item['account_ids']);
-		if (empty($text)) {
-			$text = esc_html(__('<Not selected>', 'parrotposter'));
-			$text = "<span style=\"color: #d63638\">$text</span>";
-		}
-		return $text;
+		return AutopostingHelpers::label_socials_networks($item);
 	}
 
 	public function prepare_items()
 	{
-		global $wpdb;
-
 		$columns = $this->get_columns();
 		$this->_column_headers = [$columns, [], []];
 
@@ -147,21 +130,19 @@ class AutopostingListTable extends WPListTable
 	{
 		AssetModules::enqueue(['modal', 'loading', 'autoposting_list_table']);
 		parent::display(); ?>
-			<div id="parrotposter-autoposting-delete-confirm" class="parrotposter-modal">
-				<div class="parrotposter-modal__container">
-					<div class="parrotposter-modal__close"></div>
-					<div class="parrotposter-modal__title"
-						data-title="<?php _e('Are you sure you want to delete {autoposting_name}?', 'parrotposter') ?>">
-					</div>
-					<div class="parrotposter-modal__footer">
-						<button class="button button-primary parrotposter-button--delete"
-							onclick="parrotposter_autoposting_delete_confirm(event)">
-							<?php _e('Delete', 'parrotposter') ?>
-						</button>
-						<button class="button parrotposter-js-close"><?php _e('Cancel', 'parrotposter') ?></button>
-					</div>
+		<div id="parrotposter-autoposting-delete-confirm" class="parrotposter-modal">
+			<div class="parrotposter-modal__container">
+				<div class="parrotposter-modal__close"></div>
+				<div class="parrotposter-modal__title" data-title="<?php _e('Are you sure you want to delete {autoposting_name}?', 'parrotposter') ?>">
+				</div>
+				<div class="parrotposter-modal__footer">
+					<button class="button button-primary parrotposter-button--delete" onclick="parrotposter_autoposting_delete_confirm(event)">
+						<?php _e('Delete', 'parrotposter') ?>
+					</button>
+					<button class="button parrotposter-js-close"><?php _e('Cancel', 'parrotposter') ?></button>
 				</div>
 			</div>
-		<?php
+		</div>
+<?php
 	}
 }

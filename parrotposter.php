@@ -6,7 +6,7 @@
  * Description: Auto post or selective post of news and products from the site to social networks (media) Facebook, Instagram, Telegram, VK, OK (autoposting, autopost).
  * Author: ParrotPoster
  * Author URI: https://parrotposter.com
- * Version: 1.0.110
+ * Version: 1.0.12
  * Text Domain: parrotposter
  * Domain Path: /languages
  * License: GPLv3
@@ -17,7 +17,7 @@ if (!defined('ABSPATH')) {
 	die;
 }
 
-define('PARROTPOSTER_VERSION', '1.0.110');
+define('PARROTPOSTER_VERSION', '1.0.12');
 define('PARROTPOSTER_DB_VERSION', '1.0.7');
 define('PARROTPOSTER_PLUGIN_FILE', __FILE__);
 define('PARROTPOSTER_PLUGIN_DIR', plugin_dir_path(__FILE__));

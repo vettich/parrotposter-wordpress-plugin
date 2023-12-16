@@ -45,6 +45,8 @@ class AdminAjaxPost
 		add_action('admin_post_parrotposter_autoposting_add', [$this, 'autoposting_add']);
 		add_action('admin_post_parrotposter_autoposting_edit', [$this, 'autoposting_edit']);
 		add_action('wp_ajax_parrotposter_autoposting_enable', [$this, 'autoposting_enable']);
+		add_action('wp_ajax_parrotposter_publish_post_via_template', [$this, 'publish_post_via_template']);
+		add_action('wp_ajax_parrotposter_has_post_duplicates', [$this, 'has_post_duplicates']);
 
 		// api access
 		add_action('wp_ajax_parrotposter_api_list_posts', [$this, 'api_list_posts']);
@@ -401,6 +403,34 @@ class AdminAjaxPost
 		}
 
 		FormHelpers::post_success();
+	}
+
+	public function has_post_duplicates()
+	{
+		FormHelpers::must_be_post_nonce();
+
+		$wp_post_id = $_POST['parrotposter']['wp_post_id'];
+		$template_ids = $_POST['parrotposter']['template_ids'];
+		$has = [];
+		foreach ($template_ids as $id) {
+			$has[$id] = Scheduler::has_duplicate($wp_post_id, $id);
+		}
+
+		FormHelpers::post_success($has);
+	}
+
+	public function publish_post_via_template()
+	{
+		FormHelpers::must_be_post_nonce();
+
+		$wp_post_id = $_POST['parrotposter']['wp_post_id'];
+		$template_id = $_POST['parrotposter']['template_id'];
+
+		$wp_post = get_post($wp_post_id);
+		$template = DBAutopostingTable::get_by_id($template_id);
+		Scheduler::get_instance()->publish_post_by_template_without_check($wp_post, $template, false);
+
+		FormHelpers::post_success('true');
 	}
 
 	public function api_list_posts()

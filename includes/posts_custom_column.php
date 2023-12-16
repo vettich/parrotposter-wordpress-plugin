@@ -1,5 +1,6 @@
 <?php
 
+use parrotposter\AssetModules;
 use parrotposter\PP;
 use parrotposter\WpPostHelpers;
 
@@ -32,57 +33,72 @@ function parrotposter_manage_posts_custom_column($col_name)
 	);
 
 	printf(
-		'<a class="parrotposter-publish" title="%s" href="%s"></a>',
+		'<a class="parrotposter-publish" title="%s" href="%s" data-wp-post-id="%s"></a>',
 		__('Publish to social networks', 'parrotposter'),
 		$link,
+		get_the_ID(),
 	);
 }
 
-add_action('admin_print_footer_scripts-edit.php', function () {
-	?>
+add_action('admin_print_footer_scripts-edit.php', 'parrotposter_print_custom_columns_styles');
+function parrotposter_print_custom_columns_styles()
+{
+?>
+	<style>
+		.column-parrotposter_col {
+			width: 10%
+		}
 
-<style>
-	.column-parrotposter_col { width: 10% }
+		.parrotposter-logo {
+			display: block;
+			height: 20px;
+			width: 20px;
+			margin: 0 auto;
+			font-size: 0;
+		}
 
-	.parrotposter-logo {
-		display: block;
-		height: 20px;
-		width: 20px;
-		margin: 0 auto;
-		font-size: 0;
-	}
+		.parrotposter-logo:before {
+			content: "";
+			display: block;
+			background-image: url(<?php echo PP::asset('images/icon.png') ?>);
+			background-size: cover;
+			background-position: center;
+			background-repeat: no-repeat;
+			width: 20px;
+			height: 20px;
+		}
 
-	.parrotposter-logo:before {
-		content: "";
-		display: block;
-		background-image: url(<?php echo PP::asset('images/icon.png')?>);
-		background-size: cover;
-		background-position: center;
-		background-repeat: no-repeat;
-		width: 20px;
-		height: 20px;
-	}
+		.parrotposter-publish {
+			display: block;
+			height: 20px;
+			width: 20px;
+			margin: 0 auto;
+			font-size: 0;
+			cursor: pointer;
+		}
 
-	.parrotposter-publish {
-		display: block;
-		height: 20px;
-		width: 20px;
-		margin: 0 auto;
-		font-size: 0;
-		cursor: pointer;
-	}
+		.parrotposter-publish:before {
+			content: "";
+			display: block;
+			background-image: url(<?php echo PP::asset('images/share.svg') ?>);
+			background-size: contain;
+			background-position: center;
+			background-repeat: no-repeat;
+			width: 20px;
+			height: 20px;
+		}
+	</style>
+<?php
+}
 
-	.parrotposter-publish:before {
-		content: "";
-		display: block;
-		background-image: url(<?php echo PP::asset('images/share.svg')?>);
-		background-size: contain;
-		background-position: center;
-		background-repeat: no-repeat;
-		width: 20px;
-		height: 20px;
-	}
-</style>
+add_action('admin_footer-edit.php', 'parrotposter_show_view_publish_via_template');
+function parrotposter_show_view_publish_via_template()
+{
+	PP::include_view('posts/publish-via-template');
+}
 
-	<?php
-});
+add_action('admin_enqueue_scripts', 'parrotposter_assets_for_view_publish_via_template', 100);
+function parrotposter_assets_for_view_publish_via_template()
+{
+	AssetModules::enqueue(['modal', 'common', 'loading', 'publish-via-template']);
+}
