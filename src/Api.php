@@ -243,7 +243,7 @@ class Api
 		if (empty($endpoint)) {
 			return false;
 		}
-		$url = self::API_URL.$endpoint.'?lang='.self::get_locale();
+		$url = self::API_URL . $endpoint . '?lang=' . self::get_locale();
 
 		$defaults = [
 			'method' => 'GET',
@@ -301,7 +301,8 @@ class Api
 	{
 		$locale = 'en';
 		$locale_splitted = explode('_', get_locale());
-		if (count($locale_splitted) > 0 &&
+		if (
+			count($locale_splitted) > 0 &&
 			!empty($locale_splitted[0]) &&
 			strlen($locale_splitted[0]) == 2
 		) {
