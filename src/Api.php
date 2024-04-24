@@ -196,6 +196,13 @@ class Api
 		return $res;
 	}
 
+	public static function get_last_post_publish_at($post_ids = [])
+	{
+		$ids = implode(',', $post_ids);
+		$res = self::get("posts/$ids/last-publish-at");
+		return ApiHelpers::retrieve_response($res);
+	}
+
 	public static function get_exchange_rate_usd()
 	{
 		$res = self::get("exchange-rate/usd");

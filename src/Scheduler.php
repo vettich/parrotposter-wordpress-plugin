@@ -193,4 +193,28 @@ class Scheduler
 
 		return $cnt > 0;
 	}
+
+	public static function last_publish_at($wp_post_id, $template_id)
+	{
+		global $wpdb;
+
+		$results = $wpdb->get_results($wpdb->prepare(
+			"SELECT post_id
+				FROM {$wpdb->prefix}parrotposter_posts
+				WHERE wp_post_id = %d and autoposting_id = %d",
+			$wp_post_id,
+			$template_id,
+		));
+
+		$ids = [];
+		foreach ($results as $res) {
+			$ids[] = $res->post_id;
+		}
+
+		if (empty($ids)) {
+			return false;
+		}
+
+		return Api::get_last_post_publish_at($ids);
+	}
 }

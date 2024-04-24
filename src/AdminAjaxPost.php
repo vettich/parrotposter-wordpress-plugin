@@ -411,12 +411,12 @@ class AdminAjaxPost
 
 		$wp_post_id = $_POST['parrotposter']['wp_post_id'];
 		$template_ids = $_POST['parrotposter']['template_ids'];
-		$has = [];
+		$results = [];
 		foreach ($template_ids as $id) {
-			$has[$id] = Scheduler::has_duplicate($wp_post_id, $id);
+			$results[$id] = Scheduler::last_publish_at($wp_post_id, $id);
 		}
 
-		FormHelpers::post_success($has);
+		FormHelpers::post_success($results);
 	}
 
 	public function publish_post_via_template()

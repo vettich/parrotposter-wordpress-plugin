@@ -46,7 +46,7 @@ $templates = array_filter($templates, function ($v) {
 							<div class="parrotposter-modal__template-when"><?php echo AutopostingHelpers::label_when_publish($templ) ?></div>
 							<div class="parrotposter-modal__template-post-already-exist">
 								<?php _e('Warning', 'parrotposter') ?>:
-								<?php _e('The post has already been previously published via this template', 'parrotposter') ?>
+								<?php _e('The post has already been previously published via this template at :time:', 'parrotposter') ?>
 							</div>
 						</label>
 					<?php endforeach ?>

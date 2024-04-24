@@ -36,7 +36,16 @@ jQuery(function($) {
 				if (!resp.data[template_id]) {
 					return;
 				}
-				$(`label[for=pp-template-${template_id}] .parrotposter-modal__template-post-already-exist`).css('display', 'block');
+
+				const existLabel = $(`label[for=pp-template-${template_id}] .parrotposter-modal__template-post-already-exist`);
+				existLabel.css('display', 'block');
+
+				let text = existLabel.data('orig');
+				if (!text || !text.length) {
+					text = existLabel.text();
+					existLabel.data('orig', text);
+				}
+				existLabel.text(text.replace(':time:', new Date(resp.data[template_id]).toLocaleString()));
 			})
 		})
 			.always(function() {
