@@ -73,18 +73,17 @@ class ApiHelpers
 		return $accounts;
 	}
 
-	public static function datetimeFormat($strtime)
-	{
-		$nowtime = strtotime('now');
-		if (empty($strtime)) {
-			$strtime = $nowtime;
-		} else {
-			$strtime = strtotime($strtime);
-			if ($strtime < $nowtime) {
-				$strtime = $nowtime;
-			}
+	public static function formatCurrentDatetime($addMinutes = 0) {
+		$datetime = current_datetime();
+		if ($addMinutes > 0) {
+			$datetime = $datetime->modify("+{$addMinutes} minutes");
 		}
-		return date(self::RFC3339_EXTENDED, $strtime);
+		return $datetime->format(self::RFC3339_EXTENDED);
+	}
+
+	public static function formatISO8601Datetime($datetime) {
+		$dt = new \DateTimeImmutable($datetime);
+		return $dt->format(self::RFC3339_EXTENDED);
 	}
 
 	public static function getTimestamp($apiTime)

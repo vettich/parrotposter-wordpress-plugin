@@ -1,17 +1,16 @@
-jQuery(function($) {
+jQuery(function ($) {
 	const fp = flatpickr('#pick-publication-time', {
 		enableTime: true,
 		time_24hr: true,
 		minDate: new Date(),
 		dateFormat: 'Z',
 		position: 'above center',
-		onChange: function(selectedDates) {
-			console.log(selectedDates);
+		onChange: function (selectedDates) {
 			$('#pick-publication-time-fmt').val(selectedDates[0].toLocaleString())
 		},
 	})
 
-	$('#pick-publication-time-fmt').click(function(e) {
+	$('#pick-publication-time-fmt').click(function (e) {
 		fp.toggle()
 	})
 

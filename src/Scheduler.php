@@ -121,10 +121,11 @@ class Scheduler
 
 		switch ($template['when_publish']) {
 			case 'immediately':
-				$publish_at = ApiHelpers::datetimeFormat('now');
+				$publish_at = ApiHelpers::formatCurrentDatetime();
 				break;
 			case 'delay':
-				$publish_at = ApiHelpers::datetimeFormat("+{$template['publish_delay']} minutes");
+				$delay = intval($template['publish_delay']);
+				$publish_at = ApiHelpers::formatCurrentDatetime($delay);
 				break;
 		}
 

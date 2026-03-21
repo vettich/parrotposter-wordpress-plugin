@@ -267,10 +267,10 @@ class AdminAjaxPost
 		$when_publish = sanitize_text_field($_POST['parrotposter']['when_publish']);
 		switch ($when_publish) {
 			case 'now':
-				$publish_at = ApiHelpers::datetimeFormat('now');
+				$publish_at = ApiHelpers::formatCurrentDatetime();
 				break;
 			case 'post_date':
-				$publish_at = ApiHelpers::datetimeFormat(get_the_date('c', $post_id));
+				$publish_at = ApiHelpers::formatISO8601Datetime(get_the_date('c', $post_id));
 				break;
 			case 'delay':
 				$delay = intval($_POST['parrotposter']['publish_delay']);
@@ -279,11 +279,11 @@ class AdminAjaxPost
 				} elseif ($delay > 10) {
 					$delay = 10;
 				}
-				$publish_at = ApiHelpers::datetimeFormat("+{$delay} minutes");
+				$publish_at = ApiHelpers::formatCurrentDatetime($delay);
 				break;
 			case 'custom':
 				$specific_time = sanitize_text_field($_POST['parrotposter']['specific_time']);
-				$publish_at = ApiHelpers::datetimeFormat($specific_time);
+				$publish_at = ApiHelpers::formatISO8601Datetime($specific_time);
 				break;
 		}
 
