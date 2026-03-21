@@ -89,5 +89,11 @@
 .parrotposter-accounts-connect__btn.insta:before {
 	background-image: url(../images/insta-white.svg);
 }
+.parrotposter-accounts-connect__btn.max {
+	background: linear-gradient(90deg,#5a8cfe -16.1%,#44d5fe 16.36%,#8e3ffb 76.63%);
+}
+.parrotposter-accounts-connect__btn.max:before {
+	background-image: url(../images/max-white.svg);
+}
 
 

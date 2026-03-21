@@ -227,6 +227,9 @@
 .parrotposter-accounts__type.insta {
 	background-image: url(../images/insta.svg);
 }
+.parrotposter-accounts__type.max {
+	background-image: url(../images/max.webp);
+}
 
 .parrotposter-accounts__result a {
 	text-decoration: none;

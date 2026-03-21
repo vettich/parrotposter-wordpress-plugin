@@ -106,6 +106,8 @@ class ApiHelpers
 			return __('Telegram', 'parrotposter');
 		case 'insta':
 			return __('Instagram', 'parrotposter');
+		case 'max':
+			return __('Max', 'parrotposter');
 		}
 		return '';
 	}
