@@ -36,6 +36,7 @@ jQuery(function($) {
 			loading('.parrotposter-meta-box-post-items', true)
 
 			$.post(ajaxurl, {
+				nonce: window.ParrotPosterAdmin && window.ParrotPosterAdmin.ajaxNonce,
 				'action': 'parrotposter_api_list_posts_by_wp_post',
 				'parrotposter': {
 					'wp_post_id': parrotposter_post_id,
@@ -99,6 +100,7 @@ jQuery(function($) {
 
 		function deleteFn (id) {
 			$.post(ajaxurl, {
+				nonce: window.ParrotPosterAdmin && window.ParrotPosterAdmin.ajaxNonce,
 				'action': 'parrotposter_api_delete_post',
 				'parrotposter': {'post_id': post_id}
 			}, function (data) {
@@ -125,6 +127,7 @@ jQuery(function($) {
 
 	function loadPostDetail(post_id) {
 		$.post(ajaxurl, {
+			nonce: window.ParrotPosterAdmin && window.ParrotPosterAdmin.ajaxNonce,
 			'action': 'parrotposter_api_get_post',
 			'parrotposter': {'post_id': post_id}
 		}, function (data) {
@@ -193,6 +196,7 @@ jQuery(function($) {
 			return
 		}
 		$.post(ajaxurl, {
+			nonce: window.ParrotPosterAdmin && window.ParrotPosterAdmin.ajaxNonce,
 			'action': 'parrotposter_api_list_accounts',
 		}, function (data) {
 			data = JSON.parse(data);
@@ -222,6 +226,7 @@ jQuery(function($) {
 		const post_id = el.data('post-id')
 		el.append(`<div class="parrotposter-loading-spinner parrotposter-loading-spinner-block"></div>`)
 		$.post(ajaxurl, {
+			nonce: window.ParrotPosterAdmin && window.ParrotPosterAdmin.ajaxNonce,
 			'action': 'parrotposter_api_delete_post',
 			'parrotposter': {'post_id': post_id}
 		}, function (data) {

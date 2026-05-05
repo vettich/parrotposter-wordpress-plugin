@@ -37,6 +37,7 @@ jQuery(function($) {
 		elem.addClass('parrotposter-loading')
 		console.log(id, period)
 		$.post(ajaxurl, {
+			nonce: window.ParrotPosterAdmin && window.ParrotPosterAdmin.ajaxNonce,
 			'action': 'parrotposter_api_create_transaction',
 			'parrotposter': {
 				'tariff_id': id,

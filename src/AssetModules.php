@@ -134,7 +134,7 @@ class AssetModules
 	{
 		$js = "js/$module.js";
 		if (PP::isset_asset($js)) {
-			wp_register_script("parrotposter-$module", PP::asset($js), [], PARROTPOSTER_VERSION);
+			wp_register_script("parrotposter-$module", PP::asset($js), ['parrotposter-admin-bootstrap'], PARROTPOSTER_VERSION);
 			self::$registered[$module]['js'] = true;
 		}
 	}

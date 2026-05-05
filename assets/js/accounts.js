@@ -29,6 +29,7 @@ jQuery(function($) {
 		const rootItem = $('.parrotposter-accounts__item[data-id="' + id + '"]')
 		rootItem.addClass('parrotposter-loading');
 		$.post(ajaxurl, {
+			nonce: window.ParrotPosterAdmin && window.ParrotPosterAdmin.ajaxNonce,
 			'action': 'parrotposter_api_delete_account',
 			'parrotposter': {
 				'account_id': id,
@@ -49,6 +50,7 @@ jQuery(function($) {
 
 	function update() {
 		$.post(ajaxurl, {
+			nonce: window.ParrotPosterAdmin && window.ParrotPosterAdmin.ajaxNonce,
 			'action': 'parrotposter_api_get_me',
 		}, function (data) {
 			data = JSON.parse(data)

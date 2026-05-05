@@ -23,6 +23,7 @@ jQuery(function($) {
 
 		const nonce = $('input[name="parrotposter[nonce]"]').val()
 		$.post(ajaxurl, {
+			nonce: window.ParrotPosterAdmin && window.ParrotPosterAdmin.ajaxNonce,
 			'action': 'parrotposter_has_post_duplicates',
 			'ajaxrequest': true,
 			'parrotposter': { nonce, template_ids, wp_post_id }
@@ -71,6 +72,7 @@ jQuery(function($) {
 
 		const nonce = $('input[name="parrotposter[nonce]"]').val()
 		$.post(ajaxurl, {
+			nonce: window.ParrotPosterAdmin && window.ParrotPosterAdmin.ajaxNonce,
 			'action': 'parrotposter_publish_post_via_template',
 			'ajaxrequest': true,
 			'parrotposter': { nonce, template_id, wp_post_id }

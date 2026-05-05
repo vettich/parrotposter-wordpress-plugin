@@ -37,38 +37,71 @@ class AutopostingListTable extends WPListTable
 		return '<input type="checkbox" name="parrotposter[items][]" value="' . $item['id'] . '" />';
 	}
 
+	/**
+	 * Slug admin.php?page=… только из белого списка (защита от reflected XSS в query).
+	 */
+	private function get_request_admin_page_slug()
+	{
+		$page = isset($_REQUEST['page']) ? sanitize_text_field(wp_unslash($_REQUEST['page'])) : '';
+		$allowed = [
+			'parrotposter',
+			'parrotposter_posts',
+			'parrotposter_accounts',
+			'parrotposter_scheduler',
+			'parrotposter_tariffs',
+			'parrotposter_profile',
+			'parrotposter_help',
+		];
+		if (in_array($page, $allowed, true)) {
+			return $page;
+		}
+
+		return 'parrotposter_scheduler';
+	}
+
 	public function column_name($item)
 	{
+		$page = $this->get_request_admin_page_slug();
+		$id = isset($item['id']) ? (int) $item['id'] : 0;
+
+		$edit_url = add_query_arg(
+			[
+				'page' => $page,
+				'view' => 'autoposting_edit',
+				'id' => $id,
+			],
+			admin_url('admin.php')
+		);
+
+		$delete_url = add_query_arg(
+			[
+				'page' => $page,
+				'action' => 'delete',
+				'id' => $id,
+			],
+			admin_url('admin.php')
+		);
+
+		$onclick = sprintf('parrotposter_autoposting_delete(event, %d)', $id);
+
 		$actions = [
 			'edit' => sprintf(
-				'<a href="?page=%s&view=%s&id=%s">%s</a>',
-				// link
-				$_REQUEST['page'],
-				'autoposting_edit',
-				$item['id'],
-				// label
-				__('Edit', 'parrotposter')
+				'<a href="%s">%s</a>',
+				esc_url($edit_url),
+				esc_html(__('Edit', 'parrotposter'))
 			),
 			'delete' => sprintf(
-				'<a href="?page=%s&action=%s&id=%s" onclick="%s(event, %s)">%s</a>',
-				// link
-				$_REQUEST['page'],
-				'delete',
-				$item['id'],
-				// js callback
-				'parrotposter_autoposting_delete',
-				$item['id'],
-				// label
-				__('Delete', 'parrotposter')
+				'<a href="%s" onclick="%s">%s</a>',
+				esc_url($delete_url),
+				esc_attr($onclick),
+				esc_html(__('Delete', 'parrotposter'))
 			),
 		];
 
 		$name = sprintf(
-			'<a href="?page=%s&view=%s&id=%s">%s</a>',
-			$_REQUEST['page'],
-			'autoposting_edit',
-			$item['id'],
-			$item['name']
+			'<a href="%s">%s</a>',
+			esc_url($edit_url),
+			esc_html(isset($item['name']) ? $item['name'] : '')
 		);
 
 		return sprintf(

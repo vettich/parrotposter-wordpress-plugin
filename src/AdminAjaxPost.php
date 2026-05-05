@@ -28,6 +28,7 @@ class AdminAjaxPost
 	{
 		// auth
 		add_action('admin_post_parrotposter_auth', [$this, 'auth']);
+		add_action('admin_post_parrotposter_auth2', [$this, 'auth2']);
 		add_action('admin_post_parrotposter_signup', [$this, 'signup']);
 		add_action('admin_post_parrotposter_forgot_password', [$this, 'forgot_password']);
 		add_action('admin_post_parrotposter_reset_password', [$this, 'reset_password']);
@@ -59,6 +60,65 @@ class AdminAjaxPost
 		add_action('wp_ajax_parrotposter_api_delete_account', [$this, 'api_delete_account']);
 		add_action('wp_ajax_parrotposter_api_get_me', [$this, 'api_get_me']);
 		add_action('wp_ajax_parrotposter_api_create_transaction', [$this, 'api_create_transaction']);
+
+		// ParrotPoster server callback: process local queue (hook token, no WP user session).
+		add_action('wp_ajax_nopriv_parrotposter_process_local_queue', [$this, 'process_local_queue']);
+		add_action('wp_ajax_parrotposter_process_local_queue', [$this, 'process_local_queue']);
+
+		// Session token refresh for the iframe (triggered via postMessage from the front-end).
+		add_action('wp_ajax_parrotposter_refresh_session_token', [$this, 'refresh_session_token']);
+	}
+
+	/**
+	 * Issues a fresh short-lived session token for the iframe.
+	 * Called via AJAX from the parent WP admin page when the iframe signals token expiry.
+	 */
+	public function refresh_session_token(): void
+	{
+		self::ajax_guard();
+		nocache_headers();
+		header('Content-Type: application/json; charset=UTF-8');
+		$res = Api::issue_session_key();
+		echo wp_json_encode($res);
+		exit;
+	}
+
+	/**
+	 * HTTP callback from ParrotPoster post-queue worker.
+	 */
+	public function process_local_queue(): void
+	{
+		nocache_headers();
+		header('Content-Type: application/json; charset=UTF-8');
+
+		if (!Api::check_hook_token()) {
+			status_header(403);
+			echo wp_json_encode(['error' => ['msg' => 'unauthorized', 'code' => 'REMOTE_AUTH']]);
+			exit;
+		}
+
+		$result = LocalQueue::handle_http_process();
+		echo wp_json_encode($result);
+		exit;
+	}
+
+	/**
+	 * Проверка прав и AJAX-nonce (parrotposter_ajax) или nonce формы (parrotposter_nonce в parrotposter[]).
+	 */
+	private static function ajax_guard(): void
+	{
+		if (!current_user_can('manage_options')) {
+			status_header(403);
+			echo wp_json_encode(['error' => 'forbidden']);
+			exit;
+		}
+		$ajax_ok = isset($_REQUEST['nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_REQUEST['nonce'])), 'parrotposter_ajax');
+		$form_ok = isset($_POST['parrotposter']['nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['parrotposter']['nonce'])), 'parrotposter_nonce');
+		if (!$ajax_ok && !$form_ok) {
+			status_header(403);
+			echo wp_json_encode(['error' => 'bad_nonce']);
+			exit;
+		}
 	}
 
 	private static function api_error($error)
@@ -91,6 +151,9 @@ class AdminAjaxPost
 	public function auth()
 	{
 		FormHelpers::must_be_post_nonce();
+		if (!current_user_can('manage_options')) {
+			FormHelpers::post_error('forbidden');
+		}
 		self::init();
 
 		$username = sanitize_text_field($_POST['parrotposter']['username']);
@@ -111,9 +174,53 @@ class AdminAjaxPost
 		FormHelpers::post_success('logged');
 	}
 
+	public function auth2()
+	{
+		FormHelpers::must_be_post_nonce();
+		if (!current_user_can('manage_options')) {
+			echo 'forbidden';
+			exit;
+		}
+		self::init(false);
+
+		$user_id = sanitize_text_field(wp_unslash($_POST['parrotposter']['user_id'] ?? ''));
+		$token = sanitize_text_field(wp_unslash($_POST['parrotposter']['token'] ?? ''));
+
+		$prev_uid = Options::user_id();
+		$prev_tok = Options::token();
+
+		Options::set_user_data($user_id, $token);
+		$valid = Api::validate_token();
+		if (!empty($valid['error'])) {
+			Options::set_user_data($prev_uid, $prev_tok);
+			echo 'error';
+			exit;
+		}
+
+		list($user, $err) = Api::me();
+		if (!empty($err) || empty($user)) {
+			Options::set_user_data($prev_uid, $prev_tok);
+			echo 'error';
+			exit;
+		}
+
+		$api_uid = isset($user['id']) ? (string) $user['id'] : '';
+		if ($api_uid !== (string) $user_id) {
+			Options::set_user_data($prev_uid, $prev_tok);
+			echo 'error';
+			exit;
+		}
+
+		echo 'ok';
+		exit;
+	}
+
 	public function signup()
 	{
 		FormHelpers::must_be_post_nonce();
+		if (!current_user_can('manage_options')) {
+			FormHelpers::post_error('forbidden');
+		}
 		self::init();
 
 		$name = sanitize_text_field($_POST['parrotposter']['name']);
@@ -142,6 +249,9 @@ class AdminAjaxPost
 	public function forgot_password()
 	{
 		FormHelpers::must_be_post_nonce();
+		if (!current_user_can('manage_options')) {
+			FormHelpers::post_error('forbidden');
+		}
 		self::init();
 
 		$username = sanitize_text_field($_POST['parrotposter']['username']);
@@ -166,6 +276,9 @@ class AdminAjaxPost
 	public function reset_password()
 	{
 		FormHelpers::must_be_post_nonce();
+		if (!current_user_can('manage_options')) {
+			FormHelpers::post_error('forbidden');
+		}
 		self::init();
 
 		$token = sanitize_text_field($_POST['parrotposter']['token']);
@@ -193,6 +306,9 @@ class AdminAjaxPost
 	public function logout()
 	{
 		FormHelpers::must_be_post_nonce();
+		if (!current_user_can('manage_options')) {
+			FormHelpers::post_error('forbidden');
+		}
 		Api::logout();
 		FormHelpers::post_success();
 	}
@@ -200,6 +316,9 @@ class AdminAjaxPost
 	public function set_tariff()
 	{
 		FormHelpers::must_be_post_nonce();
+		if (!current_user_can('manage_options')) {
+			FormHelpers::post_error('forbidden');
+		}
 
 		$tariff_id = sanitize_text_field($_POST['parrotposter']['tariff_id']);
 
@@ -213,6 +332,9 @@ class AdminAjaxPost
 	public function create_transaction()
 	{
 		FormHelpers::must_be_post_nonce();
+		if (!current_user_can('manage_options')) {
+			FormHelpers::post_error('forbidden');
+		}
 
 		$tariff_id = sanitize_text_field($_POST['parrotposter']['tariff_id']);
 		$period = sanitize_text_field($_POST['parrotposter']['period']);
@@ -241,13 +363,18 @@ class AdminAjaxPost
 	public function publish_post()
 	{
 		FormHelpers::must_be_post_nonce();
+		if (!current_user_can('manage_options')) {
+			FormHelpers::post_error('forbidden');
+		}
 
 		$post_id = sanitize_text_field($_POST['parrotposter']['post_id']);
 		$text = sanitize_textarea_field($_POST['parrotposter']['post_text']);
 		$link = esc_url_raw($_POST['parrotposter']['post_link']);
 
 		$images = [];
-		$images_ids = $_POST['parrotposter']['images_ids']; // it is array, sanitizing below
+		$images_ids = (isset($_POST['parrotposter']['images_ids']) && is_array($_POST['parrotposter']['images_ids']))
+			? $_POST['parrotposter']['images_ids']
+			: [];
 		foreach ($images_ids as $id) {
 			$id = sanitize_text_field($id);
 			$attached_file = get_attached_file($id);
@@ -265,6 +392,8 @@ class AdminAjaxPost
 		}
 
 		$when_publish = sanitize_text_field($_POST['parrotposter']['when_publish']);
+		$publish_at = null;
+		$publish_delay_minutes = null;
 		switch ($when_publish) {
 			case 'now':
 				$publish_at = ApiHelpers::formatCurrentDatetime();
@@ -279,7 +408,7 @@ class AdminAjaxPost
 				} elseif ($delay > 10) {
 					$delay = 10;
 				}
-				$publish_at = ApiHelpers::formatCurrentDatetime($delay);
+				$publish_delay_minutes = $delay;
 				break;
 			case 'custom':
 				$specific_time = sanitize_text_field($_POST['parrotposter']['specific_time']);
@@ -287,7 +416,9 @@ class AdminAjaxPost
 				break;
 		}
 
-		$account_ids = $_POST['parrotposter']['account_ids'];
+		$account_ids = (isset($_POST['parrotposter']['account_ids']) && is_array($_POST['parrotposter']['account_ids']))
+			? $_POST['parrotposter']['account_ids']
+			: [];
 		foreach ($account_ids as $k => $id) {
 			$account_ids[$k] = sanitize_text_field($id);
 		}
@@ -307,11 +438,15 @@ class AdminAjaxPost
 					'vk_from_group' => !!$extra_vk_from_group,
 				]
 			],
-			'publish_at' => $publish_at,
 			'networks' => [
 				'accounts' => $account_ids,
 			]
 		];
+		if ($publish_delay_minutes !== null) {
+			$post['publish_delay_minutes'] = $publish_delay_minutes;
+		} else {
+			$post['publish_at'] = $publish_at;
+		}
 
 		$res = Api::create_post($post);
 		if (!empty($res['error'])) {
@@ -349,6 +484,9 @@ class AdminAjaxPost
 	public function autoposting_add()
 	{
 		FormHelpers::must_be_post_nonce();
+		if (!current_user_can('manage_options')) {
+			FormHelpers::post_error('forbidden');
+		}
 
 		if (isset($_POST['parrotposter']['apply'])) {
 			set_transient('parrotposter_autoposting_add_data', $_POST['parrotposter'], MINUTE_IN_SECONDS);
@@ -373,6 +511,9 @@ class AdminAjaxPost
 	public function autoposting_edit()
 	{
 		FormHelpers::must_be_post_nonce();
+		if (!current_user_can('manage_options')) {
+			FormHelpers::post_error('forbidden');
+		}
 
 		if (isset($_POST['parrotposter']['apply'])) {
 			set_transient('parrotposter_autoposting_edit_data', $_POST['parrotposter'], MINUTE_IN_SECONDS);
@@ -392,7 +533,7 @@ class AdminAjaxPost
 
 	public function autoposting_enable()
 	{
-		FormHelpers::must_be_post_nonce();
+		self::ajax_guard();
 
 		$err = DBAutopostingTable::switch_enable(
 			$_POST['parrotposter']['id'],
@@ -407,21 +548,20 @@ class AdminAjaxPost
 
 	public function has_post_duplicates()
 	{
-		FormHelpers::must_be_post_nonce();
+		self::ajax_guard();
 
-		$wp_post_id = $_POST['parrotposter']['wp_post_id'];
-		$template_ids = $_POST['parrotposter']['template_ids'];
-		$results = [];
-		foreach ($template_ids as $id) {
-			$results[$id] = Scheduler::last_publish_at($wp_post_id, $id);
-		}
+		$wp_post_id = isset($_POST['parrotposter']['wp_post_id']) ? absint($_POST['parrotposter']['wp_post_id']) : 0;
+		$template_ids = isset($_POST['parrotposter']['template_ids']) && is_array($_POST['parrotposter']['template_ids'])
+			? $_POST['parrotposter']['template_ids']
+			: [];
+		$results = Scheduler::last_publish_at_for_templates($wp_post_id, $template_ids);
 
 		FormHelpers::post_success($results);
 	}
 
 	public function publish_post_via_template()
 	{
-		FormHelpers::must_be_post_nonce();
+		self::ajax_guard();
 
 		$wp_post_id = $_POST['parrotposter']['wp_post_id'];
 		$template_id = $_POST['parrotposter']['template_id'];
@@ -433,8 +573,17 @@ class AdminAjaxPost
 		FormHelpers::post_success('true');
 	}
 
+	public function get_post_html()
+	{
+		self::ajax_guard();
+		status_header(501);
+		echo wp_json_encode(['error' => 'not_implemented']);
+		exit;
+	}
+
 	public function api_list_posts()
 	{
+		self::ajax_guard();
 		if (isset($_POST['parrotposter']) && !is_array($_POST['parrotposter'])) {
 			FormHelpers::post_error('wrong input data');
 		}
@@ -466,6 +615,7 @@ class AdminAjaxPost
 
 	public function api_list_posts_by_wp_post()
 	{
+		self::ajax_guard();
 		if (isset($_POST['parrotposter']) && !is_array($_POST['parrotposter'])) {
 			FormHelpers::post_error('wrong input data');
 		}
@@ -475,7 +625,11 @@ class AdminAjaxPost
 			'fields.extra.wp_post_id' => intval($_POST['parrotposter']['wp_post_id']),
 		];
 
-		$res = Api::list_posts($filter);
+		$res = Api::list_posts($filter, [], [
+			'page' => 1,
+			'size' => 50,
+			'skip_total' => true,
+		]);
 		if (!empty($res['response']['posts'])) {
 			foreach ($res['response']['posts'] as $i => $post) {
 				$res['response']['posts'][$i]['status_view'] = ApiHelpers::get_post_status_text($post['status']);
@@ -487,6 +641,7 @@ class AdminAjaxPost
 
 	public function api_get_post()
 	{
+		self::ajax_guard();
 		FormHelpers::must_be_right_input_data();
 		$post_id = sanitize_text_field($_POST['parrotposter']['post_id']);
 		list($post, $error) = Api::get_post($post_id);
@@ -503,6 +658,7 @@ class AdminAjaxPost
 
 	public function api_delete_post()
 	{
+		self::ajax_guard();
 		FormHelpers::must_be_right_input_data();
 		$post_id = sanitize_text_field($_POST['parrotposter']['post_id']);
 		$res = Api::delete_post($post_id);
@@ -512,6 +668,7 @@ class AdminAjaxPost
 
 	public function api_list_accounts()
 	{
+		self::ajax_guard();
 		list($accounts, $error) = Api::list_accounts();
 		$accounts = ApiHelpers::fix_accounts_photos($accounts);
 		self::api_response([$accounts, $error], ['accounts', 'error']);
@@ -519,6 +676,7 @@ class AdminAjaxPost
 
 	public function api_get_connect_url()
 	{
+		self::ajax_guard();
 		$type = sanitize_text_field($_POST['parrotposter']['type']);
 		$callback_url = esc_url_raw($_POST['parrotposter']['callback_url']);
 		$res = Api::get_connect_url($type, $callback_url);
@@ -528,6 +686,7 @@ class AdminAjaxPost
 
 	public function api_connect()
 	{
+		self::ajax_guard();
 		$type = sanitize_text_field($_POST['parrotposter']['type']);
 		$fields = [];
 		if (isset($_POST['parrotposter']['username'])) {
@@ -553,6 +712,7 @@ class AdminAjaxPost
 
 	public function api_delete_account()
 	{
+		self::ajax_guard();
 		FormHelpers::must_be_right_input_data();
 		$id = sanitize_text_field($_POST['parrotposter']['account_id']);
 		$res = Api::delete_account($id);
@@ -562,6 +722,7 @@ class AdminAjaxPost
 
 	public function api_get_me()
 	{
+		self::ajax_guard();
 		list($user, $error) = Api::me();
 		if (!empty($error)) {
 			self::api_error($error);
@@ -584,6 +745,7 @@ class AdminAjaxPost
 
 	public function api_create_transaction()
 	{
+		self::ajax_guard();
 		FormHelpers::must_be_right_input_data();
 		$tariff_id = sanitize_text_field($_POST['parrotposter']['tariff_id']);
 		$period = sanitize_text_field($_POST['parrotposter']['period']);

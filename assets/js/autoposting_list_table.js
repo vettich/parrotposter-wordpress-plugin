@@ -29,6 +29,7 @@ function parrotposter_autoposting_enable(e, id) {
 	const elem = $(e.target)
 	const nonce = $('input[name="parrotposter[nonce]"]').val()
 	$.post(ajaxurl, {
+		nonce: window.ParrotPosterAdmin && window.ParrotPosterAdmin.ajaxNonce,
 		'action': 'parrotposter_autoposting_enable',
 		'ajaxrequest': true,
 		'parrotposter': {

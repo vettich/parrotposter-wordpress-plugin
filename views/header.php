@@ -42,15 +42,22 @@ $menu = Menu::get_items();
 	<a class="parrotposter-h1__back" href="<?php echo esc_url($view_args['back_url']) ?>"></a>
 	<?php endif ?>
 
-	<h1><?php echo esc_attr($view_args['title']) ?></h1>
+	<h1><?php echo esc_html($view_args['title']) ?></h1>
 
 	<?php if (!empty($view_args['button_link'])): ?>
-	<?php $btn_cls = isset($view_args['button_link']['class']) ? $view_args['button_link']['class'] : '' ?>
+	<?php
+	$btn = $view_args['button_link'];
+	$btn_href = isset($btn['href']) ? $btn['href'] : '';
+	$btn_text = isset($btn['text']) ? $btn['text'] : '';
+	$btn_class = isset($btn['class']) ? $btn['class'] : '';
+	?>
+	<?php if ($btn_href !== '' && $btn_text !== ''): ?>
 	<a
-		class="button <?php echo $btn_cls ?> parrotposter-h1__button-link"
-		href="<?php echo $view_args['button_link']['href'] ?>">
-		<?php echo $view_args['button_link']['text'] ?>
+		class="<?php echo esc_attr(trim('button ' . $btn_class . ' parrotposter-h1__button-link')) ?>"
+		href="<?php echo esc_url($btn_href) ?>">
+		<?php echo esc_html($btn_text) ?>
 	</a>
+	<?php endif ?>
 	<?php endif ?>
 </div>
 <?php endif ?>

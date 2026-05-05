@@ -15,4 +15,5 @@ zip -r "${ZIP_FILE}" \
 	index.php \
 	LICENSE \
 	parrotposter.php \
+	uninstall.php \
 	readme.txt

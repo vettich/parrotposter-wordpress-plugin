@@ -1,4 +1,5 @@
 <?php
+defined('ABSPATH') || die;
 
 use parrotposter\PP;
 use parrotposter\FormHelpers;
@@ -6,10 +7,6 @@ use parrotposter\AssetModules;
 use parrotposter\Profile;
 
 AssetModules::enqueue(['block']);
-
-if (!defined('ABSPATH')) {
-	die;
-}
 
 $profile = Profile::get_info();
 if (!empty($profile['user'])) {
@@ -35,10 +32,12 @@ if (!empty($profile['user'])) {
 		</div>
 	<?php endif ?>
 
-	<div class="parrotposter-block__group">
-		<div class="parrotposter-block__label"><?php _e('Email', 'parrotposter') ?></div>
-		<div class="parrotposter-block__value"><?php echo esc_attr($profile['user']['username']) ?></div>
-	</div>
+	<?php if (!empty($profile['user']['username'])): ?>
+		<div class="parrotposter-block__group">
+			<div class="parrotposter-block__label"><?php _e('Email', 'parrotposter') ?></div>
+			<div class="parrotposter-block__value"><?php echo esc_attr($profile['user']['username']) ?></div>
+		</div>
+	<?php endif ?>
 
 	<div class="parrotposter-block__group">
 		<div class="parrotposter-block__label"><?php _e('Tariff', 'parrotposter') ?></div>
@@ -53,8 +52,10 @@ if (!empty($profile['user'])) {
 	<div class="parrotposter-block__group">
 		<div class="parrotposter-block__label"><?php _e('Expiry at', 'parrotposter') ?></div>
 		<div class="parrotposter-block__value">
-			<?php echo wp_date(get_option('date_format'), strtotime($profile['user']['tariff']['expiry_at'])) ?>
-			<?php echo esc_attr($profile['left']) ?>
+			<span class="<?php echo $profile['expired'] ? 'parrotposter-block__value--error' : 'parrotposter-block__value--success' ?>">
+				<?php echo wp_date(get_option('date_format'), strtotime($profile['user']['tariff']['expiry_at'])) ?>
+				<?php echo esc_attr($profile['left']) ?>
+			</span>
 		</div>
 	</div>
 

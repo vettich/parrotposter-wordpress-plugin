@@ -146,10 +146,9 @@ class CommonType
 
 	private static function get_field_value_images_in_content($post)
 	{
-		$content = apply_filters('the_content', $post->post_content);
-		return WpPostHelpers::get_image_ids_from_content(
-			// search in before and after filtered content
-			[$post->post_content, $content]
-		);
+		// Only raw post_content: filtered HTML duplicates img tags with CDN URLs (Jetpack Photon,
+		// etc.) so the same attachment appears twice (numeric ID + CDN URL).
+		// Shortcode-rendered images (legacy page builders) are not expanded here.
+		return WpPostHelpers::get_image_ids_from_content($post->post_content);
 	}
 }

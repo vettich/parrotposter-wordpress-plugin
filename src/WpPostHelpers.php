@@ -49,42 +49,40 @@ class WpPostHelpers
 	}
 
 	/**
-	 * Return an ID of an attachment by searching the database with the file URL.
+	 * Возвращает ID вложения по URL файла на этом же сайте.
 	 *
-	 * First checks to see if the $url is pointing to a file that exists in
-	 * the wp-content directory. If so, then we search the database for a
-	 * partial match consisting of the remaining path AFTER the wp-content
-	 * directory. Finally, if a match is found the attachment ID will be
-	 * returned.
+	 * Раньше использовался `guid RLIKE` по `wp_posts` без индекса (полный скан).
+	 * Используется {@see attachment_url_to_postid()}: выборка по `postmeta._wp_attached_file`
+	 * с точным совпадением пути (как в ядре с WP 4.0).
 	 *
-	 * https://frankiejarrett.com/2013/05/get-an-attachment-id-by-url-in-wordpress/
+	 * @param string $url URL файла, например https://example.com/wp-content/uploads/2013/05/test-image.jpg
 	 *
-	 * @param string $url The URL of the image (ex: http://mysite.com/wp-content/uploads/2013/05/test-image.jpg)
-	 *
-	 * @return int|null $attachment Returns an attachment ID, or null if no attachment is found
+	 * @return int|null ID вложения или null, если не найдено
 	 */
 	public static function get_attachment_id_by_url($url)
 	{
-		// Split the $url into two parts with the wp-content directory as the separator
-		$parsed_url = explode(parse_url(WP_CONTENT_URL, PHP_URL_PATH), $url);
-
-		// Get the host of the current site and the host of the $url, ignoring www
-		$this_host = str_ireplace('www.', '', parse_url(home_url(), PHP_URL_HOST));
-		$file_host = str_ireplace('www.', '', parse_url($url, PHP_URL_HOST));
-
-		// Return nothing if there aren't any $url parts or if the current host and $url host do not match
-		if (!isset($parsed_url[1]) || empty($parsed_url[1]) || ($this_host != $file_host)) {
-			return;
+		if (!is_string($url) || $url === '') {
+			return null;
 		}
 
-		// Now we're going to quickly search the DB for any attachment GUID with a partial path match
-		// Example: /uploads/2013/05/test-image.jpg
-		global $wpdb;
+		$this_host = str_ireplace('www.', '', (string) parse_url(home_url(), PHP_URL_HOST));
+		$file_host = str_ireplace('www.', '', (string) parse_url($url, PHP_URL_HOST));
 
-		$attachment = $wpdb->get_col($wpdb->prepare("SELECT ID FROM {$wpdb->prefix}posts WHERE guid RLIKE %s;", $parsed_url[1]));
+		if ($this_host === '' || $file_host === '' || strcasecmp($this_host, $file_host) !== 0) {
+			return null;
+		}
 
-		// Returns null if no attachment is found
-		return $attachment[0];
+		$content_path = parse_url(WP_CONTENT_URL, PHP_URL_PATH);
+		if (is_string($content_path) && $content_path !== '') {
+			$parsed_url = explode($content_path, $url, 2);
+			if (!isset($parsed_url[1]) || $parsed_url[1] === '') {
+				return null;
+			}
+		}
+
+		$id = (int) attachment_url_to_postid($url);
+
+		return $id > 0 ? $id : null;
 	}
 
 	/**

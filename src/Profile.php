@@ -8,18 +8,23 @@ class Profile
 {
 	public static function get_info()
 	{
+		$tariff = null;
+		$left = null;
+		$expired = null;
+
 		list($user, $error) = Api::me();
 
 		if (!empty($user)) {
 			list($tariff, $error) = Api::get_tariff($user['tariff']['id'] ?: $user['tariff']['code']);
 
 			$lang = Tools::get_current_lang();
-			if (isset($tariff['translates'][$lang])) {
+			if (is_array($tariff) && isset($tariff['translates'][$lang])) {
 				$tariff['name'] = $tariff['translates'][$lang]['name'];
 			}
 
 			$interval = (new \DateTime('now'))->diff(new \DateTime($user['tariff']['expiry_at']));
-			if ($interval->invert) {
+			$expired = $interval->invert;
+			if ($expired) {
 				$left = _x('(expired)', 'tariff expired', 'parrotposter');
 			} elseif ($interval->y > 0) {
 				$left = sprintf(_n('(left %s year)', '(left %s years)', $interval->y, 'parrotposter'), $interval->y);
@@ -27,6 +32,8 @@ class Profile
 				$left = sprintf(_n('(left %s month)', '(left %s months)', $interval->m, 'parrotposter'), $interval->m);
 			} elseif ($interval->d > 0) {
 				$left = sprintf(_n('(left %s day)', '(left %s days)', $interval->d, 'parrotposter'), $interval->d);
+			} elseif (!$expired) {
+				$left = _x('(left less than a day)', 'tariff time left', 'parrotposter');
 			}
 		}
 
@@ -35,6 +42,7 @@ class Profile
 			'user' => $user,
 			'tariff' => $tariff,
 			'left' => $left,
+			'expired' => $expired,
 		];
 	}
 }

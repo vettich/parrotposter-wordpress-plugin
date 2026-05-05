@@ -2,9 +2,9 @@
 Contributors: parrotposter
 Tags: auto post, auto publish, autopost, autopublish, social media automation, автопостинг, автопубликация, vk, telegram, facebook, instagram, ok
 Requires at least: 5.0
-Tested up to: 6.5
-Requires PHP: 7.0
-Stable tag: 1.0.15
+Tested up to: 6.9
+Requires PHP: 7.4
+Stable tag: 1.1.0
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -127,6 +127,17 @@ Email us at [support@parrotposter.com](mailto:support@parrotposter.com)
 12. Posting results (product)
 
 == Changelog ==
+
+= 1.1.0 =
+* Reworked the plugin admin experience around an embedded ParrotPoster interface with short-lived session tokens, iframe messaging, and a safer login flow after authorization
+* Reworked autoposting scheduling: tasks are queued locally and processed asynchronously, and the scheduler reacts when posts are published, updated, trashed, or permanently deleted
+* When a published WordPress post already linked to ParrotPoster is edited, the plugin updates existing social publications where appropriate instead of only creating new ones
+* Improved reliability when calling the ParrotPoster API (automatic fallback across domains and clearer behavior when the service is temporarily unavailable)
+* Optimized duplicate checks and last-publication-time lookups when publishing via multiple autoposting templates
+* Added WordPress AJAX nonce verification for admin requests and restricted sensitive plugin actions to administrators only
+
+= 1.0.16 =
+* Fixed the publication of news with a delay
 
 = 1.0.15 =
 * Fixed delayed post publication

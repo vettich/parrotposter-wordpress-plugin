@@ -30,6 +30,9 @@ class Conditions
 
 	public static function check($conditions, $post)
 	{
+		if (!is_array($conditions)) {
+			$conditions = [];
+		}
 		foreach ($conditions as $cond) {
 			foreach (self::$implements as $impl) {
 				$res = self::call($impl, "check", [$cond, $post]);

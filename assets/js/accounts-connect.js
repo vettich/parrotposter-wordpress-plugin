@@ -5,6 +5,7 @@ jQuery(function($) {
 		}
 		$(elem).addClass('loading')
 		$.post(ajaxurl, {
+			nonce: window.ParrotPosterAdmin && window.ParrotPosterAdmin.ajaxNonce,
 			'action': 'parrotposter_api_get_connect_url',
 			'parrotposter': {
 				'type': type,
@@ -54,6 +55,7 @@ jQuery(function($) {
 			'code': $('#parrotposter-connect-insta input[name="parrotposter[code]"]').val(),
 		}
 		$.post(ajaxurl, {
+			nonce: window.ParrotPosterAdmin && window.ParrotPosterAdmin.ajaxNonce,
 			'action': 'parrotposter_api_connect',
 			'parrotposter': fields,
 		}, function (data) {
@@ -93,6 +95,7 @@ jQuery(function($) {
 			'bot_token': $('#parrotposter-connect-tg input[name="parrotposter[bot_token]"]').val(),
 		}
 		$.post(ajaxurl, {
+			nonce: window.ParrotPosterAdmin && window.ParrotPosterAdmin.ajaxNonce,
 			'action': 'parrotposter_api_connect',
 			'parrotposter': fields,
 		}, function (data) {

@@ -17,7 +17,7 @@ if (isset($_GET['parrotposter_success_data'])) {
 <?php if (!empty($error_msg)): ?>
 	<div class="notice notice-error">
 		<p>
-			<?php echo esc_attr(is_array($error_msg) ? $error_msg['msg'] : $error_msg) ?>
+			<?php echo esc_html($error_msg) ?>
 		</p>
 	</div>
 <?php endif ?>

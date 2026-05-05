@@ -25,6 +25,9 @@ class DB
 
 	public static function autoposting_from_db($data)
 	{
+		if (!is_array($data)) {
+			return $data;
+		}
 		// decode json arrays
 		foreach (['conditions', 'account_ids', 'post_images'] as $key) {
 			if (empty($data[$key])) {

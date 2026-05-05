@@ -14,6 +14,9 @@ class DBAutopostingTable
 			"SELECT * FROM {$wpdb->prefix}parrotposter_autoposting WHERE id = $id",
 			ARRAY_A
 		);
+		if ($data === null) {
+			return null;
+		}
 		$data = self::autoposting_from_db($data);
 		return $data;
 	}
@@ -125,6 +128,9 @@ class DBAutopostingTable
 
 	protected static function autoposting_from_db($data)
 	{
+		if (!is_array($data)) {
+			return $data;
+		}
 		// decode json arrays
 		foreach (['conditions', 'account_ids', 'post_images'] as $key) {
 			if (empty($data[$key])) {

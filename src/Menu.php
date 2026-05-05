@@ -44,7 +44,7 @@ class Menu
 
 	public static function get_items()
 	{
-		if (!self::$items) {
+		if (self::$items === null) {
 			self::init();
 		}
 		return self::$items;
@@ -55,6 +55,18 @@ class Menu
 		$items = self::get_items();
 		if (!empty($items) && count($items) > 0) {
 			return $items[0];
+		}
+		return null;
+	}
+
+	public static function get_item_by_id($id)
+	{
+		$items = self::get_items();
+		$maybe_full_id = "parrotposter_$id";
+		foreach ($items as $item) {
+			if ($item['id'] == $id || $item['id'] == $maybe_full_id) {
+				return $item;
+			}
 		}
 		return null;
 	}

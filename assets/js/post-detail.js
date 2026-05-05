@@ -44,6 +44,7 @@ function parrotposterLoadPost(postId, loadingSelector, deleteFn) {
 
 	console.log(postId)
 	$.post(ajaxurl, {
+		nonce: window.ParrotPosterAdmin && window.ParrotPosterAdmin.ajaxNonce,
 		'action': 'parrotposter_api_get_post',
 		'parrotposter': {
 			'post_id': postId,
@@ -185,6 +186,7 @@ function parrotposterLoadAccounts(successCb) {
 	}
 
 	jQuery.post(ajaxurl, {
+		nonce: window.ParrotPosterAdmin && window.ParrotPosterAdmin.ajaxNonce,
 		'action': 'parrotposter_api_list_accounts',
 	}, function(data) {
 		data = JSON.parse(data)
