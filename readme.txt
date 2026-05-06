@@ -22,6 +22,7 @@ Easy to understand and configure plugin for auto publishing (auto posting) news 
 * Instagram
 * Telegram
 * VKontakte
+* Max
 * Odnoklassniki
 
 = Features and benefits =
@@ -115,16 +116,10 @@ Email us at [support@parrotposter.com](mailto:support@parrotposter.com)
 == Screenshots ==
 1. Sign up for the plugin
 2. Social network accounts
-3. Posts
-4. List of autoposting templates
-5. Create autoposting (general, post template)
-6. Create autoposting (link, tags, images, social networks)
-7. Create autoposting (when to publish, additional settings)
-8. Publishing news/products directly to social networks
-9. Post customization page before publishing
-10. Choice of social networks
-11. Posting results (post)
-12. Posting results (product)
+3. List of autoposting templates
+4. Create autoposting (general, post template)
+5. List posts
+6. Post results
 
 == Changelog ==
 
