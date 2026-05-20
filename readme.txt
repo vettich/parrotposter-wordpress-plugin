@@ -123,6 +123,9 @@ Email us at [support@parrotposter.com](mailto:support@parrotposter.com)
 
 == Changelog ==
 
+= 1.1.1 =
+* Added an admin notice on Posts and Scheduler when the local sync queue has pending tasks, with a View button that opens a modal listing queue items and linked WordPress posts
+
 = 1.1.0 =
 * Reworked the plugin admin experience around an embedded ParrotPoster interface with short-lived session tokens, iframe messaging, and a safer login flow after authorization
 * Reworked autoposting scheduling: tasks are queued locally and processed asynchronously, and the scheduler reacts when posts are published, updated, trashed, or permanently deleted
