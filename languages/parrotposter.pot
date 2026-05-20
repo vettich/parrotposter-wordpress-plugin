@@ -1562,3 +1562,103 @@ msgstr ""
 #: views/tariffs/success.php:17
 msgid "You paid successfully. Thank you!"
 msgstr ""
+
+#: views/local-queue/notice.php
+msgid "View"
+msgstr ""
+
+#: views/local-queue/notice.php
+msgid "Temporary tasks on your site: changes to WordPress posts that the plugin is still sending to ParrotPoster. The page stays fast; sync runs in the background."
+msgstr ""
+
+#: views/local-queue/notice.php
+msgid "Local queue: %d item waiting to sync with ParrotPoster."
+msgid_plural "Local queue: %d items waiting to sync with ParrotPoster."
+msgstr[0] ""
+msgstr[1] ""
+
+#: views/local-queue/modal.php
+msgid "Local sync queue"
+msgstr ""
+
+#: views/local-queue/modal.php
+msgid "Tasks waiting to be sent to ParrotPoster (create, update, or delete). Usually the list shrinks quickly once sync succeeds."
+msgstr ""
+
+#: views/local-queue/modal.php
+msgid "No items in the queue."
+msgstr ""
+
+#: views/local-queue/modal.php
+msgid "ID"
+msgstr ""
+
+#: views/local-queue/modal.php
+msgid "WP post"
+msgstr ""
+
+#: views/local-queue/modal.php
+msgid "Operation"
+msgstr ""
+
+#: views/local-queue/modal.php
+msgid "Status"
+msgstr ""
+
+#: views/local-queue/modal.php
+msgid "Attempts"
+msgstr ""
+
+#: views/local-queue/modal.php
+msgid "Next attempt"
+msgstr ""
+
+#: views/local-queue/modal.php
+msgid "Created"
+msgstr ""
+
+#: views/local-queue/modal.php
+msgid "Details"
+msgstr ""
+
+#: views/local-queue/modal.php
+msgid "If the count stays high for a long time, check site connectivity to ParrotPoster or contact %s."
+msgstr ""
+
+#: src/LocalQueue.php
+msgctxt "local queue operation"
+msgid "Create"
+msgstr ""
+
+#: src/LocalQueue.php
+msgctxt "local queue operation"
+msgid "Update"
+msgstr ""
+
+#: src/LocalQueue.php
+msgctxt "local queue operation"
+msgid "Delete"
+msgstr ""
+
+#: src/LocalQueue.php
+msgctxt "local queue status"
+msgid "Pending"
+msgstr ""
+
+#: src/LocalQueue.php
+msgctxt "local queue status"
+msgid "Processing"
+msgstr ""
+
+#: src/LocalQueue.php
+msgctxt "local queue status"
+msgid "Failed"
+msgstr ""
+
+#: assets/js/local-queue-admin.js
+msgid "Background sync wake is pending: the site could not reach ParrotPoster to continue the queue. It will retry automatically."
+msgstr ""
+
+#: assets/js/local-queue-admin.js
+msgid "(post not found)"
+msgstr ""

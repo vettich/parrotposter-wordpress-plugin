@@ -435,6 +435,203 @@ class LocalQueue
 		);
 	}
 
+	public static function get_active_count(): int
+	{
+		global $wpdb;
+
+		$t = self::table();
+
+		return (int) $wpdb->get_var(
+			$wpdb->prepare(
+				"SELECT COUNT(*) FROM {$t} WHERE status IN (%s, %s, %s)",
+				self::STATUS_PENDING,
+				self::STATUS_PROCESSING,
+				self::STATUS_FAILED
+			)
+		);
+	}
+
+	/**
+	 * Rows for admin UI (pending, processing, failed).
+	 *
+	 * @return list<array<string, mixed>>
+	 */
+	public static function list_for_admin(): array
+	{
+		global $wpdb;
+
+		$t = self::table();
+		$rows = $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT id, wp_post_id, operation, payload, status, attempts, next_attempt_at, created_at, locked_until
+				FROM {$t}
+				WHERE status IN (%s, %s, %s)
+				ORDER BY id ASC",
+				self::STATUS_PENDING,
+				self::STATUS_PROCESSING,
+				self::STATUS_FAILED
+			),
+			ARRAY_A
+		);
+		if (!is_array($rows)) {
+			return [];
+		}
+
+		$items = [];
+		foreach ($rows as $row) {
+			$items[] = self::format_admin_row($row);
+		}
+
+		return $items;
+	}
+
+	/**
+	 * @param array<string, mixed> $row
+	 * @return array<string, mixed>
+	 */
+	private static function format_admin_row(array $row): array
+	{
+		$wp_post_id = (int) ($row['wp_post_id'] ?? 0);
+		$operation = (string) ($row['operation'] ?? '');
+		$status = (string) ($row['status'] ?? '');
+		$payload = (string) ($row['payload'] ?? '');
+
+		$post_title = '';
+		$post_status = '';
+		$post_type = '';
+		$edit_link = '';
+		$post_missing = true;
+
+		if ($wp_post_id > 0) {
+			$wp_post = get_post($wp_post_id);
+			if ($wp_post instanceof \WP_Post) {
+				$post_missing = false;
+				$post_title = $wp_post->post_title;
+				$post_status = $wp_post->post_status;
+				$post_type = $wp_post->post_type;
+				$link = get_edit_post_link($wp_post_id, 'raw');
+				$edit_link = is_string($link) ? $link : '';
+			}
+		}
+
+		$payload_display = '';
+		if ($operation === self::OP_UPDATE && $payload !== '' && $payload !== '{}') {
+			$payload_display = $payload;
+			if (strlen($payload_display) > 200) {
+				$payload_display = substr($payload_display, 0, 200) . '…';
+			}
+		}
+
+		return [
+			'id' => (int) ($row['id'] ?? 0),
+			'wp_post_id' => $wp_post_id,
+			'operation' => $operation,
+			'operation_label' => self::label_operation($operation),
+			'status' => $status,
+			'status_label' => self::label_status($status),
+			'attempts' => (int) ($row['attempts'] ?? 0),
+			'next_attempt_at' => (string) ($row['next_attempt_at'] ?? ''),
+			'created_at' => (string) ($row['created_at'] ?? ''),
+			'locked_until' => (string) ($row['locked_until'] ?? ''),
+			'payload' => $payload_display,
+			'post_title' => $post_title,
+			'post_status' => $post_status,
+			'post_type' => $post_type,
+			'edit_link' => $edit_link,
+			'post_missing' => $post_missing,
+		];
+	}
+
+	private static function label_operation(string $operation): string
+	{
+		switch ($operation) {
+			case self::OP_CREATE:
+				return _x('Create', 'local queue operation', 'parrotposter');
+			case self::OP_UPDATE:
+				return _x('Update', 'local queue operation', 'parrotposter');
+			case self::OP_DELETE:
+				return _x('Delete', 'local queue operation', 'parrotposter');
+			default:
+				return $operation;
+		}
+	}
+
+	private static function label_status(string $status): string
+	{
+		switch ($status) {
+			case self::STATUS_PENDING:
+				return _x('Pending', 'local queue status', 'parrotposter');
+			case self::STATUS_PROCESSING:
+				return _x('Processing', 'local queue status', 'parrotposter');
+			case self::STATUS_FAILED:
+				return _x('Failed', 'local queue status', 'parrotposter');
+			default:
+				return $status;
+		}
+	}
+
+	public static function get_wake_pending_flag(): bool
+	{
+		return self::is_wake_pending();
+	}
+
+	/**
+	 * Dev preview: one pending update row for admin UI testing.
+	 * Enable with define('PARROTPOSTER_LQ_TEST_SEED', true); in wp-config.php.
+	 */
+	public static function seed_test_record_for_admin_ui(): void
+	{
+		$wp_post_id = self::resolve_test_wp_post_id();
+		self::enqueue_pending_upsert(
+			$wp_post_id,
+			self::OP_UPDATE,
+			wp_json_encode(
+				[
+					'_pp_admin_ui_test' => true,
+					'note' => 'Test local queue row for ParrotPoster admin preview',
+				],
+				JSON_UNESCAPED_UNICODE
+			) ?: '{}',
+			true
+		);
+	}
+
+	/**
+	 * Called on admin_init when PARROTPOSTER_LQ_TEST_SEED is enabled.
+	 */
+	public static function maybe_seed_test_record(): void
+	{
+		if (!Env::local_queue_test_seed()) {
+			return;
+		}
+		if (!is_admin() || !current_user_can('manage_options')) {
+			return;
+		}
+		if (!PP::is_parrotposter_admin_context()) {
+			return;
+		}
+
+		self::seed_test_record_for_admin_ui();
+	}
+
+	private static function resolve_test_wp_post_id(): int
+	{
+		$posts = get_posts(
+			[
+				'post_status' => 'publish',
+				'posts_per_page' => 1,
+				'orderby' => 'ID',
+				'order' => 'DESC',
+				'post_type' => 'any',
+			]
+		);
+		if (!empty($posts[0]) && $posts[0] instanceof \WP_Post) {
+			return (int) $posts[0]->ID;
+		}
+
+		return 1;
+	}
+
 	private static function schedule_wake_on_shutdown(): void
 	{
 		if (self::$pp_wake_shutdown_registered) {

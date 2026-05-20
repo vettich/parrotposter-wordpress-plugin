@@ -24,6 +24,7 @@ if ($view_args['tab'] == 'unload') {
 	'button_link' => $view_args['show_button'] ? $button_link : false,
 ]) ?>
 <?php PP::include_view('notice') ?>
+<?php PP::include_view('local-queue/setup') ?>
 
 <nav class="parrotposter-nav-tab__wrapper">
 	<a href="?page=parrotposter_scheduler"

@@ -1681,6 +1681,111 @@ msgstr ""
 msgid "You paid successfully. Thank you!"
 msgstr "Вы успешно оплатили. Спасибо!"
 
+#: views/local-queue/notice.php
+msgid "View"
+msgstr "Посмотреть"
+
+#: views/local-queue/notice.php
+msgid "Temporary tasks on your site: changes to WordPress posts that the plugin is still sending to ParrotPoster. The page stays fast; sync runs in the background."
+msgstr "Временные задания на сайте: изменения записей WordPress, которые плагин ещё передаёт в ParrotPoster. Страница остаётся быстрой; синхронизация идёт в фоне."
+
+#: views/local-queue/notice.php
+msgid "Local queue: %d item waiting to sync with ParrotPoster."
+msgid_plural "Local queue: %d items waiting to sync with ParrotPoster."
+msgstr[0] "В локальной очереди: %d задание ожидает синхронизации с ParrotPoster."
+msgstr[1] "В локальной очереди: %d задания ожидают синхронизации с ParrotPoster."
+msgstr[2] "В локальной очереди: %d заданий ожидают синхронизации с ParrotPoster."
+
+#: views/local-queue/modal.php
+msgid "Local sync queue"
+msgstr "Локальная очередь синхронизации"
+
+#: views/local-queue/modal.php
+msgid "Tasks waiting to be sent to ParrotPoster (create, update, or delete). Usually the list shrinks quickly once sync succeeds."
+msgstr "Задания на отправку в ParrotPoster (создание, обновление или удаление). Обычно список быстро уменьшается после успешной синхронизации."
+
+#: views/local-queue/modal.php
+msgid "No items in the queue."
+msgstr "В очереди нет элементов."
+
+#: views/local-queue/modal.php
+msgid "ID"
+msgstr "ID"
+
+#: views/local-queue/modal.php
+msgid "WP post"
+msgstr "Запись WP"
+
+#: views/local-queue/modal.php
+msgid "Operation"
+msgstr "Операция"
+
+#: views/local-queue/modal.php
+msgid "Status"
+msgstr "Статус"
+
+#: views/local-queue/modal.php
+msgid "Attempts"
+msgstr "Попытки"
+
+#: views/local-queue/modal.php
+msgid "Next attempt"
+msgstr "Следующая попытка"
+
+#: views/local-queue/modal.php
+msgid "Created"
+msgstr "Создано"
+
+#: views/local-queue/modal.php
+msgid "Details"
+msgstr "Детали"
+
+#: views/local-queue/modal.php
+msgid "If the count stays high for a long time, check site connectivity to ParrotPoster or contact %s."
+msgstr "Если число долго не уменьшается, проверьте доступ сайта к ParrotPoster или напишите на %s."
+
+#: views/local-queue/modal.php
+msgid "Close"
+msgstr "Закрыть"
+
+#: src/LocalQueue.php
+msgctxt "local queue operation"
+msgid "Create"
+msgstr "Создание"
+
+#: src/LocalQueue.php
+msgctxt "local queue operation"
+msgid "Update"
+msgstr "Обновление"
+
+#: src/LocalQueue.php
+msgctxt "local queue operation"
+msgid "Delete"
+msgstr "Удаление"
+
+#: src/LocalQueue.php
+msgctxt "local queue status"
+msgid "Pending"
+msgstr "Ожидает"
+
+#: src/LocalQueue.php
+msgctxt "local queue status"
+msgid "Processing"
+msgstr "Обрабатывается"
+
+#: src/LocalQueue.php
+msgctxt "local queue status"
+msgid "Failed"
+msgstr "Ошибка"
+
+#: assets/js/local-queue-admin.js
+msgid "Background sync wake is pending: the site could not reach ParrotPoster to continue the queue. It will retry automatically."
+msgstr "Ожидается повторный запуск фоновой синхронизации: сайт не смог связаться с ParrotPoster для продолжения очереди. Повтор произойдёт автоматически."
+
+#: assets/js/local-queue-admin.js
+msgid "(post not found)"
+msgstr "(запись не найдена)"
+
 #~ msgid ""
 #~ "For security reasons, Instagram may reset your password. Before "
 #~ "connecting your account, please make sure you have access to the email or "

@@ -28,6 +28,7 @@ class AssetModules
 		'publish-post',
 		'publish-via-template',
 		'help',
+		'local-queue-admin',
 	];
 
 	private static $libs = [
@@ -134,7 +135,11 @@ class AssetModules
 	{
 		$js = "js/$module.js";
 		if (PP::isset_asset($js)) {
-			wp_register_script("parrotposter-$module", PP::asset($js), ['parrotposter-admin-bootstrap'], PARROTPOSTER_VERSION);
+			$deps = ['parrotposter-admin-bootstrap'];
+			if ($module === 'local-queue-admin') {
+				$deps[] = 'parrotposter-modal';
+			}
+			wp_register_script("parrotposter-$module", PP::asset($js), $deps, PARROTPOSTER_VERSION, true);
 			self::$registered[$module]['js'] = true;
 		}
 	}

@@ -82,4 +82,13 @@ class Env
 		}
 		return self::DEFAULT_LOG_ENABLED;
 	}
+
+	/**
+	 * Seed one pending local-queue row in admin (for UI preview). Set in wp-config.php:
+	 * define('PARROTPOSTER_LQ_TEST_SEED', true);
+	 */
+	public static function local_queue_test_seed(): bool
+	{
+		return defined('PARROTPOSTER_LQ_TEST_SEED') && PARROTPOSTER_LQ_TEST_SEED;
+	}
 }

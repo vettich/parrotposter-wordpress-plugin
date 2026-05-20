@@ -48,6 +48,7 @@ class AdminAjaxPost
 		add_action('wp_ajax_parrotposter_autoposting_enable', [$this, 'autoposting_enable']);
 		add_action('wp_ajax_parrotposter_publish_post_via_template', [$this, 'publish_post_via_template']);
 		add_action('wp_ajax_parrotposter_has_post_duplicates', [$this, 'has_post_duplicates']);
+		add_action('wp_ajax_parrotposter_local_queue_list', [$this, 'local_queue_list']);
 
 		// api access
 		add_action('wp_ajax_parrotposter_api_list_posts', [$this, 'api_list_posts']);
@@ -557,6 +558,18 @@ class AdminAjaxPost
 		$results = Scheduler::last_publish_at_for_templates($wp_post_id, $template_ids);
 
 		FormHelpers::post_success($results);
+	}
+
+	public function local_queue_list()
+	{
+		self::ajax_guard();
+
+		FormHelpers::post_success([
+			'items' => LocalQueue::list_for_admin(),
+			'pending_count' => LocalQueue::get_pending_count(),
+			'active_count' => LocalQueue::get_active_count(),
+			'wake_pending' => LocalQueue::get_wake_pending_flag(),
+		]);
 	}
 
 	public function publish_post_via_template()

@@ -53,6 +53,7 @@ class PP
 		add_action('admin_enqueue_scripts', [$this, 'enqueue_admin_translates'], 100);
 		add_action('admin_menu', [$this, 'redirect_to_authorization']);
 		add_action('admin_menu', [$this, 'admin_menu']);
+		add_action('admin_init', [LocalQueue::class, 'maybe_seed_test_record'], 20);
 		add_action('add_meta_boxes', [$this, 'post_meta_box']);
 
 		AdminAjaxPost::init(false);
