@@ -49,6 +49,7 @@ class AdminAjaxPost
 		add_action('wp_ajax_parrotposter_publish_post_via_template', [$this, 'publish_post_via_template']);
 		add_action('wp_ajax_parrotposter_has_post_duplicates', [$this, 'has_post_duplicates']);
 		add_action('wp_ajax_parrotposter_local_queue_list', [$this, 'local_queue_list']);
+		add_action('wp_ajax_parrotposter_process_local_queue_admin', [$this, 'process_local_queue_admin']);
 
 		// api access
 		add_action('wp_ajax_parrotposter_api_list_posts', [$this, 'api_list_posts']);
@@ -101,6 +102,28 @@ class AdminAjaxPost
 		$result = LocalQueue::handle_http_process();
 		echo wp_json_encode($result);
 		exit;
+	}
+
+	/**
+	 * Admin UI: run local queue on this site (no post-queue / scheduler wake).
+	 */
+	public function process_local_queue_admin(): void
+	{
+		self::ajax_guard();
+
+		$queue_id = isset($_POST['queue_id']) ? (int) $_POST['queue_id'] : 0;
+		if ($queue_id > 0) {
+			$result = LocalQueue::process_queue_row($queue_id);
+		} else {
+			$result = LocalQueue::process_pending_admin();
+		}
+
+		if (empty($result['ok'])) {
+			$code = isset($result['error']) ? (string) $result['error'] : 'error';
+			FormHelpers::post_error($code);
+		}
+
+		FormHelpers::post_success($result);
 	}
 
 	/**

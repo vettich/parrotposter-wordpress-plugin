@@ -32,11 +32,13 @@ if (!current_user_can('manage_options')) {
 						<th scope="col"><?php esc_html_e('Next attempt', 'parrotposter'); ?></th>
 						<th scope="col"><?php esc_html_e('Created', 'parrotposter'); ?></th>
 						<th scope="col"><?php esc_html_e('Details', 'parrotposter'); ?></th>
+						<th scope="col" class="parrotposter-local-queue-table__actions-col"><?php esc_html_e('Actions', 'parrotposter'); ?></th>
 					</tr>
 				</thead>
 				<tbody></tbody>
 			</table>
 		</div>
+		<p class="parrotposter-local-queue-modal__feedback description" style="display: none;" role="status"></p>
 		<p class="parrotposter-local-queue-modal__wake-hint description" style="display: none;"></p>
 		<p class="parrotposter-local-queue-modal__support description">
 			<?php
@@ -51,6 +53,9 @@ if (!current_user_can('manage_options')) {
 			?>
 		</p>
 		<div class="parrotposter-modal__footer">
+			<button type="button" class="button button-primary parrotposter-local-queue-process-all-btn">
+				<?php esc_html_e('Process now', 'parrotposter'); ?>
+			</button>
 			<button type="button" class="button parrotposter-js-close"><?php esc_html_e('Close', 'parrotposter'); ?></button>
 		</div>
 	</div>

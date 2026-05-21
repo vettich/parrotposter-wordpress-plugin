@@ -4,7 +4,7 @@ Tags: auto post, auto publish, autopost, autopublish, social media automation, �
 Requires at least: 5.0
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 1.1.1
+Stable tag: 1.1.2
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -122,6 +122,10 @@ Email us at [support@parrotposter.com](mailto:support@parrotposter.com)
 6. Post results
 
 == Changelog ==
+
+= 1.1.2 =
+* Fixed local sync queue stuck in pending when WordPress timezone differs from MySQL: queue datetimes are stored and compared in UTC, with a one-time migration for existing pending rows and an automatic post-queue wake after migration
+* Local sync queue HTTP processing uses a dynamic batch: one item at a time, up to 10 items or 5 seconds per callback (scheduler or admin “Process now”)
 
 = 1.1.1 =
 * Added an admin notice on Posts and Scheduler when the local sync queue has pending tasks, with a View button that opens a modal listing queue items and linked WordPress posts

@@ -1662,3 +1662,47 @@ msgstr ""
 #: assets/js/local-queue-admin.js
 msgid "(post not found)"
 msgstr ""
+
+#: views/local-queue/modal.php
+msgid "Actions"
+msgstr ""
+
+#: views/local-queue/modal.php
+msgid "Process now"
+msgstr ""
+
+#: assets/js/local-queue-admin.js
+msgid "Process"
+msgstr ""
+
+#: assets/js/local-queue-admin.js
+msgid "Processed %d item(s)."
+msgstr ""
+
+#: assets/js/local-queue-admin.js
+msgid "Invalid server response."
+msgstr ""
+
+#: assets/js/local-queue-admin.js
+msgid "Request failed."
+msgstr ""
+
+#: assets/js/local-queue-admin.js
+msgid "This queue item is busy or not ready yet. Try again in a moment."
+msgstr ""
+
+#: assets/js/local-queue-admin.js
+msgid "Queue item not found."
+msgstr ""
+
+#: assets/js/local-queue-admin.js
+msgid "This queue item cannot be processed."
+msgstr ""
+
+#: assets/js/local-queue-admin.js
+msgid "Invalid queue item."
+msgstr ""
+
+#: assets/js/local-queue-admin.js
+msgid "Could not process the queue item."
+msgstr ""

@@ -25,13 +25,26 @@ class LocalQueue
 
 	private const MAX_ATTEMPTS = 4;
 
-	private const BATCH_LIMIT = 10;
+	private const HTTP_PROCESS_MAX_ITEMS = 10;
+
+	private const HTTP_PROCESS_TIME_BUDGET_SEC = 5;
 
 	private const FAILED_PURGE_BATCH = 200;
 
 	public const OPTION_WAKE_PENDING = 'parrotposter_lq_wake_pending';
 
+	/** DB schema version that stores local queue datetimes in UTC. */
+	public const DB_VERSION_UTC = '1.0.9';
+
 	private static $pp_wake_shutdown_registered = false;
+
+	/**
+	 * Current UTC time for queue columns (next_attempt_at, created_at).
+	 */
+	private static function now_utc_for_db(): string
+	{
+		return gmdate('Y-m-d H:i:s');
+	}
 
 	private static function table(): string
 	{
@@ -137,7 +150,7 @@ class LocalQueue
 		$wpdb->query(
 			$wpdb->prepare(
 				"UPDATE {$t} SET status = %s, locked_until = NULL
-				WHERE status = %s AND (locked_until IS NULL OR locked_until < NOW())",
+				WHERE status = %s AND (locked_until IS NULL OR locked_until < UTC_TIMESTAMP())",
 				self::STATUS_PENDING,
 				self::STATUS_PROCESSING
 			)
@@ -145,44 +158,44 @@ class LocalQueue
 	}
 
 	/**
-	 * @return int[]
+	 * Atomically claim one ready pending row for HTTP/admin processing.
 	 */
-	private static function claim_pending_batch_ids(): array
+	private static function claim_pending_one_id(): ?int
 	{
 		global $wpdb;
 
 		$t = self::table();
-		$ids = [];
+		$id = null;
 
 		$wpdb->query('START TRANSACTION');
-		$rows = $wpdb->get_col(
+		$row_id = $wpdb->get_var(
 			$wpdb->prepare(
 				"SELECT id FROM {$t}
-				WHERE status = %s AND next_attempt_at <= NOW()
+				WHERE status = %s AND next_attempt_at <= UTC_TIMESTAMP()
 				ORDER BY id ASC
-				LIMIT %d
+				LIMIT 1
 				FOR UPDATE",
-				self::STATUS_PENDING,
-				self::BATCH_LIMIT
+				self::STATUS_PENDING
 			)
 		);
-		if (!is_array($rows)) {
-			$rows = [];
-		}
-		$ids = array_map('intval', $rows);
-		if (!empty($ids)) {
-			$in = implode(',', $ids);
-			$wpdb->query(
-				$wpdb->prepare(
-					"UPDATE {$t} SET status = %s, locked_until = DATE_ADD(NOW(), INTERVAL %d SECOND) WHERE id IN ({$in})",
-					self::STATUS_PROCESSING,
-					self::LOCK_LEASE_SECONDS
-				)
-			);
+		if ($row_id !== null && $row_id !== '') {
+			$id = (int) $row_id;
+			if ($id > 0) {
+				$wpdb->query(
+					$wpdb->prepare(
+						"UPDATE {$t} SET status = %s, locked_until = DATE_ADD(UTC_TIMESTAMP(), INTERVAL %d SECOND) WHERE id = %d",
+						self::STATUS_PROCESSING,
+						self::LOCK_LEASE_SECONDS,
+						$id
+					)
+				);
+			} else {
+				$id = null;
+			}
 		}
 		$wpdb->query('COMMIT');
 
-		return $ids;
+		return $id;
 	}
 
 	/**
@@ -197,7 +210,7 @@ class LocalQueue
 		global $wpdb;
 
 		$t = self::table();
-		$now = current_time('mysql');
+		$now = self::now_utc_for_db();
 
 		$upd_payload = $update_payload_on_dup ? ', payload = VALUES(payload)' : '';
 
@@ -229,29 +242,189 @@ class LocalQueue
 	/**
 	 * @return array<string, mixed>
 	 */
-	public static function handle_http_process(): array
+	public static function handle_http_process(bool $chain_wake = true): array
 	{
-		$processed = self::process_pending_batch();
+		$started = microtime(true);
+		$batch = self::process_pending_batch();
 		$has_more = self::has_pending_ready();
 
-		if ($processed > 0) {
+		if ($batch['processed'] > 0) {
 			self::set_wake_pending(false);
 		}
 
-		if ($has_more && !empty(Options::token())) {
+		if ($chain_wake && $has_more && !empty(Options::token())) {
 			$chain_ok = Api::request_local_queue_wake();
 			if (!$chain_ok) {
 				self::set_wake_pending(true);
 			}
 		}
 
-		PP::log(['LocalQueue::handle_http_process', 'processed' => $processed, 'has_more' => $has_more]);
+		PP::log([
+			'LocalQueue::handle_http_process',
+			'processed' => $batch['processed'],
+			'items_attempted' => $batch['items_attempted'],
+			'elapsed_sec' => round(microtime(true) - $started, 3),
+			'has_more' => $has_more,
+			'chain_wake' => $chain_wake,
+		]);
+
+		return [
+			'ok' => true,
+			'processed' => $batch['processed'],
+			'has_more' => $has_more,
+		];
+	}
+
+	/**
+	 * Admin UI: process ready pending batch on this site (no post-queue wake).
+	 *
+	 * @return array<string, mixed>
+	 */
+	public static function process_pending_admin(): array
+	{
+		return self::handle_http_process(false);
+	}
+
+	/**
+	 * Admin UI: process a single queue row on this site (no post-queue wake).
+	 *
+	 * @return array<string, mixed>
+	 */
+	public static function process_queue_row(int $id): array
+	{
+		$id = (int) $id;
+		if ($id < 1) {
+			return [
+				'ok' => false,
+				'error' => 'invalid_id',
+				'processed' => 0,
+				'queue_id' => $id,
+			];
+		}
+
+		self::recover_stale_processing();
+
+		global $wpdb;
+
+		$t = self::table();
+		$row = $wpdb->get_row(
+			$wpdb->prepare("SELECT * FROM {$t} WHERE id = %d", $id),
+			ARRAY_A
+		);
+		if (!is_array($row)) {
+			return [
+				'ok' => false,
+				'error' => 'not_found',
+				'processed' => 0,
+				'queue_id' => $id,
+			];
+		}
+
+		$status = (string) ($row['status'] ?? '');
+		if ($status === self::STATUS_PROCESSING) {
+			return [
+				'ok' => false,
+				'error' => 'busy',
+				'processed' => 0,
+				'queue_id' => $id,
+			];
+		}
+
+		if ($status === self::STATUS_FAILED) {
+			$wpdb->update(
+				$t,
+				[
+					'status' => self::STATUS_PENDING,
+					'next_attempt_at' => self::now_utc_for_db(),
+					'locked_until' => null,
+				],
+				['id' => $id],
+				['%s', '%s', '%s'],
+				['%d']
+			);
+			$status = self::STATUS_PENDING;
+		}
+
+		if ($status !== self::STATUS_PENDING) {
+			return [
+				'ok' => false,
+				'error' => 'not_processable',
+				'processed' => 0,
+				'queue_id' => $id,
+			];
+		}
+
+		self::ensure_row_ready_for_claim($id);
+
+		if (!self::claim_row_by_id($id)) {
+			return [
+				'ok' => false,
+				'error' => 'busy',
+				'processed' => 0,
+				'queue_id' => $id,
+			];
+		}
+
+		$row = $wpdb->get_row(
+			$wpdb->prepare("SELECT * FROM {$t} WHERE id = %d", $id),
+			ARRAY_A
+		);
+		if (!is_array($row)) {
+			return [
+				'ok' => false,
+				'error' => 'not_found',
+				'processed' => 0,
+				'queue_id' => $id,
+			];
+		}
+
+		$processed = self::execute_claimed_row($row);
+		if ($processed > 0) {
+			self::set_wake_pending(false);
+		}
+
+		PP::log(['LocalQueue::process_queue_row', 'queue_id' => $id, 'processed' => $processed]);
 
 		return [
 			'ok' => true,
 			'processed' => $processed,
-			'has_more' => $has_more,
+			'queue_id' => $id,
+			'has_more' => self::has_pending_ready(),
 		];
+	}
+
+	private static function ensure_row_ready_for_claim(int $id): void
+	{
+		global $wpdb;
+
+		$t = self::table();
+		$wpdb->query(
+			$wpdb->prepare(
+				"UPDATE {$t} SET next_attempt_at = %s WHERE id = %d AND status = %s AND next_attempt_at > UTC_TIMESTAMP()",
+				self::now_utc_for_db(),
+				$id,
+				self::STATUS_PENDING
+			)
+		);
+	}
+
+	private static function claim_row_by_id(int $id): bool
+	{
+		global $wpdb;
+
+		$t = self::table();
+		$updated = $wpdb->query(
+			$wpdb->prepare(
+				"UPDATE {$t} SET status = %s, locked_until = DATE_ADD(UTC_TIMESTAMP(), INTERVAL %d SECOND)
+				WHERE id = %d AND status = %s AND next_attempt_at <= UTC_TIMESTAMP()",
+				self::STATUS_PROCESSING,
+				self::LOCK_LEASE_SECONDS,
+				$id,
+				self::STATUS_PENDING
+			)
+		);
+
+		return is_int($updated) && $updated > 0;
 	}
 
 	private static function has_pending_ready(): bool
@@ -261,7 +434,7 @@ class LocalQueue
 		$t = self::table();
 		$id = $wpdb->get_var(
 			$wpdb->prepare(
-				"SELECT id FROM {$t} WHERE status = %s AND next_attempt_at <= NOW() ORDER BY id ASC LIMIT 1",
+				"SELECT id FROM {$t} WHERE status = %s AND next_attempt_at <= UTC_TIMESTAMP() ORDER BY id ASC LIMIT 1",
 				self::STATUS_PENDING
 			)
 		);
@@ -269,86 +442,116 @@ class LocalQueue
 		return (int) $id > 0;
 	}
 
-	private static function process_pending_batch(): int
+	/**
+	 * @return array{processed: int, items_attempted: int}
+	 */
+	private static function process_pending_batch(): array
 	{
 		self::recover_stale_processing();
-
-		$ids = self::claim_pending_batch_ids();
-		if (empty($ids)) {
-			return 0;
-		}
 
 		global $wpdb;
 
 		$t = self::table();
-		$in = implode(',', array_map('intval', $ids));
-		$rows = $wpdb->get_results("SELECT * FROM {$t} WHERE id IN ({$in}) ORDER BY id ASC", ARRAY_A);
-		if (!is_array($rows)) {
-			$rows = [];
-		}
-
+		$deadline = microtime(true) + self::HTTP_PROCESS_TIME_BUDGET_SEC;
 		$processed = 0;
-		foreach ($rows as $row) {
-			$id = (int) ($row['id'] ?? 0);
-			$wp_post_id = (int) ($row['wp_post_id'] ?? 0);
-			$op = (string) ($row['operation'] ?? '');
-			try {
-				if ($op === self::OP_UPDATE) {
-					self::run_update($wp_post_id);
-				} elseif ($op === self::OP_DELETE) {
-					self::run_delete($wp_post_id);
-				} elseif ($op === self::OP_CREATE) {
-					self::run_create($wp_post_id);
-				} else {
-					$wpdb->update(
-						$t,
-						[
-							'status' => self::STATUS_FAILED,
-							'locked_until' => null,
-						],
-						['id' => $id],
-						['%s', '%s'],
-						['%d']
-					);
-					continue;
-				}
-				$wpdb->delete($t, ['id' => $id], ['%d']);
-				++$processed;
-			} catch (\Throwable $e) {
-				PP::log(['LocalQueue::process', 'id' => $id, 'err' => $e->getMessage()]);
-				$attempts = (int) ($row['attempts'] ?? 0) + 1;
-				if ($attempts >= self::MAX_ATTEMPTS) {
-					$wpdb->update(
-						$t,
-						[
-							'status' => self::STATUS_FAILED,
-							'attempts' => $attempts,
-							'locked_until' => null,
-						],
-						['id' => $id],
-						['%s', '%d', '%s'],
-						['%d']
-					);
-				} else {
-					$delay_sec = min(3600, (int) pow(2, $attempts) * 60);
-					$next = gmdate('Y-m-d H:i:s', time() + $delay_sec);
-					$wpdb->update(
-						$t,
-						[
-							'status' => self::STATUS_PENDING,
-							'attempts' => $attempts,
-							'next_attempt_at' => $next,
-							'locked_until' => null,
-						],
-						['id' => $id],
-						['%s', '%d', '%s', '%s'],
-						['%d']
-					);
-				}
+		$items_attempted = 0;
+
+		while ($items_attempted < self::HTTP_PROCESS_MAX_ITEMS && microtime(true) < $deadline) {
+			$id = self::claim_pending_one_id();
+			if ($id === null) {
+				break;
 			}
+
+			$row = $wpdb->get_row(
+				$wpdb->prepare("SELECT * FROM {$t} WHERE id = %d", $id),
+				ARRAY_A
+			);
+			if (!is_array($row)) {
+				break;
+			}
+
+			++$items_attempted;
+			$processed += self::execute_claimed_row($row);
 		}
 
-		return $processed;
+		return [
+			'processed' => $processed,
+			'items_attempted' => $items_attempted,
+		];
+	}
+
+	/**
+	 * Run operation for a row already in processing status.
+	 *
+	 * @param array<string, mixed> $row
+	 */
+	private static function execute_claimed_row(array $row): int
+	{
+		global $wpdb;
+
+		$t = self::table();
+		$id = (int) ($row['id'] ?? 0);
+		$wp_post_id = (int) ($row['wp_post_id'] ?? 0);
+		$op = (string) ($row['operation'] ?? '');
+
+		try {
+			if ($op === self::OP_UPDATE) {
+				self::run_update($wp_post_id);
+			} elseif ($op === self::OP_DELETE) {
+				self::run_delete($wp_post_id);
+			} elseif ($op === self::OP_CREATE) {
+				self::run_create($wp_post_id);
+			} else {
+				$wpdb->update(
+					$t,
+					[
+						'status' => self::STATUS_FAILED,
+						'locked_until' => null,
+					],
+					['id' => $id],
+					['%s', '%s'],
+					['%d']
+				);
+
+				return 0;
+			}
+			$wpdb->delete($t, ['id' => $id], ['%d']);
+
+			return 1;
+		} catch (\Throwable $e) {
+			PP::log(['LocalQueue::process', 'id' => $id, 'err' => $e->getMessage()]);
+			$attempts = (int) ($row['attempts'] ?? 0) + 1;
+			if ($attempts >= self::MAX_ATTEMPTS) {
+				$wpdb->update(
+					$t,
+					[
+						'status' => self::STATUS_FAILED,
+						'attempts' => $attempts,
+						'locked_until' => null,
+					],
+					['id' => $id],
+					['%s', '%d', '%s'],
+					['%d']
+				);
+			} else {
+				$delay_sec = min(3600, (int) pow(2, $attempts) * 60);
+				$next = gmdate('Y-m-d H:i:s', time() + $delay_sec);
+				$wpdb->update(
+					$t,
+					[
+						'status' => self::STATUS_PENDING,
+						'attempts' => $attempts,
+						'next_attempt_at' => $next,
+						'locked_until' => null,
+					],
+					['id' => $id],
+					['%s', '%d', '%s', '%s'],
+					['%d']
+				);
+			}
+
+			return 0;
+		}
 	}
 
 	private static function run_create(int $wp_post_id): void
@@ -573,6 +776,100 @@ class LocalQueue
 	public static function get_wake_pending_flag(): bool
 	{
 		return self::is_wake_pending();
+	}
+
+	/**
+	 * One-time upgrade: rows enqueued with current_time('mysql') → UTC (pending, attempts = 0 only).
+	 *
+	 * @return int Number of updated rows
+	 */
+	public static function migrate_enqueue_rows_to_utc(): int
+	{
+		global $wpdb;
+
+		$t = self::table();
+		$rows = $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT id, next_attempt_at, created_at FROM {$t} WHERE status = %s AND attempts = 0",
+				self::STATUS_PENDING
+			),
+			ARRAY_A
+		);
+		if (!is_array($rows) || empty($rows)) {
+			return 0;
+		}
+
+		$wp_tz = wp_timezone();
+		$utc_tz = new \DateTimeZone('UTC');
+		$updated = 0;
+
+		foreach ($rows as $row) {
+			$id = (int) ($row['id'] ?? 0);
+			if ($id < 1) {
+				continue;
+			}
+
+			$next_raw = (string) ($row['next_attempt_at'] ?? '');
+			$created_raw = (string) ($row['created_at'] ?? '');
+			if ($next_raw === '' || $created_raw === '') {
+				continue;
+			}
+
+			try {
+				$next_utc = self::convert_queue_datetime_wp_tz_to_utc($next_raw, $wp_tz, $utc_tz);
+				$created_utc = self::convert_queue_datetime_wp_tz_to_utc($created_raw, $wp_tz, $utc_tz);
+			} catch (\Throwable $e) {
+				PP::log(['LocalQueue::migrate_enqueue_rows_to_utc', 'id' => $id, 'err' => $e->getMessage()]);
+				continue;
+			}
+
+			if ($next_utc === $next_raw && $created_utc === $created_raw) {
+				continue;
+			}
+
+			$wpdb->update(
+				$t,
+				[
+					'next_attempt_at' => $next_utc,
+					'created_at' => $created_utc,
+				],
+				['id' => $id],
+				['%s', '%s'],
+				['%d']
+			);
+			++$updated;
+		}
+
+		if ($updated > 0) {
+			PP::log(['LocalQueue::migrate_enqueue_rows_to_utc', 'updated' => $updated]);
+		}
+
+		return $updated;
+	}
+
+	/**
+	 * Register post-queue callback with ParrotPoster (no-op without API token).
+	 */
+	public static function request_post_queue_wake(): bool
+	{
+		if (empty(Options::token())) {
+			return false;
+		}
+
+		$ok = Api::request_local_queue_wake();
+		self::set_wake_pending(!$ok);
+
+		return $ok;
+	}
+
+	private static function convert_queue_datetime_wp_tz_to_utc(
+		string $value,
+		\DateTimeZone $wp_tz,
+		\DateTimeZone $utc_tz
+	): string {
+		$dt = new \DateTimeImmutable($value, $wp_tz);
+
+		return $dt->setTimezone($utc_tz)->format('Y-m-d H:i:s');
 	}
 
 	/**

@@ -38,6 +38,15 @@ class Install
 		}
 
 		$ver = get_option(self::VERSION_OPTION);
+		$old_ver = $ver ? (string) $ver : '0';
+
+		if ($old_ver !== '0' && version_compare($old_ver, LocalQueue::DB_VERSION_UTC, '<')) {
+			$migrated = LocalQueue::migrate_enqueue_rows_to_utc();
+			if ($migrated > 0) {
+				LocalQueue::request_post_queue_wake();
+			}
+		}
+
 		$requires_update = version_compare($ver, PARROTPOSTER_DB_VERSION, '<');
 
 		if (!$ver || $requires_update) {

@@ -1786,6 +1786,50 @@ msgstr "Ожидается повторный запуск фоновой син
 msgid "(post not found)"
 msgstr "(запись не найдена)"
 
+#: views/local-queue/modal.php
+msgid "Actions"
+msgstr "Действия"
+
+#: views/local-queue/modal.php
+msgid "Process now"
+msgstr "Обработать сейчас"
+
+#: assets/js/local-queue-admin.js
+msgid "Process"
+msgstr "Обработать"
+
+#: assets/js/local-queue-admin.js
+msgid "Processed %d item(s)."
+msgstr "Обработано элементов: %d."
+
+#: assets/js/local-queue-admin.js
+msgid "Invalid server response."
+msgstr "Некорректный ответ сервера."
+
+#: assets/js/local-queue-admin.js
+msgid "Request failed."
+msgstr "Запрос не выполнен."
+
+#: assets/js/local-queue-admin.js
+msgid "This queue item is busy or not ready yet. Try again in a moment."
+msgstr "Элемент очереди занят или ещё не готов. Повторите через некоторое время."
+
+#: assets/js/local-queue-admin.js
+msgid "Queue item not found."
+msgstr "Элемент очереди не найден."
+
+#: assets/js/local-queue-admin.js
+msgid "This queue item cannot be processed."
+msgstr "Этот элемент очереди нельзя обработать."
+
+#: assets/js/local-queue-admin.js
+msgid "Invalid queue item."
+msgstr "Некорректный элемент очереди."
+
+#: assets/js/local-queue-admin.js
+msgid "Could not process the queue item."
+msgstr "Не удалось обработать элемент очереди."
+
 #~ msgid ""
 #~ "For security reasons, Instagram may reset your password. Before "
 #~ "connecting your account, please make sure you have access to the email or "

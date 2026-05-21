@@ -23,3 +23,20 @@
 .parrotposter-local-queue-modal__wake-hint {
 	color: #b32d2e;
 }
+
+.parrotposter-local-queue-table__actions-col,
+.parrotposter-local-queue-table__actions {
+	white-space: nowrap;
+	width: 1%;
+}
+
+.parrotposter-modal--local-queue .parrotposter-modal__footer {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+	justify-content: flex-end;
+}
+
+.parrotposter-local-queue-modal__feedback--error {
+	color: #b32d2e;
+}
