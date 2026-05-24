@@ -112,4 +112,40 @@ class Tools
 		}
 		return false;
 	}
+
+	public static function str_starts_with(string $haystack, string $needle): bool
+	{
+		if ($needle === '') {
+			return true;
+		}
+
+		return strncmp($haystack, $needle, strlen($needle)) === 0;
+	}
+
+	/**
+	 * Prepare post `fields` for ParrotPoster REST API.
+	 *
+	 * On update, omit empty `images` / `image_urls` so the server treats media as unchanged
+	 * (null/omit), not as an explicit clear (`[]`).
+	 *
+	 * @param array<string, mixed> $fields
+	 * @param bool                 $omit_empty_media
+	 *
+	 * @return array<string, mixed>
+	 */
+	public static function filter_post_fields_for_api(array $fields, bool $omit_empty_media = false): array
+	{
+		if (!$omit_empty_media) {
+			return $fields;
+		}
+
+		if (empty($fields['images'])) {
+			unset($fields['images']);
+		}
+		if (empty($fields['image_urls'])) {
+			unset($fields['image_urls']);
+		}
+
+		return $fields;
+	}
 }

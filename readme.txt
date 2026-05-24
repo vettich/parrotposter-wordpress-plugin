@@ -4,7 +4,7 @@ Tags: auto post, auto publish, autopost, autopublish, social media automation, Ð
 Requires at least: 5.0
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 1.1.2
+Stable tag: 1.1.3
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -122,6 +122,11 @@ Email us at [support@parrotposter.com](mailto:support@parrotposter.com)
 6. Post results
 
 == Changelog ==
+
+= 1.1.3 =
+* Shared lazy media upload cache when several autopost templates publish one WordPress post (no duplicate uploads per attachment)
+* Retry file upload to ParrotPoster; fallback to image URLs when upload fails
+* Fix image URLs on post update; rate-limit guard distinguishes templates (wp_autoposting_id)
 
 = 1.1.2 =
 * Fixed local sync queue stuck in pending when WordPress timezone differs from MySQL: queue datetimes are stored and compared in UTC, with a one-time migration for existing pending rows and an automatic post-queue wake after migration

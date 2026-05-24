@@ -6,7 +6,7 @@
  * Description: Auto post or selective post of news and products from the site to social networks (media) Facebook, Instagram, Telegram, VK, OK (autoposting, autopost).
  * Author: ParrotPoster
  * Author URI: https://parrotposter.com
- * Version: 1.1.2
+ * Version: 1.1.3
  * Requires at least: 5.0
  * Tested up to: 6.9
  * Requires PHP: 7.4
@@ -20,7 +20,7 @@ if (!defined('ABSPATH')) {
 	die;
 }
 
-define('PARROTPOSTER_VERSION', '1.1.2');
+define('PARROTPOSTER_VERSION', '1.1.3');
 define('PARROTPOSTER_DB_VERSION', '1.0.9');
 define('PARROTPOSTER_PLUGIN_FILE', __FILE__);
 define('PARROTPOSTER_PLUGIN_DIR', plugin_dir_path(__FILE__));

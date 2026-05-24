@@ -58,7 +58,7 @@ foreach ($contentImagesIds as $attachment_id) {
 	$img_url = wp_get_attachment_url($attachment_id);
 	if (!empty($img_url)) {
 		$images[$attachment_id] = $img_url;
-	} elseif (str_starts_with($attachment_id, 'http')) {
+	} elseif (Tools::str_starts_with($attachment_id, 'http')) {
 		$images[$attachment_id] = $attachment_id;
 	}
 }

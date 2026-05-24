@@ -111,6 +111,7 @@ class Scheduler
 			return;
 		}
 
+		$eligible = [];
 		foreach ($autopostings as $item) {
 			if (!$item['enable'] || empty($item['account_ids'])) {
 				continue;
@@ -118,12 +119,28 @@ class Scheduler
 			if (!Conditions::check($item['conditions'], $wp_post)) {
 				continue;
 			}
+			$eligible[] = $item;
+		}
 
-			$this->publish_post_by_template_without_check($wp_post, $item, true);
+		if (empty($eligible)) {
+			return;
+		}
+
+		// Cache fills lazily per template; same attachment_id is uploaded once per run.
+		$cache = new MediaUploadCache();
+
+		foreach ($eligible as $item) {
+			$this->publish_post_by_template_without_check($wp_post, $item, true, $cache);
 		}
 	}
 
-	public function publish_post_by_template_without_check($wp_post, $template, $exclude_duplicates)
+	/**
+	 * @param \WP_Post              $wp_post
+	 * @param array<string, mixed>  $template
+	 * @param bool                  $exclude_duplicates
+	 * @param MediaUploadCache|null $cache
+	 */
+	public function publish_post_by_template_without_check($wp_post, $template, $exclude_duplicates, $cache = null)
 	{
 		global $wpdb;
 
@@ -137,7 +154,11 @@ class Scheduler
 		$post_tags = TextProcessor::replace_post_text($wp_post, $template['post_tags']);
 		$post_tags = Tools::clear_text($post_tags);
 
-		list($image_ids, $image_urls) = self::upload_wp_images($wp_post, $template['post_images']);
+		$post_images = $template['post_images'] ?? [];
+		if (!is_array($post_images)) {
+			$post_images = [];
+		}
+		list($image_ids, $image_urls) = self::upload_wp_images($wp_post, $post_images, $cache);
 
 		$post_fields = [
 			'text' => $post_text,
@@ -147,6 +168,7 @@ class Scheduler
 			'image_urls' => $image_urls,
 			'extra' => [
 				'wp_post_id' => $wp_post->ID,
+				'wp_autoposting_id' => (int) $template['id'],
 				'wp_site_domain' => WpPostHelpers::get_site_domain(),
 				'vk_signed' => !!$template['extra_vk_signed'],
 				'vk_from_group' => !!$template['extra_vk_from_group'],
@@ -204,6 +226,15 @@ class Scheduler
 				],
 				['%d', '%s', '%d'],
 			);
+		} else {
+			PP::log([
+				'create_pp_post_failed',
+				'wp_post_id' => $wp_post->ID,
+				'autoposting_id' => (int) $template['id'],
+				'images_count' => count($image_ids),
+				'image_urls_count' => count($image_urls),
+				'error' => $res['error'],
+			]);
 		}
 	}
 
@@ -259,6 +290,9 @@ class Scheduler
 			$templates_by_id[(int) $tpl['id']] = $tpl;
 		}
 
+		// Cache fills lazily per linked PP post; no upfront upload for rows that may be skipped.
+		$cache = new MediaUploadCache();
+
 		foreach ($rows as $row) {
 			$pp_post_id = isset($row['post_id']) ? (string) $row['post_id'] : '';
 			$tpl_id = isset($row['autoposting_id']) ? (int) $row['autoposting_id'] : 0;
@@ -294,16 +328,21 @@ class Scheduler
 			$post_tags = TextProcessor::replace_post_text($wp_post, $template['post_tags']);
 			$post_tags = Tools::clear_text($post_tags);
 
-			list($image_ids, $image_urls) = self::upload_wp_images($wp_post, $template['post_images']);
+			$post_images = $template['post_images'] ?? [];
+			if (!is_array($post_images)) {
+				$post_images = [];
+			}
+			list($image_ids, $image_urls) = self::upload_wp_images($wp_post, $post_images, $cache);
 
 			$fields = [
 				'text' => $post_text,
 				'tags' => $post_tags,
 				'link' => TextProcessor::replace_post_text($wp_post, $template['post_link']),
 				'images' => $image_ids,
-				'images_url' => $image_urls,
+				'image_urls' => $image_urls,
 				'extra' => [
 					'wp_post_id' => $wp_post->ID,
+					'wp_autoposting_id' => (int) $template['id'],
 					'wp_site_domain' => WpPostHelpers::get_site_domain(),
 					'vk_signed' => !!$template['extra_vk_signed'],
 					'vk_from_group' => !!$template['extra_vk_from_group'],
@@ -321,6 +360,8 @@ class Scheduler
 				];
 			}
 
+			$fields = Tools::filter_post_fields_for_api($fields, true);
+
 			$update_data = [
 				'fields' => $fields,
 				'networks' => [
@@ -335,51 +376,171 @@ class Scheduler
 		}
 	}
 
-	public static function upload_wp_images($wp_post, $images_txt_keys)
+	/**
+	 * @param \WP_Post                   $wp_post
+	 * @param array<int, string>         $images_txt_keys
+	 * @param MediaUploadCache|null      $cache
+	 * @return array{0: string[], 1: string[]}
+	 */
+	public static function upload_wp_images($wp_post, $images_txt_keys, $cache = null)
 	{
 		$images_txt = implode('', $images_txt_keys);
 		$wp_images_ids = TextProcessor::replace_post_image_text_to_ids($wp_post, $images_txt);
 		$image_ids = [];
 		$image_urls = [];
-		$wp_images_processed = [];
-		foreach ($wp_images_ids as $id) {
-			$url = $id;
-			$id = sanitize_text_field($id);
-			$attached_file = get_attached_file($id);
-			if (empty($attached_file) || isset($wp_images_processed[$id])) {
-				if (str_starts_with((string) $url, 'http')) {
-					$normalized = self::normalize_url_key((string) $url);
-					if (isset($wp_images_processed[$normalized])) {
-						continue;
-					}
-					$wp_images_processed[$normalized] = true;
-					$image_urls[] = $url;
+		$output_seen = [];
+
+		foreach ($wp_images_ids as $raw) {
+			$original = $raw;
+			$id = sanitize_text_field($raw);
+
+			if (Tools::str_starts_with((string) $original, 'http')) {
+				$key = MediaUploadCache::keyForUrl((string) $original);
+				if (isset($output_seen[$key])) {
+					continue;
 				}
+				$resolved = self::resolve_wp_image_source($wp_post, $original, $id, $original, $cache);
+				$output_seen[$key] = true;
+				self::append_resolved_media($resolved, $image_ids, $image_urls);
 				continue;
 			}
-			$wp_images_processed[$id] = true;
+
+			if ($id === '' || !preg_match('/^\d+$/', $id)) {
+				continue;
+			}
+
+			$key = MediaUploadCache::keyForAttachmentId($id);
+			if (isset($output_seen[$key])) {
+				continue;
+			}
 
 			$att_url = wp_get_attachment_url((int) $id);
+			$resolved = self::resolve_wp_image_source($wp_post, $original, $id, is_string($att_url) ? $att_url : '', $cache);
+			$output_seen[$key] = true;
 			if (!empty($att_url)) {
-				$wp_images_processed[self::normalize_url_key($att_url)] = true;
+				$output_seen[MediaUploadCache::keyForUrl($att_url)] = true;
 			}
-
-			$res = Api::upload_file($attached_file);
-			$file_id = ApiHelpers::retrieve_response($res, 'file_id');
-			if (empty($file_id)) {
-				continue;
-			}
-			$image_ids[] = $file_id;
+			self::append_resolved_media($resolved, $image_ids, $image_urls);
 		}
+
 		return [$image_ids, $image_urls];
 	}
 
 	/**
-	 * Normalize URL for deduplication keys (matches WpPostHelpers display normalization).
+	 * @param array{file_id: ?string, fallback_url: ?string} $resolved
+	 * @param string[]                                      $image_ids
+	 * @param string[]                                      $image_urls
 	 */
-	private static function normalize_url_key(string $url): string
+	private static function append_resolved_media(array $resolved, array &$image_ids, array &$image_urls): void
 	{
-		return str_replace('http://', 'https://', $url);
+		if (!empty($resolved['file_id'])) {
+			$image_ids[] = $resolved['file_id'];
+			return;
+		}
+		if (!empty($resolved['fallback_url'])) {
+			$image_urls[] = $resolved['fallback_url'];
+		}
+	}
+
+	/**
+	 * @param \WP_Post              $wp_post
+	 * @param string                $original raw value from field resolver
+	 * @param string                $id       sanitized attachment id or empty
+	 * @param string                $url_hint attachment URL if known
+	 * @param MediaUploadCache|null $cache
+	 * @return array{file_id: ?string, fallback_url: ?string}
+	 */
+	private static function resolve_wp_image_source($wp_post, $original, $id, $url_hint, $cache)
+	{
+		if (Tools::str_starts_with((string) $original, 'http')) {
+			$cache_key = MediaUploadCache::keyForUrl((string) $original);
+			if ($cache instanceof MediaUploadCache && $cache->has($cache_key)) {
+				$cached = $cache->get($cache_key);
+				if (is_array($cached)) {
+					return $cached;
+				}
+			}
+			$result = [
+				'file_id' => null,
+				'fallback_url' => (string) $original,
+			];
+			if ($cache instanceof MediaUploadCache) {
+				$cache->set($cache_key, null, $result['fallback_url']);
+			}
+			return $result;
+		}
+
+		$cache_key = MediaUploadCache::keyForAttachmentId($id);
+		if ($cache instanceof MediaUploadCache && $cache->has($cache_key)) {
+			$cached = $cache->get($cache_key);
+			if (is_array($cached)) {
+				return $cached;
+			}
+		}
+
+		$attached_file = get_attached_file($id);
+		$att_url = $url_hint !== '' ? $url_hint : wp_get_attachment_url((int) $id);
+		if (!is_string($att_url)) {
+			$att_url = '';
+		}
+
+		if (empty($attached_file)) {
+			$fallback = (Tools::str_starts_with($att_url, 'http')) ? $att_url : null;
+			$result = ['file_id' => null, 'fallback_url' => $fallback];
+			if ($cache instanceof MediaUploadCache) {
+				$cache->set($cache_key, null, $fallback);
+			}
+			if ($fallback === null && $att_url === '') {
+				PP::log([
+					'upload_wp_images_failed',
+					'wp_post_id' => $wp_post->ID,
+					'attachment_id' => $id,
+					'reason' => 'no_local_file_and_no_url',
+				]);
+			}
+			return $result;
+		}
+
+		$res = Api::upload_file($attached_file);
+		$file_id = ApiHelpers::retrieve_response($res, 'file_id');
+		if (!empty($file_id)) {
+			$result = ['file_id' => (string) $file_id, 'fallback_url' => null];
+			if ($cache instanceof MediaUploadCache) {
+				$cache->set($cache_key, $result['file_id'], null);
+				if (Tools::str_starts_with($att_url, 'http')) {
+					$cache->set(MediaUploadCache::keyForUrl($att_url), $result['file_id'], null);
+				}
+			}
+			return $result;
+		}
+
+		$fallback = (Tools::str_starts_with($att_url, 'http')) ? $att_url : null;
+		if ($fallback !== null) {
+			PP::log([
+				'upload_wp_images_fallback_url',
+				'wp_post_id' => $wp_post->ID,
+				'attachment_id' => $id,
+				'url' => $fallback,
+				'upload_error' => $res['error'] ?? null,
+			]);
+		} else {
+			PP::log([
+				'upload_wp_images_failed',
+				'wp_post_id' => $wp_post->ID,
+				'attachment_id' => $id,
+				'upload_error' => $res['error'] ?? null,
+			]);
+		}
+
+		$result = ['file_id' => null, 'fallback_url' => $fallback];
+		if ($cache instanceof MediaUploadCache) {
+			$cache->set($cache_key, null, $fallback);
+			if ($fallback !== null) {
+				$cache->set(MediaUploadCache::keyForUrl($fallback), null, $fallback);
+			}
+		}
+
+		return $result;
 	}
 
 	public static function has_duplicate($wp_post_id, $template_id)

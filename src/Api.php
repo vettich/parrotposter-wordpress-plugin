@@ -619,10 +619,87 @@ class Api
 		return $res;
 	}
 
+	/**
+	 * @return array{response?: array, error?: array}
+	 */
 	public static function upload_file($filepath)
 	{
+		if (self::is_pp_down_circuit_open()) {
+			return [
+				'error' => [
+					'msg' => 'server is unavailable',
+					'code' => self::SERVER_UNAVAILABLE,
+				],
+			];
+		}
+
+		$max_attempts = 3;
+		$last_res = ['error' => ['msg' => 'upload failed']];
+
+		for ($attempt = 1; $attempt <= $max_attempts; ++$attempt) {
+			if ($attempt > 1) {
+				usleep(200000 * $attempt);
+			}
+
+			$last_res = self::upload_file_once($filepath);
+			if (empty($last_res['error'])) {
+				return $last_res;
+			}
+
+			if (!self::is_upload_error_retriable($last_res)) {
+				break;
+			}
+		}
+
+		PP::log([
+			'Api::upload_file_failed',
+			'filepath' => $filepath,
+			'error' => $last_res['error'] ?? null,
+		]);
+
+		return $last_res;
+	}
+
+	/**
+	 * @param array{response?: array, error?: array} $res
+	 */
+	private static function is_upload_error_retriable(array $res): bool
+	{
+		if (empty($res['error']) || !is_array($res['error'])) {
+			return false;
+		}
+		$code = $res['error']['code'] ?? null;
+
+		return $code === self::SERVER_UNAVAILABLE;
+	}
+
+	/**
+	 * @return string MIME type for multipart upload
+	 */
+	private static function detect_upload_mime_type(string $filepath): string
+	{
+		if (function_exists('mime_content_type')) {
+			$mime = \mime_content_type($filepath);
+			if (is_string($mime) && $mime !== '') {
+				return $mime;
+			}
+		}
+
+		$checked = wp_check_filetype(basename($filepath));
+		if (!empty($checked['type']) && is_string($checked['type'])) {
+			return $checked['type'];
+		}
+
+		return 'application/octet-stream';
+	}
+
+	/**
+	 * @return array{response?: array, error?: array}
+	 */
+	private static function upload_file_once($filepath)
+	{
 		$filename = basename($filepath);
-		$content_type = mime_content_type($filepath);
+		$content_type = self::detect_upload_mime_type($filepath);
 		$boundary = wp_generate_password(24, false);
 
 		$payload = "--$boundary\r\n";
@@ -645,11 +722,18 @@ class Api
 		if (!empty($res['error'])) {
 			return $res;
 		}
-		$file_id = $res['response']['file_id'];
+		$file_id = $res['response']['file_id'] ?? null;
+		if (empty($file_id)) {
+			return ['error' => ['msg' => 'no file_id in response']];
+		}
 
 		$res = self::get("files/$file_id/status");
-		if (!empty($res['response']) && $res['response']['status'] != 'uploaded') {
-			return ['error' => ['msg' => 'failed file upload']];
+		if (!empty($res['response']) && ($res['response']['status'] ?? '') !== 'uploaded') {
+			usleep(300000);
+			$res = self::get("files/$file_id/status");
+			if (!empty($res['response']) && ($res['response']['status'] ?? '') !== 'uploaded') {
+				return ['error' => ['msg' => 'failed file upload']];
+			}
 		}
 
 		return ['response' => ['file_id' => $file_id]];
