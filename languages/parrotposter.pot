@@ -342,6 +342,11 @@ msgstr ""
 
 #: src/fields/CommonType.php:44
 msgctxt "wp_post_field"
+msgid "First paragraph of content"
+msgstr ""
+
+#: src/fields/CommonType.php:48
+msgctxt "wp_post_field"
 msgid "Excerpt"
 msgstr ""
 
@@ -963,7 +968,12 @@ msgid ""
 "(it can be set in a separate field when creating the news)."
 msgstr ""
 
-#: views/help/index.php:151
+#: views/help/index.php:150
+msgctxt "help"
+msgid "Use <span class=\"code\">{content_first_paragraph}</span> to publish only the first paragraph from the post body (not the Excerpt field)."
+msgstr ""
+
+#: views/help/index.php:153
 msgctxt "help"
 msgid "Link:"
 msgstr ""

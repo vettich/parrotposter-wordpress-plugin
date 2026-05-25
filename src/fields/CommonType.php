@@ -40,6 +40,10 @@ class CommonType
 				'label' => _x('Content', 'wp_post_field', 'parrotposter'),
 			],
 			[
+				'key' => '{content_first_paragraph}',
+				'label' => _x('First paragraph of content', 'wp_post_field', 'parrotposter'),
+			],
+			[
 				'key' => '{excerpt}',
 				'label' => _x('Excerpt', 'wp_post_field', 'parrotposter'),
 			],
@@ -123,6 +127,11 @@ class CommonType
 	private static function get_field_value_content($post)
 	{
 		return $post->post_content;
+	}
+
+	private static function get_field_value_content_first_paragraph($post)
+	{
+		return Tools::content_first_paragraph(self::get_field_value_content($post));
 	}
 
 	private static function get_field_value_link($post)

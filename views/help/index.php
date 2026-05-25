@@ -145,7 +145,10 @@ AssetModules::enqueue(['help']);
 					{br}<br>
 					{excerpt}<br>
 				</div>
+				<br>
 				<?php _ex('In this case, the text will take the title of the news and excerpted text (it can be set in a separate field when creating the news).', 'help', 'parrotposter') ?>
+				<br>
+				<?php _ex('Use <span class="code">{content_first_paragraph}</span> to publish only the first paragraph from the post body (not the Excerpt field).', 'help', 'parrotposter') ?>
 			</p>
 			<p>
 				<b><?php _ex('Link:', 'help', 'parrotposter') ?></b>

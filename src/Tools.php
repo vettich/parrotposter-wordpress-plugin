@@ -45,6 +45,82 @@ class Tools
 		return $text;
 	}
 
+	/**
+	 * First paragraph from raw post_content (no the_content filters).
+	 */
+	public static function content_first_paragraph(string $content): string
+	{
+		$content = trim($content);
+		if ($content === '') {
+			return '';
+		}
+
+		if (function_exists('parse_blocks')) {
+			$from_blocks = self::first_paragraph_from_blocks(parse_blocks($content));
+			if ($from_blocks !== '') {
+				return $from_blocks;
+			}
+		}
+
+		if (preg_match('/<p[^>]*>(.*?)<\/p>/is', $content, $matches)) {
+			$text = self::clear_text($matches[1]);
+			if ($text !== '') {
+				return $text;
+			}
+		}
+
+		$text = self::clear_text($content);
+		if ($text === '') {
+			return '';
+		}
+
+		$parts = preg_split("/\n\n+/", $text);
+		foreach ($parts as $part) {
+			$part = trim($part);
+			if ($part !== '') {
+				return $part;
+			}
+		}
+
+		return '';
+	}
+
+	/**
+	 * @param array<int, array<string, mixed>> $blocks
+	 */
+	private static function first_paragraph_from_blocks(array $blocks): string
+	{
+		foreach ($blocks as $block) {
+			if (!is_array($block)) {
+				continue;
+			}
+
+			$name = $block['blockName'] ?? null;
+			if ($name === 'core/paragraph') {
+				$html = '';
+				if (!empty($block['innerHTML'])) {
+					$html = (string) $block['innerHTML'];
+				} elseif (!empty($block['innerContent']) && is_array($block['innerContent'])) {
+					$html = implode('', $block['innerContent']);
+				}
+				$text = self::clear_text($html);
+				if ($text !== '') {
+					return $text;
+				}
+				continue;
+			}
+
+			if (!empty($block['innerBlocks']) && is_array($block['innerBlocks'])) {
+				$nested = self::first_paragraph_from_blocks($block['innerBlocks']);
+				if ($nested !== '') {
+					return $nested;
+				}
+			}
+		}
+
+		return '';
+	}
+
 	public static function truncate_text($text, $length = 100, $more = '...') {
 		$text = trim($text);
 		if (strlen($text) <= $length) {

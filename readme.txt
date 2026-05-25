@@ -4,7 +4,7 @@ Tags: auto post, auto publish, autopost, autopublish, social media automation, �
 Requires at least: 5.0
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 1.1.3
+Stable tag: 1.1.4
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -43,7 +43,7 @@ The plugin has no limit on the number of posts, publish as many as you need
 Customize auto posting templates by post type, selection of certain headings, titles, authors, tags, maximum and minimum product price, with selection of certain social media accounts and publishing time (immediate/time delay after news/product publication)
 
 **Easily customize post text template for auto posting 📄**
-Add title, excerpt, full description (content), line breaks, product prices and sizes, currency, weight, link, tags and more to the post text
+Add title, excerpt, first paragraph of content, full description (content), line breaks, product prices and sizes, currency, weight, link, tags and more to the post text
 
 **Create multiple templates for auto posting 👍**
 Create multiple templates with preset settings for specific social networks accounts and with your own posting parameters
@@ -122,6 +122,9 @@ Email us at [support@parrotposter.com](mailto:support@parrotposter.com)
 6. Post results
 
 == Changelog ==
+
+= 1.1.4 =
+* Added `{content_first_paragraph}` template macro: first paragraph from post content (Gutenberg paragraph block, first `<p>`, or plain-text fallback)
 
 = 1.1.3 =
 * Shared lazy media upload cache when several autopost templates publish one WordPress post (no duplicate uploads per attachment)
