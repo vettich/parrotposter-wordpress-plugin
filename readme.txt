@@ -4,7 +4,7 @@ Tags: auto post, auto publish, autopost, autopublish, social media automation, Ð
 Requires at least: 5.0
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 1.1.4
+Stable tag: 1.1.5
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -122,6 +122,9 @@ Email us at [support@parrotposter.com](mailto:support@parrotposter.com)
 6. Post results
 
 == Changelog ==
+
+= 1.1.5 =
+* Fixed `{content_first_paragraph}`: walks content in document order, skips image-only paragraphs and decorative separators (`-----`), supports list items and classic HTML blocks
 
 = 1.1.4 =
 * Added `{content_first_paragraph}` template macro: first paragraph from post content (Gutenberg paragraph block, first `<p>`, or plain-text fallback)
