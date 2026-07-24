@@ -21,6 +21,8 @@ class LocalQueue
 
 	public const OP_DELETE = 'delete';
 
+	public const OP_PIPELINE_EVENT_PREFIX = 'pe_';
+
 	private const LOCK_LEASE_SECONDS = 120;
 
 	private const MAX_ATTEMPTS = 4;
@@ -107,6 +109,62 @@ class LocalQueue
 		self::remove_pending_op(self::OP_CREATE, $wp_post_id);
 		self::enqueue_pending_upsert($wp_post_id, self::OP_DELETE, '{}', false);
 		self::schedule_wake_on_shutdown();
+	}
+
+	/**
+	 * Deferred pipeline push event (pluginPipelineEventIngest variables).
+	 *
+	 * @param array<string, mixed> $variables
+	 */
+	public static function enqueue(string $operation, array $variables, int $wp_post_id = 0): void
+	{
+		if ($operation !== 'pipeline_event' || !is_array($variables)) {
+			return;
+		}
+
+		$pipeline_id = isset($variables['pipelineId']) ? (string) $variables['pipelineId'] : '';
+		if ($pipeline_id === '') {
+			return;
+		}
+
+		if ($wp_post_id <= 0 && !empty($variables['sourceItemId']) && is_string($variables['sourceItemId'])) {
+			$parts = explode(':', $variables['sourceItemId'], 2);
+			if (count($parts) === 2) {
+				$wp_post_id = (int) $parts[1];
+			}
+		}
+
+		PP::log([
+			'LocalQueue::enqueue_pipeline_event',
+			'wp_post_id' => $wp_post_id,
+			'pipeline_id' => $pipeline_id,
+			'event_type' => $variables['eventType'] ?? null,
+		]);
+
+		$json = wp_json_encode($variables, JSON_UNESCAPED_UNICODE);
+		if ($json === false) {
+			$json = '{}';
+		}
+
+		self::enqueue_pending_upsert(
+			$wp_post_id,
+			self::pipeline_event_operation($pipeline_id),
+			$json,
+			true
+		);
+		self::schedule_wake_on_shutdown();
+	}
+
+	private static function pipeline_event_operation(string $pipeline_id): string
+	{
+		$compact = str_replace('-', '', $pipeline_id);
+
+		return self::OP_PIPELINE_EVENT_PREFIX . substr($compact, 0, 17);
+	}
+
+	public static function is_pipeline_event_operation(string $operation): bool
+	{
+		return strncmp($operation, self::OP_PIPELINE_EVENT_PREFIX, strlen(self::OP_PIPELINE_EVENT_PREFIX)) === 0;
 	}
 
 	private static function has_pending_create(int $wp_post_id): bool
@@ -501,6 +559,8 @@ class LocalQueue
 				self::run_delete($wp_post_id);
 			} elseif ($op === self::OP_CREATE) {
 				self::run_create($wp_post_id);
+			} elseif (self::is_pipeline_event_operation($op)) {
+				self::run_pipeline_event((string) ($row['payload'] ?? '{}'), $wp_post_id);
 			} else {
 				$wpdb->update(
 					$t,
@@ -577,6 +637,43 @@ class LocalQueue
 		}
 
 		Scheduler::update_pp_posts_for_wp_post($wp_post);
+	}
+
+	private static function run_pipeline_event(string $payload_json, int $wp_post_id = 0): void
+	{
+		$variables = json_decode($payload_json, true);
+		if (!is_array($variables)) {
+			throw new \RuntimeException('invalid pipeline event payload');
+		}
+
+		if ($wp_post_id <= 0) {
+			$wp_post_id = self::wp_post_id_from_pipeline_event_variables($variables);
+		}
+
+		$res = Api::graphql_mutation('pluginPipelineEventIngest', $variables, [
+			'curl_timeout' => 3,
+			'curl_connect_timeout' => 2,
+		]);
+		if (!empty($res['error'])) {
+			throw new \RuntimeException((string) ($res['error']['msg'] ?? 'pipeline event failed'));
+		}
+
+		PushEventService::apply_side_effects_after_ingest($wp_post_id, $variables, $res);
+	}
+
+	/**
+	 * @param array<string, mixed> $variables
+	 */
+	private static function wp_post_id_from_pipeline_event_variables(array $variables): int
+	{
+		if (!empty($variables['sourceItemId']) && is_string($variables['sourceItemId'])) {
+			$parts = explode(':', $variables['sourceItemId'], 2);
+			if (count($parts) === 2) {
+				return (int) $parts[1];
+			}
+		}
+
+		return 0;
 	}
 
 	private static function purge_old_failed_records(): void
@@ -718,7 +815,11 @@ class LocalQueue
 		}
 
 		$payload_display = '';
-		if ($operation === self::OP_UPDATE && $payload !== '' && $payload !== '{}') {
+		if (
+			($operation === self::OP_UPDATE || self::is_pipeline_event_operation($operation))
+			&& $payload !== ''
+			&& $payload !== '{}'
+		) {
 			$payload_display = $payload;
 			if (strlen($payload_display) > 200) {
 				$payload_display = substr($payload_display, 0, 200) . '…';
@@ -755,6 +856,10 @@ class LocalQueue
 			case self::OP_DELETE:
 				return _x('Delete', 'local queue operation', 'parrotposter');
 			default:
+				if (self::is_pipeline_event_operation($operation)) {
+					return _x('Pipeline event', 'local queue operation', 'parrotposter');
+				}
+
 				return $operation;
 		}
 	}
@@ -940,6 +1045,21 @@ class LocalQueue
 
 	public static function run_wake_on_shutdown(): void
 	{
+		if (function_exists('fastcgi_finish_request')) {
+			@fastcgi_finish_request();
+
+			if (Settings::site_to_pp_secret() !== '' || !empty(Options::token())) {
+				$result = self::handle_http_process(true);
+				PP::log([
+					'LocalQueue::run_self_flush_on_shutdown',
+					'processed' => $result['processed'] ?? 0,
+					'has_more' => $result['has_more'] ?? false,
+				]);
+			}
+
+			return;
+		}
+
 		if (empty(Options::token())) {
 			return;
 		}

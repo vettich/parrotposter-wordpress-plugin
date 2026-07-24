@@ -315,9 +315,16 @@ class Api
 				}
 
 				if (!empty($decoded['errors'])) {
-					$msg = $decoded['errors'][0]['message'] ?? 'graphql error';
+					$first = $decoded['errors'][0];
+					$msg = is_array($first) && isset($first['message'])
+						? (string) $first['message']
+						: 'graphql error';
+					$code = null;
+					if (is_array($first) && isset($first['extensions']['code']) && is_string($first['extensions']['code'])) {
+						$code = $first['extensions']['code'];
+					}
 
-					return ['error' => ['msg' => $msg]];
+					return ['error' => array_filter(['msg' => $msg, 'code' => $code])];
 				}
 
 				return ['data' => isset($decoded['data']) && is_array($decoded['data']) ? $decoded['data'] : []];
@@ -332,6 +339,395 @@ class Api
 				'code' => self::SERVER_UNAVAILABLE,
 			],
 		];
+	}
+
+	/**
+	 * GraphQL mutation with site_to_pp Bearer + HMAC (machine-path, SPEC-002-09 §4.2).
+	 *
+	 * @param array<string, mixed> $variables Mutation variables (input fields for pluginPipelineEventIngest)
+	 * @param array<string, mixed> $opts      curl_timeout, curl_connect_timeout, _retried_contract
+	 * @return array{data?: array, error?: array{msg: string, code?: int|string, extensions?: array}}
+	 */
+	public static function graphql_mutation(string $operation, array $variables = [], array $opts = []): array
+	{
+		$secret = Settings::site_to_pp_secret();
+		if ($secret === '') {
+			return ['error' => ['msg' => 'site_to_pp secret is empty']];
+		}
+
+		$query = self::build_graphql_mutation_query($operation);
+		if ($query === '') {
+			return ['error' => ['msg' => 'unknown graphql operation']];
+		}
+
+		$gql_variables = self::wrap_graphql_variables($operation, $variables);
+		$res = self::do_graphql_site_request($query, $gql_variables, array_merge($opts, [
+			'bearer_token' => $secret,
+			'sign_with_site_to_pp' => true,
+			'log_label' => $operation,
+		]));
+
+		if (!empty($res['error']) && self::is_contract_version_mismatch_error($res)) {
+			self::apply_contract_version_mismatch($res);
+			if (empty($opts['_retried_contract'])) {
+				$variables = self::refresh_contract_version_in_variables($operation, $variables);
+				$opts['_retried_contract'] = true;
+
+				return self::graphql_mutation($operation, $variables, $opts);
+			}
+		}
+
+		if (!empty($res['data'])) {
+			return self::normalize_graphql_mutation_response($operation, $res);
+		}
+
+		return $res;
+	}
+
+	/**
+	 * GraphQL mutation with user session Bearer (admin UI path, SPEC-002-17).
+	 *
+	 * @param array<string, mixed> $variables Mutation variables
+	 * @param array<string, mixed> $opts      curl_timeout, curl_connect_timeout
+	 * @return array{data?: array, error?: array{msg: string, code?: int|string, extensions?: array}}
+	 */
+	public static function graphql_user_mutation(string $operation, array $variables = [], array $opts = []): array
+	{
+		$bearer = Options::token();
+		if ($bearer === '') {
+			return ['error' => ['msg' => __('Требуется авторизация в ParrotPoster.', 'parrotposter')]];
+		}
+
+		$query = self::build_graphql_mutation_query($operation);
+		if ($query === '') {
+			return ['error' => ['msg' => 'unknown graphql operation']];
+		}
+
+		$gql_variables = self::wrap_graphql_variables($operation, $variables);
+		$res = self::do_graphql_request($query, $gql_variables, array_merge($opts, [
+			'bearer_token' => $bearer,
+			'log_label' => $operation,
+		]));
+
+		return self::normalize_graphql_mutation_response($operation, $res);
+	}
+
+	/**
+	 * @param array{data?: array, error?: array{msg: string, code?: int|string, extensions?: array}} $res
+	 * @return array{data?: array, error?: array{msg: string, code?: int|string, extensions?: array}}
+	 */
+	private static function normalize_graphql_mutation_response(string $operation, array $res): array
+	{
+		if (empty($res['data'])) {
+			return $res;
+		}
+
+		$payload = self::extract_mutation_payload($operation, $res['data']);
+		if (is_array($payload) && array_key_exists('accepted', $payload) && empty($payload['accepted'])) {
+			$msg = 'graphql mutation rejected';
+			if (!empty($payload['errors']) && is_array($payload['errors'])) {
+				$first = $payload['errors'][0] ?? null;
+				if (is_array($first) && !empty($first['message'])) {
+					$msg = (string) $first['message'];
+				}
+			}
+
+			return ['error' => ['msg' => $msg, 'errors' => $payload['errors'] ?? []]];
+		}
+		if (is_array($payload) && !empty($payload['errors']) && is_array($payload['errors'])) {
+			$first = $payload['errors'][0] ?? null;
+			if (is_array($first) && !empty($first['message'])) {
+				return ['error' => ['msg' => (string) $first['message'], 'errors' => $payload['errors']]];
+			}
+		}
+
+		return $res;
+	}
+
+	private static function build_graphql_mutation_query(string $operation): string
+	{
+		switch ($operation) {
+			case 'pluginPipelineEventIngest':
+				return 'mutation PluginPipelineEventIngest($input: PluginPipelineEventInput!) { pluginPipelineEventIngest(input: $input) { accepted triggerRunIds errors { message code } } }';
+			case 'migratePluginToPipeline':
+				return 'mutation MigratePluginToPipeline($input: MigratePluginInput!) { migratePluginToPipeline(input: $input) { plugin { id migrationMode pipelineIdsFromMigration } pipelines { id name } warnings errors { message code } } }';
+			case 'revertPluginToLegacy':
+				return 'mutation RevertPluginToLegacy($pluginId: ID!) { revertPluginToLegacy(pluginId: $pluginId) { plugin { id migrationMode pipelineIdsFromMigration } errors { message code } } }';
+			default:
+				return '';
+		}
+	}
+
+	/**
+	 * @param array<string, mixed> $variables
+	 * @return array<string, mixed>
+	 */
+	private static function wrap_graphql_variables(string $operation, array $variables): array
+	{
+		switch ($operation) {
+			case 'pluginPipelineEventIngest':
+				return ['input' => $variables];
+			case 'migratePluginToPipeline':
+				return ['input' => $variables];
+			case 'revertPluginToLegacy':
+				return $variables;
+			default:
+				return $variables;
+		}
+	}
+
+	/**
+	 * @param array<string, mixed> $data
+	 * @return array<string, mixed>|null
+	 */
+	private static function extract_mutation_payload(string $operation, array $data): ?array
+	{
+		switch ($operation) {
+			case 'pluginPipelineEventIngest':
+				return isset($data['pluginPipelineEventIngest']) && is_array($data['pluginPipelineEventIngest'])
+					? $data['pluginPipelineEventIngest']
+					: null;
+			case 'migratePluginToPipeline':
+				return isset($data['migratePluginToPipeline']) && is_array($data['migratePluginToPipeline'])
+					? $data['migratePluginToPipeline']
+					: null;
+			case 'revertPluginToLegacy':
+				return isset($data['revertPluginToLegacy']) && is_array($data['revertPluginToLegacy'])
+					? $data['revertPluginToLegacy']
+					: null;
+			default:
+				return null;
+		}
+	}
+
+	/**
+	 * @param array{error: array{msg?: string, code?: string, extensions?: array}} $res
+	 */
+	private static function is_contract_version_mismatch_error(array $res): bool
+	{
+		$code = $res['error']['code'] ?? '';
+		if ($code === 'contract_version_mismatch') {
+			return true;
+		}
+		$msg = strtolower((string) ($res['error']['msg'] ?? ''));
+
+		return strpos($msg, 'contract_version_mismatch') !== false;
+	}
+
+	/**
+	 * @param array{error: array{extensions?: array}} $res
+	 */
+	private static function apply_contract_version_mismatch(array $res): void
+	{
+		$extensions = $res['error']['extensions'] ?? null;
+		if (!is_array($extensions)) {
+			return;
+		}
+		$contract = $extensions['pipelineContract'] ?? $extensions['pipeline_contract'] ?? null;
+		if (!is_array($contract)) {
+			return;
+		}
+		Settings::apply_pipeline_contract_snapshot($contract);
+	}
+
+	/**
+	 * @param array<string, mixed> $variables
+	 * @return array<string, mixed>
+	 */
+	private static function refresh_contract_version_in_variables(string $operation, array $variables): array
+	{
+		if ($operation !== 'pluginPipelineEventIngest') {
+			return $variables;
+		}
+		$pipeline_id = isset($variables['pipelineId']) ? (string) $variables['pipelineId'] : '';
+		if ($pipeline_id === '') {
+			return $variables;
+		}
+		$contract = Settings::get_pipeline_contract($pipeline_id);
+		if (!is_array($contract)) {
+			return $variables;
+		}
+		$variables['contractVersion'] = (int) ($contract['contract_version'] ?? 0);
+
+		return $variables;
+	}
+
+	/**
+	 * @param array<string, mixed> $variables
+	 * @param array<string, mixed> $opts
+	 * @return array{data?: array, error?: array{msg: string, code?: int|string, extensions?: array}}
+	 */
+	private static function do_graphql_site_request(string $query, array $variables = [], array $opts = []): array
+	{
+		if (self::is_pp_down_circuit_open()) {
+			return [
+				'error' => [
+					'msg' => 'server is unavailable',
+					'code' => self::SERVER_UNAVAILABLE,
+				],
+			];
+		}
+
+		$bearer_token = isset($opts['bearer_token']) ? (string) $opts['bearer_token'] : '';
+		$sign_with_site_to_pp = !empty($opts['sign_with_site_to_pp']);
+		$curl_timeout = isset($opts['curl_timeout']) ? (int) $opts['curl_timeout'] : 15;
+		$curl_connect_timeout = isset($opts['curl_connect_timeout']) ? (int) $opts['curl_connect_timeout'] : 5;
+		$log_label = isset($opts['log_label']) ? (string) $opts['log_label'] : 'graphql';
+
+		$payload = ['query' => $query];
+		if ($variables !== []) {
+			$payload['variables'] = $variables;
+		}
+		$body_json = wp_json_encode($payload, JSON_UNESCAPED_UNICODE);
+		if ($body_json === false) {
+			return ['error' => ['msg' => 'json encode error']];
+		}
+
+		$passes = [
+			['force_refresh' => false],
+			['force_refresh' => true],
+		];
+
+		foreach ($passes as $pass) {
+			$domains = DomainSelector::get_priority_domains($pass['force_refresh']);
+			if (empty($domains)) {
+				$best = DomainSelector::get_best_domain();
+				if (!empty($best)) {
+					$domains = [$best];
+				}
+			}
+
+			foreach ($domains as $domain) {
+				$gql_url = rtrim($domain, '/') . Env::graphql_api_uri();
+
+				$headers = [
+					'Content-Type' => 'application/json',
+					'X-PP-WordPress-Version' => defined('PARROTPOSTER_VERSION') ? (string) PARROTPOSTER_VERSION : '',
+				];
+				if ($bearer_token !== '') {
+					$headers['Authorization'] = 'Bearer ' . $bearer_token;
+				}
+				if ($sign_with_site_to_pp && $bearer_token !== '') {
+					$headers = array_merge($headers, self::build_site_to_pp_hmac_headers(
+						'POST',
+						Env::graphql_signing_path(),
+						$body_json,
+						$bearer_token
+					));
+				}
+
+				$response = wp_remote_post($gql_url, [
+					'timeout' => $curl_timeout,
+					'connect_timeout' => $curl_connect_timeout,
+					'redirection' => 3,
+					'user-agent' => self::USER_AGENT,
+					'sslverify' => true,
+					'headers' => $headers,
+					'body' => $body_json,
+				]);
+
+				if (is_wp_error($response)) {
+					if (self::is_network_wp_error($response)) {
+						DomainSelector::mark_domain_error($domain);
+					}
+					PP::log([$log_label . '_network', $domain, $response->get_error_message()]);
+					continue;
+				}
+
+				self::clear_pp_down_circuit();
+
+				$code = (int) wp_remote_retrieve_response_code($response);
+				$body = wp_remote_retrieve_body($response);
+
+				if ($code >= 500) {
+					$decoded = json_decode((string) $body, true);
+					if (is_array($decoded) && !empty($decoded['errors'])) {
+						$parsed = self::parse_graphql_error($decoded['errors'][0] ?? null);
+
+						return ['error' => $parsed];
+					}
+
+					return [
+						'error' => [
+							'msg' => 'server is unavailable',
+							'code' => self::SERVER_UNAVAILABLE,
+						],
+					];
+				}
+
+				$decoded = json_decode((string) $body, true);
+				if (!is_array($decoded)) {
+					continue;
+				}
+
+				if (!empty($decoded['errors'])) {
+					$parsed = self::parse_graphql_error($decoded['errors'][0] ?? null);
+
+					return ['error' => $parsed];
+				}
+
+				return ['data' => isset($decoded['data']) && is_array($decoded['data']) ? $decoded['data'] : []];
+			}
+		}
+
+		self::mark_pp_unavailable_for_circuit();
+
+		return [
+			'error' => [
+				'msg' => 'server is unavailable',
+				'code' => self::SERVER_UNAVAILABLE,
+			],
+		];
+	}
+
+	/**
+	 * @param mixed $error
+	 * @return array{msg: string, code?: string, extensions?: array}
+	 */
+	private static function parse_graphql_error($error): array
+	{
+		if (!is_array($error)) {
+			return ['msg' => 'graphql error'];
+		}
+		$msg = isset($error['message']) ? (string) $error['message'] : 'graphql error';
+		$extensions = isset($error['extensions']) && is_array($error['extensions']) ? $error['extensions'] : [];
+		$code = '';
+		if (isset($extensions['code']) && is_string($extensions['code'])) {
+			$code = $extensions['code'];
+		}
+
+		return [
+			'msg' => $msg,
+			'code' => $code !== '' ? $code : null,
+			'extensions' => $extensions,
+		];
+	}
+
+	/**
+	 * @return array<string, string>
+	 */
+	private static function build_site_to_pp_hmac_headers(
+		string $method,
+		string $path,
+		string $raw_body,
+		string $site_to_pp_secret
+	): array {
+		$timestamp = (string) time();
+		$nonce = function_exists('wp_generate_uuid4') ? wp_generate_uuid4() : uniqid('pp_', true);
+		$body_hash = hash('sha256', $raw_body);
+		$signing_input = strtoupper($method) . "\n" . $path . "\n" . $timestamp . "\n" . $nonce . "\n" . $body_hash;
+		$signature = self::base64url_encode(hash_hmac('sha256', $signing_input, $site_to_pp_secret, true));
+
+		return [
+			'X-PP-Timestamp' => $timestamp,
+			'X-PP-Nonce' => $nonce,
+			'X-PP-Signature' => $signature,
+		];
+	}
+
+	private static function base64url_encode(string $data): string
+	{
+		return rtrim(strtr(base64_encode($data), '+/', '-_'), '=');
 	}
 
 	/**
@@ -401,6 +797,227 @@ class Api
 		}
 
 		return ['token' => (string) $token];
+	}
+
+	/**
+	 * Issue one-time auth code for plugin binding (user session Bearer).
+	 *
+	 * @return array{code: string, expires_at?: string}|array{error: array{msg: string, code?: int}}
+	 */
+	public static function create_plugin_auth_code(
+		string $domain,
+		string $callback_url,
+		?string $plugin_version = null
+	): array {
+		$bearer = Options::token();
+		if ($bearer === '') {
+			return ['error' => ['msg' => __('Требуется авторизация в ParrotPoster.', 'parrotposter')]];
+		}
+
+		$domain = trim($domain);
+		$callback_url = trim($callback_url);
+		if ($domain === '' || $callback_url === '') {
+			return ['error' => ['msg' => __('Некорректные параметры подключения.', 'parrotposter')]];
+		}
+
+		$variables = [
+			'domain' => $domain,
+			'platform' => 'WORDPRESS',
+			'callbackUrl' => $callback_url,
+		];
+		if ($plugin_version !== null && trim($plugin_version) !== '') {
+			$variables['pluginVersion'] = trim($plugin_version);
+		}
+
+		$q = 'mutation CreatePluginAuthCode($domain: String!, $platform: PluginPlatform!, $callbackUrl: String!, $pluginVersion: String) {
+			createPluginAuthCode(domain: $domain, platform: $platform, callbackUrl: $callbackUrl, pluginVersion: $pluginVersion) {
+				code expiresAt
+			}
+		}';
+		$res = self::do_graphql_request($q, $variables, [
+			'bearer_token' => $bearer,
+			'log_label' => 'createPluginAuthCode',
+		]);
+
+		if (!empty($res['error'])) {
+			return $res;
+		}
+
+		$payload = $res['data']['createPluginAuthCode'] ?? null;
+		if (!is_array($payload)) {
+			return ['error' => ['msg' => __('Некорректный ответ сервера.', 'parrotposter')]];
+		}
+
+		$code = isset($payload['code']) ? (string) $payload['code'] : '';
+		if ($code === '') {
+			return ['error' => ['msg' => __('Код подключения не получен.', 'parrotposter')]];
+		}
+
+		$result = ['code' => $code];
+		if (!empty($payload['expiresAt'])) {
+			$result['expires_at'] = (string) $payload['expiresAt'];
+		}
+
+		return $result;
+	}
+
+	/**
+	 * Build SSO URL for opening the main web app in a new tab.
+	 *
+	 * @return array{url: string}|array{error: array{msg: string}}
+	 */
+	public static function build_sso_url(?string $return_to = null): array
+	{
+		$session = self::issue_session_key();
+		if (!empty($session['error'])) {
+			return $session;
+		}
+
+		$token = (string) $session['token'];
+		$domains = Env::domains();
+		$pp_base = !empty($domains) ? rtrim((string) $domains[0], '/') : 'https://parrotposter.com';
+		$params = [
+			'token' => $token,
+			'lang' => substr(get_user_locale(), 0, 2),
+		];
+		if ($return_to !== null && $return_to !== '') {
+			$params['returnTo'] = $return_to;
+		}
+
+		return [
+			'url' => add_query_arg($params, $pp_base . '/auth/enter-with-token'),
+		];
+	}
+
+	/**
+	 * Plugin binding: exchange one-time auth code for machine secrets (no HMAC).
+	 *
+	 * @return array{plugin_id: string, site_to_pp_secret: string, pp_to_site_secret: string, migration_mode?: string}|array{error: array{msg: string, code?: string}}
+	 */
+	public static function complete_plugin_binding(
+		string $code,
+		string $domain,
+		string $callback_url,
+		?string $plugin_version = null
+	): array {
+		$code = trim($code);
+		if ($code === '') {
+			return ['error' => ['msg' => __('Код подключения не указан.', 'parrotposter')]];
+		}
+		if (strlen($code) > 8192) {
+			return ['error' => ['msg' => __('Код подключения слишком длинный.', 'parrotposter')]];
+		}
+
+		$domain = trim($domain);
+		$callback_url = trim($callback_url);
+		if ($domain === '' || $callback_url === '') {
+			return ['error' => ['msg' => __('Некорректные параметры подключения.', 'parrotposter')]];
+		}
+
+		$variables = [
+			'code' => $code,
+			'platform' => 'WORDPRESS',
+			'domain' => $domain,
+			'callbackUrl' => $callback_url,
+		];
+		if ($plugin_version !== null && trim($plugin_version) !== '') {
+			$variables['pluginVersion'] = trim($plugin_version);
+		}
+
+		$q = 'mutation CompletePluginBinding($code: String!, $platform: PluginPlatform!, $domain: String!, $callbackUrl: String!, $pluginVersion: String) {
+			completePluginBinding(code: $code, platform: $platform, domain: $domain, callbackUrl: $callbackUrl, pluginVersion: $pluginVersion) {
+				pluginId siteToPpSecret ppToSiteSecret migrationMode
+			}
+		}';
+		$res = self::do_graphql_request($q, $variables, [
+			'log_label' => 'completePluginBinding',
+		]);
+
+		if (!empty($res['error'])) {
+			$mapped = self::map_plugin_binding_error($res['error']);
+
+			return ['error' => $mapped];
+		}
+
+		$payload = $res['data']['completePluginBinding'] ?? null;
+		if (!is_array($payload)) {
+			return ['error' => ['msg' => __('Некорректный ответ сервера.', 'parrotposter')]];
+		}
+
+		$plugin_id = isset($payload['pluginId']) ? (string) $payload['pluginId'] : '';
+		$site_to_pp = isset($payload['siteToPpSecret']) ? (string) $payload['siteToPpSecret'] : '';
+		$pp_to_site = isset($payload['ppToSiteSecret']) ? (string) $payload['ppToSiteSecret'] : '';
+		if ($plugin_id === '' || $site_to_pp === '' || $pp_to_site === '') {
+			return ['error' => ['msg' => __('Сервер не вернул данные подключения.', 'parrotposter')]];
+		}
+
+		$result = [
+			'plugin_id' => $plugin_id,
+			'site_to_pp_secret' => $site_to_pp,
+			'pp_to_site_secret' => $pp_to_site,
+		];
+		if (isset($payload['migrationMode']) && is_string($payload['migrationMode'])) {
+			$result['migration_mode'] = $payload['migrationMode'];
+		}
+
+		return $result;
+	}
+
+	/**
+	 * Disable plugin binding on PP (user session; MustAuth on server).
+	 *
+	 * @return array{ok: true}|array{error: array{msg: string, code?: string}}
+	 */
+	public static function disable_plugin(string $plugin_id): array
+	{
+		$plugin_id = trim($plugin_id);
+		if ($plugin_id === '') {
+			return ['error' => ['msg' => 'plugin_id is empty']];
+		}
+
+		$bearer = Options::token();
+		if ($bearer === '') {
+			return ['error' => ['msg' => 'token is empty']];
+		}
+
+		$q = 'mutation DisablePlugin($id: ID!) { disablePlugin(id: $id) }';
+		$res = self::do_graphql_request($q, ['id' => $plugin_id], [
+			'bearer_token' => $bearer,
+			'log_label' => 'disablePlugin',
+		]);
+
+		if (!empty($res['error'])) {
+			return $res;
+		}
+
+		$ok = $res['data']['disablePlugin'] ?? null;
+		if ($ok !== true) {
+			return ['error' => ['msg' => 'disablePlugin failed']];
+		}
+
+		return ['ok' => true];
+	}
+
+	/**
+	 * @param array{msg?: string, code?: string} $error
+	 * @return array{msg: string, code?: string}
+	 */
+	private static function map_plugin_binding_error(array $error): array
+	{
+		$code = isset($error['code']) ? (string) $error['code'] : '';
+		$messages = [
+			'auth_code_invalid_or_expired' => __('Код подключения недействителен или истёк. Начните подключение заново.', 'parrotposter'),
+			'binding_mismatch' => __('Данные подключения не совпадают. Проверьте домен и callback URL.', 'parrotposter'),
+			'callback_url_must_be_https' => __('Callback URL должен использовать HTTPS.', 'parrotposter'),
+			'callback_url_invalid' => __('Некорректный callback URL. Убедитесь, что сайт доступен по HTTPS и не использует локальный адрес.', 'parrotposter'),
+		];
+		if ($code !== '' && isset($messages[$code])) {
+			return ['msg' => $messages[$code], 'code' => $code];
+		}
+
+		$msg = isset($error['msg']) ? (string) $error['msg'] : __('Не удалось завершить подключение.', 'parrotposter');
+
+		return array_filter(['msg' => $msg, 'code' => $code !== '' ? $code : null]);
 	}
 
 	public static function ping()

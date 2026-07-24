@@ -17,6 +17,9 @@ class Env
 	private const DEFAULT_AVAILABLE_CHECK_URI = '/api/v1/ping';
 	private const DEFAULT_API_URI = '/api/v1';
 	private const DEFAULT_GRAPHQL_API_URI = '/api/graphql';
+
+	/** Internal path on back-app (after nginx strips /api); used in HMAC signing_input. */
+	private const DEFAULT_GRAPHQL_SIGNING_PATH = '/graphql';
 	private const DEFAULT_FRONT_BASE_URI = '/plugin/wp';
 	private const DEFAULT_LOG_ENABLED = false;
 
@@ -53,11 +56,19 @@ class Env
 	}
 
 	/**
-	 * Путь GraphQL на домене.
+	 * Путь GraphQL на домене (HTTP URL, includes /api prefix).
 	 */
 	public static function graphql_api_uri(): string
 	{
 		return self::DEFAULT_GRAPHQL_API_URI;
+	}
+
+	/**
+	 * Path for site_to_pp HMAC signing_input (SPEC-002-01 §4; back-app route, not public URL).
+	 */
+	public static function graphql_signing_path(): string
+	{
+		return self::DEFAULT_GRAPHQL_SIGNING_PATH;
 	}
 
 	/**
@@ -66,6 +77,14 @@ class Env
 	public static function front_base_uri(): string
 	{
 		return self::DEFAULT_FRONT_BASE_URI;
+	}
+
+	/**
+	 * Front path for plugin binding (pipeline automation connect flow).
+	 */
+	public static function front_connect_uri(): string
+	{
+		return '/app/integrations/connect';
 	}
 
 	/**

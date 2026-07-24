@@ -29,6 +29,7 @@ class AssetModules
 		'publish-via-template',
 		'help',
 		'local-queue-admin',
+		'pipeline-migration',
 	];
 
 	private static $libs = [
@@ -138,6 +139,9 @@ class AssetModules
 			$deps = ['parrotposter-admin-bootstrap'];
 			if ($module === 'local-queue-admin') {
 				$deps[] = 'parrotposter-modal';
+			}
+			if ($module === 'pipeline-migration') {
+				$deps[] = 'jquery';
 			}
 			wp_register_script("parrotposter-$module", PP::asset($js), $deps, PARROTPOSTER_VERSION, true);
 			self::$registered[$module]['js'] = true;

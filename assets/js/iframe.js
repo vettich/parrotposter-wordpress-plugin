@@ -23,6 +23,7 @@
 		var lang = config.lang || 'en';
 		var moduleReadOnly = config.moduleReadOnly ? 1 : 0;
 		var sitePage = config.sitePage || '';
+		var pluginId = config.pluginId || '';
 		var timeout = config.timeout != null ? config.timeout : 5000;
 		var pingPath = config.pingPath || '';
 		var pingTimeout = config.pingTimeout != null ? config.pingTimeout : 2500;
@@ -343,6 +344,9 @@
 				moduleReadOnly +
 				'&site_page=' +
 				encodeURIComponent(sitePage);
+			if (pluginId) {
+				q += '&plugin_id=' + encodeURIComponent(pluginId);
+			}
 			return base + p + '?' + q;
 		}
 

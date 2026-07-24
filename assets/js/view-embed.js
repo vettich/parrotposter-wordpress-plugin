@@ -287,7 +287,7 @@
 				.then(function (resp) {
 					return resp.text().then(function (txt) {
 						if (txt === 'ok') {
-							location.href = cfg.profilePageUrl || '';
+							location.href = cfg.accountsPageUrl || '';
 						} else {
 							pp_send_message('login_error');
 						}

@@ -49,6 +49,7 @@ class AutopostingListTable extends WPListTable
 			'parrotposter_accounts',
 			'parrotposter_scheduler',
 			'parrotposter_tariffs',
+			'parrotposter_settings',
 			'parrotposter_profile',
 			'parrotposter_help',
 		];

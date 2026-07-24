@@ -45,6 +45,10 @@ class Scheduler
 
 	public function wp_after_insert_post_handler($post_id, $post, $updated, $post_before)
 	{
+		if (Settings::get_migration_mode() === Settings::MIGRATION_MODE_PIPELINE) {
+			return;
+		}
+
 		if (wp_is_post_revision($post_id)) {
 			PP::log(['wp_after_insert_post_handler', $post_id, 'post is revision, skip']);
 			return;
@@ -75,6 +79,10 @@ class Scheduler
 
 	public function on_post_trashed($post_id)
 	{
+		if (Settings::get_migration_mode() === Settings::MIGRATION_MODE_PIPELINE) {
+			return;
+		}
+
 		$post_id = (int) $post_id;
 		if ($post_id <= 0 || wp_is_post_revision($post_id)) {
 			return;
@@ -92,6 +100,10 @@ class Scheduler
 	 */
 	public function on_before_delete_post($post_id, $post = null)
 	{
+		if (Settings::get_migration_mode() === Settings::MIGRATION_MODE_PIPELINE) {
+			return;
+		}
+
 		$post_id = (int) $post_id;
 		if ($post_id <= 0 || wp_is_post_revision($post_id)) {
 			return;

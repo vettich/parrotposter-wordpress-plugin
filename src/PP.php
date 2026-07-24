@@ -57,8 +57,15 @@ class PP
 		add_action('add_meta_boxes', [$this, 'post_meta_box']);
 
 		AdminAjaxPost::init(false);
+		PluginConnect::init();
 		Install::init();
 		Scheduler::init();
+		PipelineHooks::init();
+
+		// Drop legacy heartbeat cron if present (last_seen is updated on real machine auth only).
+		wp_clear_scheduled_hook('parrotposter_plugin_heartbeat');
+
+		add_action('rest_api_init', [WireProtocol::class, 'register_rest_routes']);
 
 		register_activation_hook(PARROTPOSTER_PLUGIN_FILE, [$this, 'activation']);
 		register_deactivation_hook(PARROTPOSTER_PLUGIN_FILE, [$this, 'deactivation']);
@@ -80,6 +87,7 @@ class PP
 	{
 		wp_clear_scheduled_hook('parrotposter_retry_local_queue');
 		wp_clear_scheduled_hook('parrotposter_refresh_domains');
+		wp_clear_scheduled_hook('parrotposter_plugin_heartbeat');
 	}
 
 	/**
@@ -244,6 +252,10 @@ class PP
 	public function admin_page()
 	{
 		$page = isset($_GET['page']) ? sanitize_text_field(wp_unslash($_GET['page'])) : 'parrotposter';
+		if ($page === 'parrotposter_profile') {
+			wp_safe_redirect(admin_url('admin.php?page=parrotposter_settings'));
+			exit;
+		}
 		$view = isset($_GET['view']) ? sanitize_text_field(wp_unslash($_GET['view'])) : 'index';
 		$prefix = 'parrotposter_';
 		if (substr($page, 0, strlen($prefix)) == $prefix) {

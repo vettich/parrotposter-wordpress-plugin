@@ -33,6 +33,7 @@ class AdminAjaxPost
 		add_action('admin_post_parrotposter_forgot_password', [$this, 'forgot_password']);
 		add_action('admin_post_parrotposter_reset_password', [$this, 'reset_password']);
 		add_action('admin_post_parrotposter_logout', [$this, 'logout']);
+		add_action('admin_post_parrotposter_save_settings', [$this, 'save_settings']);
 
 		// tariffs
 		add_action('admin_post_parrotposter_set_tariff', [$this, 'set_tariff']);
@@ -69,6 +70,11 @@ class AdminAjaxPost
 
 		// Session token refresh for the iframe (triggered via postMessage from the front-end).
 		add_action('wp_ajax_parrotposter_refresh_session_token', [$this, 'refresh_session_token']);
+
+		// Pipeline migration (SPEC-002-17).
+		add_action('wp_ajax_pp_migrate_to_pipeline', [$this, 'migrate_to_pipeline']);
+		add_action('wp_ajax_pp_revert_migration', [$this, 'revert_migration']);
+		add_action('wp_ajax_pp_dismiss_migration_banner', [$this, 'dismiss_migration_banner']);
 	}
 
 	/**
@@ -83,6 +89,100 @@ class AdminAjaxPost
 		$res = Api::issue_session_key();
 		echo wp_json_encode($res);
 		exit;
+	}
+
+	/**
+	 * Migrate legacy autoposting templates to PP pipelines (GraphQL migratePluginToPipeline).
+	 */
+	public function migrate_to_pipeline(): void
+	{
+		self::ajax_guard();
+		nocache_headers();
+		header('Content-Type: application/json; charset=UTF-8');
+
+		if (Settings::plugin_id() === '') {
+			$bind = PluginConnect::silent_bind();
+			if (!empty($bind['error'])) {
+				$msg = is_string($bind['error']) ? $bind['error'] : 'plugin bind failed';
+				echo wp_json_encode(['success' => false, 'error' => $msg]);
+				exit;
+			}
+		}
+
+		$mode = isset($_POST['mode']) ? sanitize_text_field(wp_unslash((string) $_POST['mode'])) : 'import';
+		$config_ids = null;
+		if ($mode === 'fresh') {
+			$config_ids = [];
+		} elseif (isset($_POST['config_ids']) && is_array($_POST['config_ids'])) {
+			$config_ids = [];
+			foreach ($_POST['config_ids'] as $id) {
+				$config_ids[] = sanitize_text_field(wp_unslash((string) $id));
+			}
+		}
+
+		if ($mode === 'import' && is_array($config_ids) && $config_ids === []) {
+			echo wp_json_encode([
+				'success' => false,
+				'error' => __('Select at least one template to migrate.', 'parrotposter'),
+			]);
+			exit;
+		}
+
+		$result = MigrationService::migrate_to_pipeline($config_ids);
+		echo wp_json_encode($result);
+		exit;
+	}
+
+	/**
+	 * Revert pipeline migration (GraphQL revertPluginToLegacy).
+	 */
+	public function revert_migration(): void
+	{
+		self::ajax_guard();
+		nocache_headers();
+		header('Content-Type: application/json; charset=UTF-8');
+
+		if (Settings::plugin_id() === '') {
+			$bind = PluginConnect::silent_bind();
+			if (!empty($bind['error'])) {
+				$msg = is_string($bind['error']) ? $bind['error'] : 'plugin bind failed';
+				echo wp_json_encode(['success' => false, 'error' => $msg]);
+				exit;
+			}
+		}
+
+		$result = MigrationService::revert_migration();
+		echo wp_json_encode($result);
+		exit;
+	}
+
+	/**
+	 * Hide the pipeline-active migration banner for the current admin.
+	 */
+	public function dismiss_migration_banner(): void
+	{
+		self::ajax_guard();
+		nocache_headers();
+		header('Content-Type: application/json; charset=UTF-8');
+
+		UserPreferences::set_show_migration_banner(false);
+		echo wp_json_encode(['success' => true]);
+		exit;
+	}
+
+	public function save_settings(): void
+	{
+		FormHelpers::must_be_post_nonce();
+		if (!current_user_can('manage_options')) {
+			FormHelpers::post_error('forbidden');
+		}
+		self::init();
+
+		$show = isset($_POST['parrotposter_show_migration_banner'])
+			&& sanitize_text_field(wp_unslash((string) $_POST['parrotposter_show_migration_banner'])) === '1';
+		UserPreferences::set_show_migration_banner($show);
+
+		FormHelpers::post_success('', 'admin.php?page=parrotposter_settings');
 	}
 
 	/**
@@ -195,6 +295,7 @@ class AdminAjaxPost
 		if (!empty($res['error'])) {
 			FormHelpers::post_error($res['error']);
 		}
+		PluginConnect::silent_bind();
 		FormHelpers::post_success('logged');
 	}
 
@@ -235,6 +336,8 @@ class AdminAjaxPost
 			exit;
 		}
 
+		PluginConnect::silent_bind();
+
 		echo 'ok';
 		exit;
 	}
@@ -263,10 +366,11 @@ class AdminAjaxPost
 			FormHelpers::post_error(__('Passwords do not match', 'parrotposter'));
 		}
 
-		$res = Api::signup($name, $username, $password);
+	$res = Api::signup($name, $username, $password);
 		if (!empty($res['error'])) {
 			FormHelpers::post_error($res['error']);
 		}
+		PluginConnect::silent_bind();
 		FormHelpers::post_success('logged');
 	}
 

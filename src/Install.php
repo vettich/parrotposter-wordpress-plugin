@@ -54,6 +54,10 @@ class Install
 			do_action('parrotposter_updated');
 		}
 
+		if ($requires_update && Options::user_id() !== '') {
+			PluginConnect::silent_bind();
+		}
+
 		if (!$ver) {
 			add_option(self::VERSION_OPTION, PARROTPOSTER_DB_VERSION);
 		}
@@ -164,6 +168,13 @@ class Install
 				KEY idx_lq_processing (status, locked_until),
 				UNIQUE KEY idx_lq_dedup (wp_post_id, operation)
 			) $charset_collate;
+
+			CREATE TABLE {$wpdb->prefix}parrotposter_exclude_ids (
+				pipeline_id varchar(64) NOT NULL,
+				source_item_id varchar(191) NOT NULL,
+				PRIMARY KEY (pipeline_id, source_item_id),
+				KEY idx_exclude_pipeline (pipeline_id)
+			) $charset_collate;
 		";
 
 		return $tables;
@@ -177,6 +188,7 @@ class Install
 			"{$wpdb->prefix}parrotposter_autoposting",
 			"{$wpdb->prefix}parrotposter_posts",
 			"{$wpdb->prefix}parrotposter_local_queue",
+			"{$wpdb->prefix}parrotposter_exclude_ids",
 		];
 	}
 

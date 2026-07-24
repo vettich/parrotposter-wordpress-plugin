@@ -84,6 +84,30 @@ class CommonType
 				'key' => '{images_in_content}',
 				'label' => _x('Images in content', 'wp_post_field', 'parrotposter'),
 			],
+			[
+				'key' => '{featured_video}',
+				'label' => _x('Featured video', 'wp_post_field', 'parrotposter'),
+			],
+			[
+				'key' => '{videos_in_content}',
+				'label' => _x('Videos in content', 'wp_post_field', 'parrotposter'),
+			],
+			[
+				'key' => '{attached_videos}',
+				'label' => _x('Attached videos', 'wp_post_field', 'parrotposter'),
+			],
+			[
+				'key' => '{gifs_in_content}',
+				'label' => _x('GIFs in content', 'wp_post_field', 'parrotposter'),
+			],
+			[
+				'key' => '{attached_audio}',
+				'label' => _x('Attached audio', 'wp_post_field', 'parrotposter'),
+			],
+			[
+				'key' => '{attached_documents}',
+				'label' => _x('Attached documents', 'wp_post_field', 'parrotposter'),
+			],
 		];
 		return $fields;
 	}
@@ -118,8 +142,9 @@ class CommonType
 		$excerpt = $post->post_excerpt;
 		if (empty($excerpt)) {
 			$content = self::get_field_value_content($post);
-			$excerpt = Tools::clear_text($content);
-			$excerpt = Tools::truncate_text($content, 360, '...');
+			$excerpt = Tools::truncate_text(Tools::clear_text($content), 360, '...');
+		} else {
+			$excerpt = Tools::clear_text($excerpt);
 		}
 		return $excerpt;
 	}
@@ -159,5 +184,40 @@ class CommonType
 		// etc.) so the same attachment appears twice (numeric ID + CDN URL).
 		// Shortcode-rendered images (legacy page builders) are not expanded here.
 		return WpPostHelpers::get_image_ids_from_content($post->post_content);
+	}
+
+	private static function get_field_value_featured_video($post)
+	{
+		$attached = WpPostHelpers::get_attached_media_ids($post, 'video');
+		if ($attached !== []) {
+			return [$attached[0]];
+		}
+
+		return [];
+	}
+
+	private static function get_field_value_videos_in_content($post)
+	{
+		return WpPostHelpers::get_video_ids_from_content($post->post_content);
+	}
+
+	private static function get_field_value_attached_videos($post)
+	{
+		return WpPostHelpers::get_attached_media_ids($post, 'video');
+	}
+
+	private static function get_field_value_gifs_in_content($post)
+	{
+		return WpPostHelpers::get_gif_ids_from_content($post->post_content);
+	}
+
+	private static function get_field_value_attached_audio($post)
+	{
+		return WpPostHelpers::get_attached_media_ids($post, 'audio');
+	}
+
+	private static function get_field_value_attached_documents($post)
+	{
+		return WpPostHelpers::get_attached_document_ids($post);
 	}
 }
