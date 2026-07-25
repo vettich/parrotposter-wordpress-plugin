@@ -6,6 +6,7 @@ defined('ABSPATH') || exit;
 
 use parrotposter\fields\CommonType;
 use parrotposter\fields\Fields;
+use parrotposter\fields\Taxonomies;
 
 /**
  * Build SourceItem payloads and send pipeline push events to PP.
@@ -190,6 +191,13 @@ class PushEventService
 			] as $product_field) {
 				$payload[$product_field] = self::resolve_field_value($product_field, $post);
 			}
+		}
+
+		foreach (Taxonomies::keys_for_post_type($post->post_type) as $tax_key) {
+			if (array_key_exists($tax_key, $payload)) {
+				continue;
+			}
+			$payload[$tax_key] = self::taxonomy_term_ids($tax_key, $post);
 		}
 
 		foreach ($required_fields as $field) {

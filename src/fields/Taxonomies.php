@@ -6,6 +6,28 @@ defined('ABSPATH') || exit;
 
 class Taxonomies
 {
+	/**
+	 * Taxonomy names with show_ui for the post type.
+	 *
+	 * @return list<string>
+	 */
+	public static function keys_for_post_type(string $post_type): array
+	{
+		$taxonomies = get_object_taxonomies($post_type, 'objects');
+		if (!is_array($taxonomies)) {
+			return [];
+		}
+
+		$keys = [];
+		foreach ($taxonomies as $tax) {
+			if ($tax instanceof \WP_Taxonomy && $tax->show_ui) {
+				$keys[] = (string) $tax->name;
+			}
+		}
+
+		return $keys;
+	}
+
 	public static function get_fields($post_type, $field_types)
 	{
 		$fields = [];

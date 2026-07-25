@@ -5,6 +5,7 @@ namespace parrotposter;
 defined('ABSPATH') || exit;
 
 use parrotposter\fields\Fields;
+use parrotposter\fields\Taxonomies;
 use parrotposter\fields\conditions\Taxonomies as ConditionsTaxonomies;
 use WP_REST_Request;
 use WP_REST_Response;
@@ -539,19 +540,7 @@ class WireProtocol
 	 */
 	private static function taxonomy_keys_for_post_type(string $post_type): array
 	{
-		$taxonomies = get_object_taxonomies($post_type, 'objects');
-		if (!is_array($taxonomies)) {
-			return [];
-		}
-
-		$keys = [];
-		foreach ($taxonomies as $tax) {
-			if ($tax instanceof \WP_Taxonomy && $tax->show_ui) {
-				$keys[] = (string) $tax->name;
-			}
-		}
-
-		return $keys;
+		return Taxonomies::keys_for_post_type($post_type);
 	}
 
 	/**
