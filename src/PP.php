@@ -33,12 +33,17 @@ class PP
 			return;
 		}
 
+		$log_dir = PARROTPOSTER_PLUGIN_DIR . 'logs';
+		if (!is_dir($log_dir)) {
+			mkdir($log_dir, 0777, true);
+		}
+
 		$log = [
 			'at' => date(DATE_ATOM),
 			'data' => $data,
 		];
 		$s = print_r($log, true);
-		error_log($s, 3, PARROTPOSTER_PLUGIN_DIR . 'var.log');
+		error_log($s, 3, $log_dir . '/var.log');
 	}
 
 	public function register()
