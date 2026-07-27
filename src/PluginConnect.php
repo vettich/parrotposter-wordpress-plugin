@@ -29,6 +29,17 @@ class PluginConnect
 			return ['error' => 'user_token_empty'];
 		}
 
+		// A stale rewrite cache (e.g. after a site migration/restore, or a
+		// permalink change that never got re-saved) makes /wp-json/* 404 at
+		// the webserver level even though WordPress thinks pretty permalinks
+		// are enabled. Resync before we hand out a callback URL that PP will
+		// poll — this is what Settings > Permalinks > Save does under the hood.
+		flush_rewrite_rules();
+
+		if (!self::rest_routes_reachable()) {
+			return ['error' => 'rest_routes_unreachable'];
+		}
+
 		$domain = home_url();
 		$callback_url = rest_url('parrotposter/v1');
 		$version = defined('PARROTPOSTER_VERSION') ? (string) PARROTPOSTER_VERSION : null;
@@ -62,6 +73,41 @@ class PluginConnect
 		self::maybe_auto_migrate_to_pipeline();
 
 		return ['ok' => true];
+	}
+
+	/**
+	 * Loopback-check the exact REST path back-app will poll (parrotposter/v1/pp/v1/info),
+	 * not just wp-json root: a raw 404 here (text/html, from Apache/nginx) means the
+	 * request never reached WordPress, as opposed to a REST-level error (JSON body),
+	 * which still proves the route is dispatchable.
+	 */
+	private static function rest_routes_reachable(): bool
+	{
+		$check_url = rest_url('parrotposter/v1/pp/v1/info');
+		$response = wp_remote_get($check_url, [
+			'timeout' => 5,
+			'redirection' => 0,
+		]);
+
+		if (is_wp_error($response)) {
+			PP::log(['event' => 'rest_routes_unreachable', 'url' => $check_url, 'error' => $response->get_error_message()]);
+
+			return false;
+		}
+
+		$content_type = wp_remote_retrieve_header($response, 'content-type');
+		$reachable = is_string($content_type) && stripos($content_type, 'json') !== false;
+
+		if (!$reachable) {
+			PP::log([
+				'event' => 'rest_routes_unreachable',
+				'url' => $check_url,
+				'status' => wp_remote_retrieve_response_code($response),
+				'content_type' => $content_type,
+			]);
+		}
+
+		return $reachable;
 	}
 
 	/**

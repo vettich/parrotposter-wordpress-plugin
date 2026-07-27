@@ -81,6 +81,12 @@ class PP
 		if (!wp_next_scheduled('parrotposter_refresh_domains')) {
 			wp_schedule_event(time() + 120, 'hourly', 'parrotposter_refresh_domains');
 		}
+
+		// Our REST routes are registered on rest_api_init, which has already
+		// fired by this point in the activation request — safe to flush now
+		// so /wp-json/* is routable immediately, without waiting on the admin
+		// to re-save Settings > Permalinks.
+		flush_rewrite_rules();
 	}
 
 	public static function deactivation()
