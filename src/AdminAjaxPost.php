@@ -71,6 +71,10 @@ class AdminAjaxPost
 		// Session token refresh for the iframe (triggered via postMessage from the front-end).
 		add_action('wp_ajax_parrotposter_refresh_session_token', [$this, 'refresh_session_token']);
 
+		// Reconnect the site after a remote (PP-side) disable — clears stale local secrets and
+		// re-binds (triggered via postMessage from the iframe pipelines-list banner).
+		add_action('wp_ajax_parrotposter_reconnect_plugin', [$this, 'reconnect_plugin']);
+
 		// Pipeline migration (SPEC-002-17).
 		add_action('wp_ajax_pp_migrate_to_pipeline', [$this, 'migrate_to_pipeline']);
 		add_action('wp_ajax_pp_revert_migration', [$this, 'revert_migration']);
@@ -88,6 +92,30 @@ class AdminAjaxPost
 		header('Content-Type: application/json; charset=UTF-8');
 		$res = Api::issue_session_key();
 		echo wp_json_encode($res);
+		exit;
+	}
+
+	/**
+	 * Re-binds the site after a remote (PP-side) disable.
+	 *
+	 * `Settings::disconnect()` clears the stale local plugin_id/secrets first — otherwise
+	 * `PluginConnect::silent_bind()` would short-circuit on `Settings::is_connected()` still
+	 * being true (it only checks local state, not whether PP still honors those secrets) and
+	 * never actually re-bind.
+	 */
+	public function reconnect_plugin(): void
+	{
+		self::ajax_guard();
+		nocache_headers();
+		header('Content-Type: application/json; charset=UTF-8');
+
+		Settings::disconnect();
+		$bind = PluginConnect::silent_bind();
+
+		echo wp_json_encode([
+			'success' => empty($bind['error']),
+			'error' => $bind['error'] ?? null,
+		]);
 		exit;
 	}
 
@@ -295,6 +323,9 @@ class AdminAjaxPost
 		if (!empty($res['error'])) {
 			FormHelpers::post_error($res['error']);
 		}
+		// Force a fresh bind so a site previously disabled on PP gets reactivated on relogin
+		// (silent_bind() would otherwise short-circuit on stale local "connected" state).
+		Settings::disconnect();
 		PluginConnect::silent_bind();
 		FormHelpers::post_success('logged');
 	}
@@ -336,6 +367,9 @@ class AdminAjaxPost
 			exit;
 		}
 
+		// Force a fresh bind so a site previously disabled on PP gets reactivated on relogin
+		// (silent_bind() would otherwise short-circuit on stale local "connected" state).
+		Settings::disconnect();
 		PluginConnect::silent_bind();
 
 		echo 'ok';
@@ -437,7 +471,14 @@ class AdminAjaxPost
 		if (!current_user_can('manage_options')) {
 			FormHelpers::post_error('forbidden');
 		}
+
+		$plugin_id = Settings::plugin_id();
+		if ($plugin_id !== '') {
+			Api::disable_plugin($plugin_id);
+		}
+
 		Api::logout();
+		Settings::disconnect();
 		FormHelpers::post_success();
 	}
 

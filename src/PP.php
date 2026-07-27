@@ -210,6 +210,11 @@ class PP
 							} else {
 								Options::set_user_data($uid, $token);
 								$is_authorized = true;
+								// Force a fresh bind so a site previously disabled on PP gets reactivated
+								// on relogin (silent_bind() would otherwise short-circuit on stale local
+								// "connected" state).
+								Settings::disconnect();
+								PluginConnect::silent_bind();
 								wp_safe_redirect(
 									remove_query_arg(
 										['code', 'state', 'error', 'error_description'],

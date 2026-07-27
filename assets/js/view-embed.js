@@ -225,6 +225,34 @@
 					});
 				});
 		},
+		reconnect_plugin: function () {
+			var ajaxUrl = typeof ajaxurl !== 'undefined' ? ajaxurl : '/wp-admin/admin-ajax.php';
+			var nonce = PP_AUTH2_NONCE || '';
+			fetch(ajaxUrl, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+				body: new URLSearchParams([
+					['action', 'parrotposter_reconnect_plugin'],
+					['parrotposter[nonce]', nonce],
+				]).toString(),
+				credentials: 'same-origin',
+			})
+				.then(function (r) {
+					return r.json();
+				})
+				.then(function (res) {
+					pp_send_message('reconnect_plugin_result', {
+						ok: !!(res && res.success),
+						error: res && res.error ? res.error : null,
+					});
+				})
+				.catch(function () {
+					pp_send_message('reconnect_plugin_result', {
+						ok: false,
+						error: 'network',
+					});
+				});
+		},
 		resize: function (data) {
 			var iframe = document.getElementById('pp-iframe');
 			if (iframe) {
