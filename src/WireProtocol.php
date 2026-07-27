@@ -105,6 +105,15 @@ class WireProtocol
 			]);
 		}
 
+		// BE-22 / WP-07: Digest fetch_batch — POST JSON only (no GET compat).
+		foreach (['items/batch', 'pp/v1/items/batch'] as $route) {
+			register_rest_route('parrotposter/v1', $route, [
+				'methods' => \WP_REST_Server::CREATABLE,
+				'callback' => [self::class, 'dispatch'],
+				'permission_callback' => [self::class, 'authorize_request'],
+			]);
+		}
+
 		// WP-06: full published exclude snapshot (PP pushes pages).
 		foreach (['published_ids_sync', 'pp/v1/published_ids_sync'] as $route) {
 			register_rest_route('parrotposter/v1', $route, [
@@ -237,6 +246,14 @@ class WireProtocol
 	public static function dispatch(WP_REST_Request $request)
 	{
 		$route = (string) $request->get_route();
+		if (strpos($route, '/items/batch') !== false) {
+			$result = self::handle_items_batch($request);
+			if (is_wp_error($result)) {
+				return $result;
+			}
+
+			return self::respond($result);
+		}
 		if (strpos($route, '/items/next') !== false) {
 			$result = self::handle_items_next($request);
 			if (is_wp_error($result)) {
@@ -749,6 +766,188 @@ class WireProtocol
 			$result['exclude_ack'] = $exclude_ack;
 		}
 		return $result;
+	}
+
+	/**
+	 * Digest fetch_batch (SPEC-002-09 §7.3.3 / BE-22 / WP-07): POST JSON body.
+	 *
+	 * Same skeleton as handle_items_next(), paginated instead of LIMIT 1:
+	 *  - date_query: half-open window [window_from, window_to), D13/DEC-002-01 window §.
+	 *  - post__not_in: excluded_digest_ids only (D11 — no exclude_sync branch for
+	 *    Digest; PP always sends inline ids within the window, exclude_mode /
+	 *    digest_included_ids_sync are out of scope here).
+	 *  - orderby: DigestBatchQuery::apply_sort_with_tiebreak() — mandatory ID DESC
+	 *    tiebreak so identical post_date values don't reorder between pages (D13).
+	 *  - no_found_rows must stay false: has_more needs WP_Query::$found_posts.
+	 *
+	 * @return array<string, mixed>|\WP_Error
+	 */
+	private static function handle_items_batch(WP_REST_Request $request)
+	{
+		$body = $request->get_json_params();
+		if (!is_array($body)) {
+			return new \WP_Error(
+				'invalid_payload',
+				'JSON body required',
+				['status' => 400]
+			);
+		}
+
+		$pipeline_id = '';
+		if (isset($body['pipeline_id']) && is_string($body['pipeline_id'])) {
+			$pipeline_id = trim($body['pipeline_id']);
+		} elseif (isset($body['pipelineId']) && is_string($body['pipelineId'])) {
+			$pipeline_id = trim($body['pipelineId']);
+		}
+		if ($pipeline_id === '') {
+			return new \WP_Error(
+				'invalid_payload',
+				'pipeline_id is required',
+				['status' => 400]
+			);
+		}
+
+		$contract_version = 0;
+		if (isset($body['contract_version']) && is_numeric($body['contract_version'])) {
+			$contract_version = (int) $body['contract_version'];
+		}
+
+		$source_path = isset($body['source_path']) && is_array($body['source_path'])
+			? $body['source_path']
+			: null;
+		if ($source_path === null) {
+			return new \WP_Error(
+				'invalid_payload',
+				'source_path is required',
+				['status' => 400]
+			);
+		}
+
+		$post_type = self::post_type_from_source_path($source_path);
+		if ($post_type === '') {
+			return new \WP_Error(
+				'invalid_payload',
+				'source_path must include post_type',
+				['status' => 400]
+			);
+		}
+
+		$allowed = WpPostHelpers::get_post_types('names');
+		if (!in_array($post_type, $allowed, true)) {
+			return new \WP_Error(
+				'invalid_post_type',
+				sprintf('Unknown post_type: %s', $post_type),
+				['status' => 400]
+			);
+		}
+
+		// window_from/window_to are mandatory for fetch_batch (unlike fetch_next).
+		$window_from = isset($body['window_from']) && is_string($body['window_from'])
+			? trim($body['window_from'])
+			: '';
+		$window_to = isset($body['window_to']) && is_string($body['window_to'])
+			? trim($body['window_to'])
+			: '';
+		if ($window_from === '' || $window_to === '') {
+			return new \WP_Error(
+				'invalid_payload',
+				'window_from and window_to are required',
+				['status' => 400]
+			);
+		}
+		if (strtotime($window_from) === false || strtotime($window_to) === false) {
+			return new \WP_Error(
+				'invalid_payload',
+				'window_from/window_to must be parseable ISO8601 datetimes',
+				['status' => 400]
+			);
+		}
+
+		$selection_filter = $body['selection_filter'] ?? null;
+		if ($selection_filter !== null && !is_array($selection_filter)) {
+			return new \WP_Error(
+				'invalid_payload',
+				'selection_filter must be an object',
+				['status' => 400]
+			);
+		}
+
+		$sort = $body['sort'] ?? null;
+		if ($sort !== null && !is_array($sort)) {
+			return new \WP_Error(
+				'invalid_payload',
+				'sort must be an object',
+				['status' => 400]
+			);
+		}
+
+		// D11: excluded_digest_ids is always inline and window-bounded (PP caps it
+		// there); no exclude_sync / digest_included_ids_sync branch for Digest.
+		$excluded_digest_ids = isset($body['excluded_digest_ids']) && is_array($body['excluded_digest_ids'])
+			? $body['excluded_digest_ids']
+			: [];
+		$exclude_post_ids = self::parse_exclude_post_ids($excluded_digest_ids);
+
+		$page = isset($body['page']) && is_numeric($body['page']) ? (int) $body['page'] : 1;
+		if ($page < 1) {
+			$page = 1;
+		}
+		$page_size = isset($body['page_size']) && is_numeric($body['page_size']) ? (int) $body['page_size'] : 100;
+		if ($page_size < 1) {
+			$page_size = 100;
+		}
+
+		$query_args = [
+			'post_type' => $post_type,
+			'post_status' => 'publish',
+			'posts_per_page' => $page_size,
+			'paged' => $page,
+			// Exclude applied in the same WHERE as everything else — before LIMIT/paging.
+			'post__not_in' => $exclude_post_ids,
+			'ignore_sticky_posts' => true,
+			// has_more needs found_posts; unlike fetch_next this must NOT be true.
+			'no_found_rows' => false,
+		];
+
+		// D13: total order — primary sort + mandatory ID DESC tiebreak.
+		DigestBatchQuery::apply_sort_with_tiebreak($query_args, $sort);
+
+		$filter_result = SelectionFilterQuery::apply($query_args, $selection_filter, $post_type);
+		if (is_wp_error($filter_result)) {
+			return $filter_result;
+		}
+
+		// Merge the window bound in AFTER SelectionFilterQuery::apply(): that call
+		// overwrites $query_args['date_query'] wholesale when selection_filter itself
+		// constrains a date field, so merging first would silently lose the window.
+		$window_date_query = DigestBatchQuery::build_window_date_query($window_from, $window_to);
+		DigestBatchQuery::merge_window_date_query($query_args, $window_date_query);
+
+		$cleanup = SelectionFilterQuery::install_where_hooks($query_args);
+		try {
+			$query = new \WP_Query($query_args);
+		} finally {
+			$cleanup();
+		}
+
+		$extra_fields = self::collect_expression_fields($selection_filter);
+		$items = [];
+		if (is_array($query->posts)) {
+			foreach ($query->posts as $post) {
+				if (!$post instanceof \WP_Post) {
+					continue;
+				}
+				$items[] = self::format_source_item($post, $pipeline_id, $extra_fields);
+			}
+		}
+
+		$found_posts = isset($query->found_posts) ? (int) $query->found_posts : count($items);
+
+		return [
+			'items' => $items,
+			'has_more' => DigestBatchQuery::compute_has_more($found_posts, $page, $page_size),
+			'contract_version' => $contract_version,
+		];
 	}
 
 	/**
