@@ -125,7 +125,10 @@ class PluginConnect
 			return;
 		}
 
-		MigrationService::migrate_to_pipeline([]);
+		$res = MigrationService::migrate_to_pipeline(null);
+		if (empty($res['success'])) {
+			PP::log(['event' => 'auto_migrate_to_pipeline_failed', 'error' => $res['error'] ?? 'unknown']);
+		}
 	}
 
 	public static function handle_disconnect(): void
