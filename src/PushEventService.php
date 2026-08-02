@@ -145,7 +145,7 @@ class PushEventService
 			'eventType' => 'DELETED',
 			'contractVersion' => self::contract_version_for_pipeline($pipeline_id),
 			'sourceItemId' => self::source_item_id($post_type, $post_id),
-			'payload' => $payload,
+			'payload' => self::payload_to_source_fields($payload),
 		];
 
 		self::enqueue_event($variables, $post_id);
@@ -260,7 +260,7 @@ class PushEventService
 			'eventType' => $event_type,
 			'contractVersion' => self::contract_version_for_pipeline($pipeline_id),
 			'sourceItemId' => self::source_item_id($post->post_type, (int) $post->ID),
-			'payload' => $payload,
+			'payload' => self::payload_to_source_fields($payload),
 		];
 		if ($changed_fields !== null) {
 			$variables['changedFields'] = array_values($changed_fields);
@@ -298,9 +298,9 @@ class PushEventService
 			return;
 		}
 
-		$payload = isset($variables['payload']) && is_array($variables['payload'])
-			? $variables['payload']
-			: [];
+		$payload = self::source_fields_to_payload(
+			isset($variables['payload']) && is_array($variables['payload']) ? $variables['payload'] : []
+		);
 		if ($wp_post_id > 0 && $payload !== []) {
 			self::save_prev_fields($wp_post_id, $payload);
 		}
@@ -538,5 +538,130 @@ class PushEventService
 			}
 		}
 		update_post_meta($post_id, self::PREV_FIELDS_META, $snapshot);
+	}
+
+	/**
+	 * Encode an associative SourceItem payload for GraphQL `[SourceFieldInput!]!`.
+	 *
+	 * @param array<string, mixed> $payload
+	 * @return list<array{key: string, value: array<string, mixed>}>
+	 */
+	public static function payload_to_source_fields(array $payload): array
+	{
+		$fields = [];
+		foreach ($payload as $key => $value) {
+			if (!is_string($key) || $key === '') {
+				continue;
+			}
+			$fields[] = [
+				'key' => $key,
+				'value' => self::value_to_source_field_value_input($value),
+			];
+		}
+
+		return $fields;
+	}
+
+	/**
+	 * Decode GraphQL `[SourceFieldInput!]!` back to an associative payload map.
+	 *
+	 * @param list<array<string, mixed>> $fields
+	 * @return array<string, mixed>
+	 */
+	public static function source_fields_to_payload(array $fields): array
+	{
+		$payload = [];
+		foreach ($fields as $field) {
+			if (!is_array($field)) {
+				continue;
+			}
+			$key = isset($field['key']) ? (string) $field['key'] : '';
+			if ($key === '' || !array_key_exists('value', $field) || !is_array($field['value'])) {
+				continue;
+			}
+			$payload[$key] = self::source_field_value_input_to_value($field['value']);
+		}
+
+		return $payload;
+	}
+
+	/**
+	 * @return array<string, mixed>
+	 */
+	private static function value_to_source_field_value_input($value): array
+	{
+		if ($value === null) {
+			return ['isNull' => true];
+		}
+		if (is_bool($value)) {
+			return ['boolean' => $value];
+		}
+		if (is_int($value) || is_float($value)) {
+			return ['number' => (float) $value];
+		}
+		if (is_string($value)) {
+			return ['string' => $value];
+		}
+		if (!is_array($value)) {
+			return ['string' => (string) $value];
+		}
+		if (self::is_list_array($value)) {
+			$items = [];
+			foreach ($value as $item) {
+				$items[] = self::value_to_source_field_value_input($item);
+			}
+
+			return ['items' => $items];
+		}
+
+		return ['fields' => self::payload_to_source_fields($value)];
+	}
+
+	/**
+	 * @param array<string, mixed> $input
+	 * @return mixed
+	 */
+	private static function source_field_value_input_to_value(array $input)
+	{
+		if (array_key_exists('string', $input) && is_string($input['string'])) {
+			return $input['string'];
+		}
+		if (array_key_exists('number', $input) && (is_int($input['number']) || is_float($input['number']))) {
+			return (float) $input['number'];
+		}
+		if (array_key_exists('boolean', $input) && is_bool($input['boolean'])) {
+			return $input['boolean'];
+		}
+		if (!empty($input['isNull'])) {
+			return null;
+		}
+		if (isset($input['items']) && is_array($input['items'])) {
+			$items = [];
+			foreach ($input['items'] as $item) {
+				if (!is_array($item)) {
+					continue;
+				}
+				$items[] = self::source_field_value_input_to_value($item);
+			}
+
+			return $items;
+		}
+		if (isset($input['fields']) && is_array($input['fields'])) {
+			return self::source_fields_to_payload($input['fields']);
+		}
+
+		return null;
+	}
+
+	/**
+	 * @param array<mixed> $value
+	 */
+	private static function is_list_array(array $value): bool
+	{
+		if ($value === []) {
+			return true;
+		}
+
+		return array_keys($value) === range(0, count($value) - 1);
 	}
 }
