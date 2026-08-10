@@ -25,6 +25,20 @@ class Settings
 
 	private const PP_TO_SITE_PEPPER_KEY = 'parrotposter_pp_to_site_pepper';
 
+	/**
+	 * Ed25519 public key verifying `PluginOutboundTask.payload_signature` (SPEC-002-03 §7,
+	 * TASK-002-WP-09). Base64 URL-safe no-pad, plaintext (it's a public key, not a secret) —
+	 * unlike `site_to_pp` / `pp_to_site` this needs no hashing/encryption at rest.
+	 */
+	private const OUTBOUND_SIGNING_KEY_KEY = 'parrotposter_outbound_task_signing_public_key';
+
+	/**
+	 * Previous signing public key (DEC-002-06 D4): retained until the first successful verify
+	 * with the *current* key, not cleared just because a new value arrived — see
+	 * {@see set_outbound_task_signing_public_key()} / {@see clear_outbound_task_signing_public_key_prev()}.
+	 */
+	private const OUTBOUND_SIGNING_KEY_PREV_KEY = 'parrotposter_outbound_task_signing_public_key_prev';
+
 	private const PIPELINE_IDS_KEY = 'parrotposter_pipeline_ids';
 
 	private const PIPELINE_CONTRACTS_KEY = 'parrotposter_pipeline_contracts';
@@ -141,6 +155,21 @@ class Settings
 	}
 
 	/**
+	 * Apply a new `pp_to_site` secret delivered by a `rotate_secrets` task (SPEC-002-01 §6 step
+	 * 2 / TASK-002-WP-09): the currently-active hash moves to the `_prev` slot (so
+	 * {@see verify_pp_to_site_secret()} keeps accepting it during PP's own dual-key window —
+	 * §6 "оба активны"), and the new secret's hash becomes current.
+	 */
+	public static function rotate_pp_to_site_secret(string $new_secret): void
+	{
+		$current_hash = get_option(self::PP_TO_SITE_HASH_KEY, '');
+		if (is_string($current_hash) && $current_hash !== '') {
+			update_option(self::PP_TO_SITE_PREV_HASH_KEY, $current_hash);
+		}
+		self::set_pp_to_site_secret($new_secret);
+	}
+
+	/**
 	 * Constant-time verify for inbound PP→site HTTP (Bearer or X-ParrotPoster-Secret).
 	 */
 	public static function verify_pp_to_site_secret(string $secret): bool
@@ -167,6 +196,56 @@ class Settings
 		$current = get_option(self::PP_TO_SITE_HASH_KEY, '');
 
 		return is_string($current) && $current !== '';
+	}
+
+	/**
+	 * Current Ed25519 public key (base64 URL-safe, no pad) verifying outbound fallback task
+	 * signatures (TASK-002-WP-09, SPEC-002-03 §7). Empty until first learned (rotate_secrets
+	 * task, or a future binding/heartbeat channel — see WP-09 report notes on the current gap).
+	 */
+	public static function outbound_task_signing_public_key(): string
+	{
+		$key = get_option(self::OUTBOUND_SIGNING_KEY_KEY, '');
+
+		return is_string($key) ? $key : '';
+	}
+
+	public static function outbound_task_signing_public_key_prev(): string
+	{
+		$key = get_option(self::OUTBOUND_SIGNING_KEY_PREV_KEY, '');
+
+		return is_string($key) ? $key : '';
+	}
+
+	/**
+	 * Learn a (possibly new) signing public key from any channel (rotate_secrets task payload,
+	 * future binding/heartbeat response — DEC-002-06 D4's "конфиг/binding-ответ"). D4's core
+	 * rule: do **not** drop the previously-active key just because a new value arrived — shift
+	 * it into the `_prev` slot instead, so a fallback task signed with the old key before the
+	 * rotation committed on PP's side stays verifiable. `_prev` is only cleared by
+	 * {@see clear_outbound_task_signing_public_key_prev()}, called by the verify path
+	 * ({@see OutboundTaskSignature}) on the *first* successful verify against the new current
+	 * key — never here.
+	 */
+	public static function set_outbound_task_signing_public_key(string $new_key): void
+	{
+		$new_key = trim($new_key);
+		if ($new_key === '') {
+			return;
+		}
+		$current = self::outbound_task_signing_public_key();
+		if ($current === $new_key) {
+			return; // already active — nothing to shift
+		}
+		if ($current !== '') {
+			update_option(self::OUTBOUND_SIGNING_KEY_PREV_KEY, $current);
+		}
+		update_option(self::OUTBOUND_SIGNING_KEY_KEY, $new_key);
+	}
+
+	public static function clear_outbound_task_signing_public_key_prev(): void
+	{
+		delete_option(self::OUTBOUND_SIGNING_KEY_PREV_KEY);
 	}
 
 	private static function hash_pp_to_site_secret(string $secret): string

@@ -230,7 +230,7 @@ class OutboundTaskWorker
 	 * Pure aside from invoking the injected `$dispatch_fn` — directly unit-tested with a fake
 	 * dispatcher standing in for {@see dispatch_task()}.
 	 *
-	 * @return array{status: string, result: mixed, error_code: ?string, dispatched: bool}
+	 * @return array{status: string, result: mixed, error_code: ?string, dispatched: bool, confirm: ?array{rotation_id: string}}
 	 */
 	public static function resolve_pending_outcome(string $expires_at_iso, int $now_ts, callable $dispatch_fn): array
 	{
@@ -240,6 +240,7 @@ class OutboundTaskWorker
 				'result' => null,
 				'error_code' => null,
 				'dispatched' => false,
+				'confirm' => null,
 			];
 		}
 
@@ -250,6 +251,15 @@ class OutboundTaskWorker
 			'result' => is_array($outcome) ? ($outcome['result'] ?? null) : null,
 			'error_code' => is_array($outcome) && isset($outcome['error_code']) ? (string) $outcome['error_code'] : null,
 			'dispatched' => true,
+			// WP-09: `rotate_secrets` dispatch hands back `confirm.rotation_id` so it can ride
+			// the same report call instead of a separate primary confirmation round-trip
+			// (SPEC-002-09 §6.4 `confirm`). Not persisted to OutboundTaskQueue — a crash between
+			// this point and send_report() below means the confirm is lost on resend_report()
+			// retry; PP's own `rotation_expires_at` cron rollback (SPEC-002-01 §6 step 5) is the
+			// safety net for that narrow window, so it never leaves the old secret unusable.
+			'confirm' => is_array($outcome) && isset($outcome['confirm']) && is_array($outcome['confirm'])
+				? ['rotation_id' => (string) ($outcome['confirm']['rotation_id'] ?? '')]
+				: null,
 		];
 	}
 
@@ -293,29 +303,33 @@ class OutboundTaskWorker
 		);
 
 		OutboundTaskQueue::mark_terminal($task_id, $outcome['status'], $outcome['result'], $outcome['error_code']);
-		self::send_report($task_id, $outcome['status'], $outcome['result'], $outcome['error_code']);
+		self::send_report($task_id, $outcome['status'], $outcome['result'], $outcome['error_code'], $outcome['confirm'] ?? null);
 	}
 
 	/**
-	 * WP-09 TODO: verify `payloadSignature` (Ed25519 vs `outbound_task_signing_public_key`) and
-	 * dispatch by `type` (`fetch_next` / `fetch_batch` / `rotate_secrets` / `ping`) onto the
-	 * existing PP→site op handlers. Left as a stub here so WP-08 can prove the lease → report
-	 * round trip end-to-end: every task is reported back untouched as `skipped`, unless a later
-	 * change hooks the `parrotposter_outbound_task_dispatch` filter (WP-09's extension seam) —
-	 * that keeps WP-09 from needing to touch this file or OutboundTaskQueue at all.
+	 * Signature verification and per-`type` dispatch (`fetch_next` / `fetch_batch` /
+	 * `rotate_secrets` / `ping`) live behind the `parrotposter_outbound_task_dispatch` filter —
+	 * {@see OutboundTaskDispatch} (TASK-002-WP-09) hooks it, so this file never needs to know
+	 * about signature verification, `SelectionFilterQuery`, or rotation details. Falls back to
+	 * `skipped` if nothing hooks the filter (e.g. in isolated tests of this class alone).
 	 *
 	 * @param array<string, mixed> $row
-	 * @return array{status: string, result: mixed, error_code: ?string}
+	 * @return array{status: string, result: mixed, error_code: ?string, confirm?: array{rotation_id: string}}
 	 */
 	private static function dispatch_task(array $row): array
 	{
 		$outcome = apply_filters('parrotposter_outbound_task_dispatch', null, $row);
 		if (is_array($outcome) && isset($outcome['status'])) {
-			return [
+			$result = [
 				'status' => (string) $outcome['status'],
 				'result' => $outcome['result'] ?? null,
 				'error_code' => isset($outcome['error_code']) ? (string) $outcome['error_code'] : null,
 			];
+			if (isset($outcome['confirm']) && is_array($outcome['confirm'])) {
+				$result['confirm'] = $outcome['confirm'];
+			}
+
+			return $result;
 		}
 
 		return [
@@ -326,9 +340,13 @@ class OutboundTaskWorker
 	}
 
 	/**
-	 * @param mixed $result
+	 * @param mixed                       $result
+	 * @param array{rotation_id: string}|null $confirm SPEC-002-09 §6.4 `confirm` (WP-09):
+	 *                                                  `rotate_secrets` dispatch rides its
+	 *                                                  confirmation on this same report call
+	 *                                                  instead of a separate primary round-trip.
 	 */
-	private static function send_report(string $task_id, string $local_status, $result, ?string $error_code): void
+	private static function send_report(string $task_id, string $local_status, $result, ?string $error_code, ?array $confirm = null): void
 	{
 		$gql_status = self::to_report_status($local_status);
 		if ($gql_status === null) {
@@ -345,8 +363,9 @@ class OutboundTaskWorker
 		if ($error_code !== null && $error_code !== '') {
 			$variables['errorCode'] = $error_code;
 		}
-		// `confirm` (RotateSecretsConfirmInput) is intentionally never sent from here —
-		// rotate_secrets dispatch + confirm is WP-09's job (see dispatch_task() above).
+		if ($confirm !== null && ($confirm['rotation_id'] ?? '') !== '') {
+			$variables['confirm'] = ['rotationId' => $confirm['rotation_id']];
+		}
 
 		$res = Api::graphql_mutation('pluginOutboundTaskReport', $variables, [
 			'curl_timeout' => 8,
@@ -360,6 +379,22 @@ class OutboundTaskWorker
 		}
 
 		OutboundTaskQueue::mark_reported($task_id);
+
+		// SPEC-002-01 §6 step 3 (commit): when this report's `confirm` committed a rotation, PP
+		// mints a fresh `site_to_pp` and returns it here, one-time plaintext — the only channel
+		// the plugin has to learn it (RotateSecretsConfirmInput doc comment, back-app dto.rs).
+		if ($confirm !== null) {
+			$payload = $res['data']['pluginOutboundTaskReport'] ?? null;
+			$new_site_to_pp = is_array($payload) && !empty($payload['newSiteToPpSecret'])
+				? (string) $payload['newSiteToPpSecret']
+				: '';
+			if ($new_site_to_pp !== '') {
+				Settings::set_site_to_pp_secret($new_site_to_pp);
+				// PP's own commit_rotation() drops its staged pp_to_site candidate at the same
+				// atomic step — mirror that locally now that the rotation is confirmed done.
+				Settings::clear_pp_to_site_prev_secret();
+			}
+		}
 	}
 
 	private static function to_report_status(string $local_status): ?string

@@ -664,6 +664,21 @@ class WireProtocol
 			);
 		}
 
+		return self::handle_items_next_from_body($body);
+	}
+
+	/**
+	 * Body-driven core of {@see handle_items_next()} — extracted (TASK-002-WP-09) so the
+	 * `fetch_next` outbound fallback task ({@see OutboundTaskDispatch}) can call the exact same
+	 * `SelectionFilterQuery` + `ExcludeCache` query builder that the primary
+	 * `POST items/next` REST path uses, fed from `PluginOutboundTask.payload` instead of an HTTP
+	 * request body — not a parallel reimplementation (WP-09 task requirement).
+	 *
+	 * @param array<string, mixed> $body
+	 * @return array<string, mixed>|\WP_Error
+	 */
+	public static function handle_items_next_from_body(array $body)
+	{
 		$pipeline_id = '';
 		if (isset($body['pipeline_id']) && is_string($body['pipeline_id'])) {
 			$pipeline_id = trim($body['pipeline_id']);
@@ -834,6 +849,19 @@ class WireProtocol
 			);
 		}
 
+		return self::handle_items_batch_from_body($body);
+	}
+
+	/**
+	 * Body-driven core of {@see handle_items_batch()} — extracted (TASK-002-WP-09) so the
+	 * `fetch_batch` outbound fallback task ({@see OutboundTaskDispatch}) reuses WP-07's exact
+	 * pagination query builder instead of a parallel implementation.
+	 *
+	 * @param array<string, mixed> $body
+	 * @return array<string, mixed>|\WP_Error
+	 */
+	public static function handle_items_batch_from_body(array $body)
+	{
 		$pipeline_id = '';
 		if (isset($body['pipeline_id']) && is_string($body['pipeline_id'])) {
 			$pipeline_id = trim($body['pipeline_id']);

@@ -68,6 +68,7 @@ class PP
 		Install::init();
 		Scheduler::init();
 		PipelineHooks::init();
+		OutboundTaskDispatch::init();
 
 		// Drop legacy heartbeat cron if present (last_seen is updated on real machine auth only).
 		wp_clear_scheduled_hook('parrotposter_plugin_heartbeat');
