@@ -69,6 +69,15 @@ class PluginConnect
 		if (isset($res['migration_mode']) && is_string($res['migration_mode'])) {
 			Settings::set_migration_mode(strtolower($res['migration_mode']));
 		}
+		// TASK-002-BE-52: initial signing key delivery — previously the only way this site could
+		// ever learn a signing key was a rotate_secrets fallback task, and nothing created one of
+		// those either. Uses the same setter WP-09 already built for the rotation path
+		// (Settings::set_outbound_task_signing_public_key() correctly shifts any prior value into
+		// the `_prev` slot rather than dropping it, per DEC-002-06 D4 — a no-op here on first
+		// bind, since there is no prior value yet).
+		if (isset($res['outbound_task_signing_public_key']) && is_string($res['outbound_task_signing_public_key'])) {
+			Settings::set_outbound_task_signing_public_key($res['outbound_task_signing_public_key']);
+		}
 
 		self::maybe_auto_migrate_to_pipeline();
 

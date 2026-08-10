@@ -908,7 +908,7 @@ class Api
 	/**
 	 * Plugin binding: exchange one-time auth code for machine secrets (no HMAC).
 	 *
-	 * @return array{plugin_id: string, site_to_pp_secret: string, pp_to_site_secret: string, migration_mode?: string}|array{error: array{msg: string, code?: string}}
+	 * @return array{plugin_id: string, site_to_pp_secret: string, pp_to_site_secret: string, migration_mode?: string, outbound_task_signing_public_key?: string}|array{error: array{msg: string, code?: string}}
 	 */
 	public static function complete_plugin_binding(
 		string $code,
@@ -940,9 +940,14 @@ class Api
 			$variables['pluginVersion'] = trim($plugin_version);
 		}
 
+		// outboundTaskSigningPublicKey (TASK-002-BE-52): the plugin's only channel for learning
+		// its *initial* Ed25519 signing public key — before this, nothing ever populated it
+		// (see Settings::set_outbound_task_signing_public_key()'s doc comment; the only other
+		// writer is a rotate_secrets fallback task, and back-app had no path that ever created
+		// one either until the same task).
 		$q = 'mutation CompletePluginBinding($code: String!, $platform: PluginPlatform!, $domain: String!, $callbackUrl: String!, $pluginVersion: String) {
 			completePluginBinding(code: $code, platform: $platform, domain: $domain, callbackUrl: $callbackUrl, pluginVersion: $pluginVersion) {
-				pluginId siteToPpSecret ppToSiteSecret migrationMode
+				pluginId siteToPpSecret ppToSiteSecret migrationMode outboundTaskSigningPublicKey
 			}
 		}';
 		$res = self::do_graphql_request($q, $variables, [
@@ -974,6 +979,9 @@ class Api
 		];
 		if (isset($payload['migrationMode']) && is_string($payload['migrationMode'])) {
 			$result['migration_mode'] = $payload['migrationMode'];
+		}
+		if (isset($payload['outboundTaskSigningPublicKey']) && is_string($payload['outboundTaskSigningPublicKey'])) {
+			$result['outbound_task_signing_public_key'] = $payload['outboundTaskSigningPublicKey'];
 		}
 
 		return $result;
