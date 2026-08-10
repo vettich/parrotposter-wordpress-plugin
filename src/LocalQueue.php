@@ -655,10 +655,57 @@ class LocalQueue
 			'curl_connect_timeout' => 2,
 		]);
 		if (!empty($res['error'])) {
+			if (self::is_pipeline_not_found_error($res)) {
+				$pipeline_id = isset($variables['pipelineId']) ? (string) $variables['pipelineId'] : '';
+				if ($pipeline_id !== '') {
+					Settings::remove_pipeline_id($pipeline_id);
+				}
+				PP::log([
+					'LocalQueue::run_pipeline_event',
+					'pipeline_not_found_dropped',
+					'pipeline_id' => $pipeline_id,
+					'wp_post_id' => $wp_post_id,
+				]);
+
+				// Treat as success: drop the queue row (caller deletes) and stop enqueueing
+				// this ghost pipeline on future saves.
+				return;
+			}
+
 			throw new \RuntimeException((string) ($res['error']['msg'] ?? 'pipeline event failed'));
 		}
 
 		PushEventService::apply_side_effects_after_ingest($wp_post_id, $variables, $res);
+	}
+
+	/**
+	 * PP soft-deleted / missing pipeline → ingest returns accepted=false with pipeline.not_found.
+	 *
+	 * @param array{error?: array{msg?: string, errors?: list<array{message?: string, code?: string}>}} $res
+	 */
+	private static function is_pipeline_not_found_error(array $res): bool
+	{
+		$msg = strtolower((string) ($res['error']['msg'] ?? ''));
+		if ($msg === 'pipeline.not_found' || strpos($msg, 'pipeline.not_found') !== false) {
+			return true;
+		}
+
+		$errors = $res['error']['errors'] ?? null;
+		if (!is_array($errors)) {
+			return false;
+		}
+
+		foreach ($errors as $err) {
+			if (!is_array($err)) {
+				continue;
+			}
+			$err_msg = strtolower((string) ($err['message'] ?? ''));
+			if ($err_msg === 'pipeline.not_found' || strpos($err_msg, 'pipeline.not_found') !== false) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	/**
@@ -711,6 +758,17 @@ class LocalQueue
 		$need_wake = self::is_wake_pending() || self::has_pending_ready();
 		if (!$need_wake) {
 			return;
+		}
+
+		// Pipeline push events use site_to_pp HMAC — flush locally instead of relying on
+		// post-queue callback (admin-ajax may be behind nginx auth-request on dev stacks).
+		if (Settings::site_to_pp_secret() !== '') {
+			self::handle_http_process(true);
+			if (!self::has_pending_ready()) {
+				self::set_wake_pending(false);
+
+				return;
+			}
 		}
 
 		if (empty(Options::token())) {
@@ -1056,6 +1114,19 @@ class LocalQueue
 					'has_more' => $result['has_more'] ?? false,
 				]);
 			}
+
+			return;
+		}
+
+		// Apache/mod_php (no fastcgi_finish_request): pipeline mode can flush via site_to_pp
+		// GraphQL without post-queue callback (often blocked by edge auth on admin-ajax).
+		if (Settings::site_to_pp_secret() !== '') {
+			$result = self::handle_http_process(true);
+			PP::log([
+				'LocalQueue::run_self_flush_on_shutdown_no_fpm',
+				'processed' => $result['processed'] ?? 0,
+				'has_more' => $result['has_more'] ?? false,
+			]);
 
 			return;
 		}

@@ -361,6 +361,37 @@ class Settings
 	}
 
 	/**
+	 * Drop a pipeline from the local cache (ids + contract snapshot).
+	 *
+	 * Used when PP reports the pipeline is gone (ingest `pipeline.not_found`).
+	 * Does not change migration_mode — an empty pipeline list in pipeline mode is valid.
+	 */
+	public static function remove_pipeline_id(string $pipeline_id): void
+	{
+		$pipeline_id = trim($pipeline_id);
+		if ($pipeline_id === '') {
+			return;
+		}
+
+		$ids = self::get_pipeline_ids();
+		$filtered = array_values(array_filter(
+			$ids,
+			static function ($id) use ($pipeline_id) {
+				return $id !== $pipeline_id;
+			}
+		));
+		if (count($filtered) !== count($ids)) {
+			self::set_pipeline_ids($filtered);
+		}
+
+		$contracts = self::get_pipeline_contracts();
+		if (isset($contracts[$pipeline_id])) {
+			unset($contracts[$pipeline_id]);
+			update_option(self::PIPELINE_CONTRACTS_KEY, $contracts);
+		}
+	}
+
+	/**
 	 * Update migration_mode from heartbeat / plugin info response (WP-02).
 	 *
 	 * @param array<string, mixed> $response
