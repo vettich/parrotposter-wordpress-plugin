@@ -43,6 +43,15 @@ class Settings
 
 	private const PIPELINE_CONTRACTS_KEY = 'parrotposter_pipeline_contracts';
 
+	/**
+	 * TASK-002-WP-10 local heuristic: last time PP successfully authenticated a primary
+	 * (PP→site) wire request — updated from the single shared choke point every registered
+	 * {@see WireProtocol} route already passes through, {@see WireProtocol::authorize_request()}.
+	 * Stored UTC `Y-m-d H:i:s`, same convention as {@see LocalQueue}'s `next_attempt_at` /
+	 * `created_at` / `locked_until` (gmdate, not `current_time('mysql')` / SQL `NOW()`).
+	 */
+	private const LAST_PRIMARY_CALL_AT_KEY = 'parrotposter_last_primary_call_at';
+
 	private const SECRET_CIPHER_PREFIX = 'PP1:';
 
 	public static function get_migration_mode(): string
@@ -75,6 +84,25 @@ class Settings
 	public static function set_plugin_id(string $plugin_id): void
 	{
 		update_option(self::PLUGIN_ID_KEY, trim($plugin_id));
+	}
+
+	/**
+	 * TASK-002-WP-10: record "PP just authenticated a primary call" — called once from
+	 * {@see WireProtocol::authorize_request()}, the single permission_callback shared by every
+	 * registered wire route (`/info`, `/fields`, `/items/*`, `/notify_contract`,
+	 * `/published_ids_sync`, `/autopost-configs`), so this never needs duplicating per-handler.
+	 */
+	public static function touch_last_primary_call(): void
+	{
+		update_option(self::LAST_PRIMARY_CALL_AT_KEY, gmdate('Y-m-d H:i:s'));
+	}
+
+	/** UTC `Y-m-d H:i:s`, or null if PP has never authenticated a primary call yet. */
+	public static function last_primary_call_at(): ?string
+	{
+		$value = get_option(self::LAST_PRIMARY_CALL_AT_KEY, '');
+
+		return is_string($value) && $value !== '' ? $value : null;
 	}
 
 	public static function is_connected(): bool

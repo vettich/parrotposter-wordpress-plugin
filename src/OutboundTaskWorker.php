@@ -21,19 +21,19 @@ defined('ABSPATH') || exit;
  * reports `skipped` unless the `parrotposter_outbound_task_dispatch` filter is hooked (WP-09's
  * extension seam) — this proves the lease → report round trip end-to-end without executing any
  * real task logic yet.
+ *
+ * Adaptive lease interval (TASK-002-WP-10): {@see OutboundPollScheduler} decides how often the
+ * `lease` GraphQL call actually goes out, based on the last response's `primaryHealth` /
+ * `recommendedPollIntervalS`, the {@see Settings::last_primary_call_at()} local heuristic, and
+ * exponential backoff+jitter — see that class's doc comment for the full priority order. This
+ * class only calls {@see OutboundPollScheduler::is_lease_due()} / `record_lease_outcome()`; it
+ * doesn't own any of the interval decision logic itself.
  */
 class OutboundTaskWorker
 {
 	public const CRON_HOOK = 'parrotposter_outbound_lease_tick';
 
 	private const CRON_SCHEDULE = 'parrotposter_outbound_base_interval';
-
-	/**
-	 * Fixed base interval (SPEC-002-03 §10.1). TASK-002-WP-10 makes this adaptive
-	 * (`primary_health` / `recommendedPollIntervalS` / backoff+jitter) — until then this single
-	 * constant is the whole schedule, deliberately easy to swap out later.
-	 */
-	private const BASE_INTERVAL_SEC = 600;
 
 	/** Mirrors LocalQueue::HTTP_PROCESS_MAX_ITEMS / HTTP_PROCESS_TIME_BUDGET_SEC (same pattern). */
 	private const MAX_ITEMS = 10;
@@ -43,21 +43,23 @@ class OutboundTaskWorker
 	/** SPEC-002-09 §6.4: lease `limit` 1-5, server clamps; ask for the max allowed per tick. */
 	private const LEASE_LIMIT = 5;
 
-	public static function base_interval_seconds(): int
-	{
-		return self::BASE_INTERVAL_SEC;
-	}
-
 	/**
 	 * @param array<string, array{interval: int, display: string}> $schedules
 	 * @return array<string, array{interval: int, display: string}>
 	 */
 	public static function register_cron_schedule(array $schedules): array
 	{
+		// TASK-002-WP-10: the recurring WP-Cron schedule itself now ticks at the finest
+		// granularity the adaptive interval could ever need (OutboundPollScheduler::MIN_INTERVAL_SEC)
+		// — WP-Cron's built-in recurring schedules can't vary their interval per tick, so the
+		// actual `lease` network call frequency is throttled inside run_cron_tick() via
+		// OutboundPollScheduler::is_lease_due() instead. The cron hook itself still fires every
+		// tick to drain/report already-claimed local rows regardless of lease throttling.
 		if (!isset($schedules[self::CRON_SCHEDULE])) {
+			$interval = OutboundPollScheduler::MIN_INTERVAL_SEC;
 			$schedules[self::CRON_SCHEDULE] = [
-				'interval' => self::BASE_INTERVAL_SEC,
-				'display' => 'Every ' . (int) (self::BASE_INTERVAL_SEC / 60) . ' minutes (ParrotPoster outbound lease)',
+				'interval' => $interval,
+				'display' => 'Every ' . (int) ($interval / 60) . ' minutes (ParrotPoster outbound lease)',
 			];
 		}
 
@@ -91,7 +93,12 @@ class OutboundTaskWorker
 
 		$deadline = microtime(true) + self::TIME_BUDGET_SEC;
 
-		self::lease_and_store();
+		// TASK-002-WP-10: the cron hook fires every tick (MIN_INTERVAL_SEC granularity), but the
+		// actual `lease` network call is throttled to the adaptively-computed interval — draining
+		// already-claimed local rows below still runs every tick regardless.
+		if (OutboundPollScheduler::is_lease_due()) {
+			self::lease_and_store();
+		}
 
 		$processed = self::process_batch(self::MAX_ITEMS, $deadline);
 
@@ -116,16 +123,30 @@ class OutboundTaskWorker
 
 		if (!empty($res['error'])) {
 			PP::log(['OutboundTaskWorker::lease_failed', 'error' => $res['error']]);
+			// No server signal to go on this round — fall back to the standard backoff/local-
+			// heuristic path (WP-10) rather than leaving next_due_at stale, so a persistent lease
+			// failure still widens the retry interval instead of retrying every single cron tick.
+			OutboundPollScheduler::record_lease_outcome('UNKNOWN', null, false);
 
 			return;
 		}
 
 		$payload = $res['data']['pluginOutboundTasksLease'] ?? null;
-		if (!is_array($payload) || empty($payload['tasks']) || !is_array($payload['tasks'])) {
-			return;
-		}
+		$tasks = is_array($payload) && isset($payload['tasks']) && is_array($payload['tasks'])
+			? $payload['tasks']
+			: [];
+		$primary_health = is_array($payload) && isset($payload['primaryHealth'])
+			? (string) $payload['primaryHealth']
+			: 'UNKNOWN';
+		$recommended_poll_interval_s = is_array($payload) && isset($payload['recommendedPollIntervalS']) && $payload['recommendedPollIntervalS'] !== null
+			? (int) $payload['recommendedPollIntervalS']
+			: null;
 
-		OutboundTaskQueue::store_leased_tasks($payload['tasks']);
+		OutboundPollScheduler::record_lease_outcome($primary_health, $recommended_poll_interval_s, $tasks !== []);
+
+		if ($tasks !== []) {
+			OutboundTaskQueue::store_leased_tasks($tasks);
+		}
 	}
 
 	private static function client_instance_id(): string

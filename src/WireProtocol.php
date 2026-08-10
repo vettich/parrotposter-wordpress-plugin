@@ -236,6 +236,13 @@ class WireProtocol
 			);
 		}
 
+		// TASK-002-WP-10: single shared choke point for "PP just reached this site directly" —
+		// every registered wire route (`/info`, `/fields`, `/items/*`, `/notify_contract`,
+		// `/published_ids_sync`, `/autopost-configs`) uses this method as its
+		// permission_callback, so one call here covers all of them without per-handler
+		// duplication. Feeds OutboundPollScheduler's local watchdog heuristic.
+		Settings::touch_last_primary_call();
+
 		return true;
 	}
 
