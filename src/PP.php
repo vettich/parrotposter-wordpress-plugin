@@ -49,8 +49,10 @@ class PP
 	public function register()
 	{
 		add_filter('cron_schedules', [__CLASS__, 'add_cron_schedules']);
+		add_filter('cron_schedules', [OutboundTaskWorker::class, 'register_cron_schedule']);
 		add_action('parrotposter_retry_local_queue', [LocalQueue::class, 'retry_via_cron']);
 		add_action('parrotposter_refresh_domains', [DomainSelector::class, 'cron_refresh_domains']);
+		add_action(OutboundTaskWorker::CRON_HOOK, [OutboundTaskWorker::class, 'run_cron_tick']);
 
 		add_action('plugins_loaded', [$this, 'load_textdomain']);
 		add_action('admin_enqueue_scripts', [$this, 'register_scripts']);
@@ -79,6 +81,7 @@ class PP
 	public static function activation()
 	{
 		add_filter('cron_schedules', [__CLASS__, 'add_cron_schedules']);
+		add_filter('cron_schedules', [OutboundTaskWorker::class, 'register_cron_schedule']);
 		Install::install();
 		if (!wp_next_scheduled('parrotposter_retry_local_queue')) {
 			wp_schedule_event(time() + 60, 'parrotposter_every_minute', 'parrotposter_retry_local_queue');
@@ -86,6 +89,7 @@ class PP
 		if (!wp_next_scheduled('parrotposter_refresh_domains')) {
 			wp_schedule_event(time() + 120, 'hourly', 'parrotposter_refresh_domains');
 		}
+		OutboundTaskWorker::ensure_scheduled();
 
 		// Our REST routes are registered on rest_api_init, which has already
 		// fired by this point in the activation request — safe to flush now
@@ -99,6 +103,7 @@ class PP
 		wp_clear_scheduled_hook('parrotposter_retry_local_queue');
 		wp_clear_scheduled_hook('parrotposter_refresh_domains');
 		wp_clear_scheduled_hook('parrotposter_plugin_heartbeat');
+		OutboundTaskWorker::clear_scheduled();
 	}
 
 	/**

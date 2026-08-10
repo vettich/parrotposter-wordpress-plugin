@@ -86,6 +86,8 @@ class Install
 			wp_schedule_event(time() + 120, 'hourly', 'parrotposter_refresh_domains');
 		}
 
+		OutboundTaskWorker::ensure_scheduled();
+
 		delete_transient('parrotposter_installing');
 
 		add_option('parrotposter_install_timestamp', time());
@@ -177,6 +179,8 @@ class Install
 			) $charset_collate;
 		";
 
+		$tables .= OutboundTaskQueue::schema_sql();
+
 		return $tables;
 	}
 
@@ -189,6 +193,7 @@ class Install
 			"{$wpdb->prefix}parrotposter_posts",
 			"{$wpdb->prefix}parrotposter_local_queue",
 			"{$wpdb->prefix}parrotposter_exclude_ids",
+			OutboundTaskQueue::table(),
 		];
 	}
 

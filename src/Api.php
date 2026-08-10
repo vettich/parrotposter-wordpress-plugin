@@ -449,6 +449,10 @@ class Api
 		switch ($operation) {
 			case 'pluginPipelineEventIngest':
 				return 'mutation PluginPipelineEventIngest($input: PluginPipelineEventInput!) { pluginPipelineEventIngest(input: $input) { accepted triggerRunIds errors { message code } } }';
+			case 'pluginOutboundTasksLease':
+				return 'mutation PluginOutboundTasksLease($input: PluginOutboundTasksLeaseInput!) { pluginOutboundTasksLease(input: $input) { tasks { taskId type payload payloadSignature expiresAt rotationId } primaryHealth recommendedPollIntervalS } }';
+			case 'pluginOutboundTaskReport':
+				return 'mutation PluginOutboundTaskReport($input: PluginOutboundTaskReportInput!) { pluginOutboundTaskReport(input: $input) { ok newSiteToPpSecret } }';
 			case 'migratePluginToPipeline':
 				return 'mutation MigratePluginToPipeline($input: MigratePluginInput!) { migratePluginToPipeline(input: $input) { plugin { id migrationMode pipelineIdsFromMigration } pipelines { id name } warnings errors { message code } } }';
 			case 'revertPluginToLegacy':
@@ -466,6 +470,10 @@ class Api
 	{
 		switch ($operation) {
 			case 'pluginPipelineEventIngest':
+				return ['input' => $variables];
+			case 'pluginOutboundTasksLease':
+				return ['input' => $variables];
+			case 'pluginOutboundTaskReport':
 				return ['input' => $variables];
 			case 'migratePluginToPipeline':
 				return ['input' => $variables];
@@ -486,6 +494,14 @@ class Api
 			case 'pluginPipelineEventIngest':
 				return isset($data['pluginPipelineEventIngest']) && is_array($data['pluginPipelineEventIngest'])
 					? $data['pluginPipelineEventIngest']
+					: null;
+			case 'pluginOutboundTasksLease':
+				return isset($data['pluginOutboundTasksLease']) && is_array($data['pluginOutboundTasksLease'])
+					? $data['pluginOutboundTasksLease']
+					: null;
+			case 'pluginOutboundTaskReport':
+				return isset($data['pluginOutboundTaskReport']) && is_array($data['pluginOutboundTaskReport'])
+					? $data['pluginOutboundTaskReport']
 					: null;
 			case 'migratePluginToPipeline':
 				return isset($data['migratePluginToPipeline']) && is_array($data['migratePluginToPipeline'])

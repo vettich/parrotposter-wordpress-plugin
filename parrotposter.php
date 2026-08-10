@@ -21,7 +21,7 @@ if (!defined('ABSPATH')) {
 }
 
 define('PARROTPOSTER_VERSION', '2.0.0');
-define('PARROTPOSTER_DB_VERSION', '1.0.10');
+define('PARROTPOSTER_DB_VERSION', '1.0.11');
 define('PARROTPOSTER_CAPABILITIES', ['push_events', 'fetch_next']);
 define('PARROTPOSTER_PLUGIN_FILE', __FILE__);
 define('PARROTPOSTER_PLUGIN_DIR', plugin_dir_path(__FILE__));
