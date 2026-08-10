@@ -75,6 +75,13 @@ class AdminAjaxPost
 		// re-binds (triggered via postMessage from the iframe pipelines-list banner).
 		add_action('wp_ajax_parrotposter_reconnect_plugin', [$this, 'reconnect_plugin']);
 
+		// Pipeline source bridge (WP-11): source-descriptor-root / -frame / field-schema
+		// over the postMessage bridge, reusing WireProtocol's /info and /fields logic
+		// directly (no HTTP loopback) — DEC-002-06 D3.
+		add_action('wp_ajax_parrotposter_bridge_source_descriptor_root', [$this, 'bridge_source_descriptor_root']);
+		add_action('wp_ajax_parrotposter_bridge_source_descriptor_frame', [$this, 'bridge_source_descriptor_frame']);
+		add_action('wp_ajax_parrotposter_bridge_field_schema', [$this, 'bridge_field_schema']);
+
 		// Pipeline migration (SPEC-002-17).
 		add_action('wp_ajax_pp_migrate_to_pipeline', [$this, 'migrate_to_pipeline']);
 		add_action('wp_ajax_pp_revert_migration', [$this, 'revert_migration']);
@@ -116,6 +123,91 @@ class AdminAjaxPost
 			'success' => empty($bind['error']),
 			'error' => $bind['error'] ?? null,
 		]);
+		exit;
+	}
+
+	/**
+	 * Bridge: source-descriptor-root (SPEC-002-02 §3.3, WP-11) — same post_type set
+	 * as REST `/info.post_types`, wrapped as a root `SourceStepDescriptor`. Called
+	 * via postMessage `source_descriptor_root` from the embedded front-app iframe
+	 * when PP backend can't reach the site directly (DEC-002-06 D3).
+	 */
+	public function bridge_source_descriptor_root(): void
+	{
+		self::ajax_guard();
+		nocache_headers();
+		header('Content-Type: application/json; charset=UTF-8');
+
+		echo wp_json_encode([
+			'key' => 'post_type',
+			'label' => __('Post type', 'parrotposter'),
+			'options_mode' => 'inline',
+			'options' => WireProtocol::post_type_options(),
+			'requires_child_selection' => false,
+			'children' => null,
+		]);
+		exit;
+	}
+
+	/**
+	 * Bridge: source-descriptor-frame (WP-11). WP's source tree is flat — the
+	 * root's `post_type` step is always a leaf (SPEC-002-02 §3.3.3), unlike
+	 * Bitrix's `iblock_type -> iblock` nesting (§3.3.4 example). The front-app
+	 * should not call this per the §3.3.3 decision tree (root has no `children`
+	 * and `requires_child_selection` is false), but the op is implemented as a
+	 * stub for wire completeness: it always reports "no further step".
+	 */
+	public function bridge_source_descriptor_frame(): void
+	{
+		self::ajax_guard();
+		nocache_headers();
+		header('Content-Type: application/json; charset=UTF-8');
+
+		echo wp_json_encode([
+			'descriptor' => null,
+		]);
+		exit;
+	}
+
+	/**
+	 * Bridge: field-schema (WP-11) — calls the same internal WireProtocol logic
+	 * as REST `/fields` (WP-04) directly, no HTTP loopback onto this site's own
+	 * REST route. Accepts either a full `source_path` (JSON-encoded
+	 * `SourceSelectionStep[]`, matching the wire `field_schema` op payload) or a
+	 * bare `post_type` for convenience.
+	 */
+	public function bridge_field_schema(): void
+	{
+		self::ajax_guard();
+		nocache_headers();
+		header('Content-Type: application/json; charset=UTF-8');
+
+		$post_type = '';
+		if (isset($_POST['source_path'])) {
+			$raw = wp_unslash($_POST['source_path']);
+			$source_path = is_string($raw) ? json_decode($raw, true) : $raw;
+			if (is_array($source_path)) {
+				$post_type = WireProtocol::post_type_from_source_path($source_path);
+			}
+		}
+		if ($post_type === '' && isset($_POST['post_type']) && is_string($_POST['post_type'])) {
+			$post_type = sanitize_key(wp_unslash($_POST['post_type']));
+		}
+
+		$result = WireProtocol::field_schema_for_post_type($post_type);
+		if (is_wp_error($result)) {
+			$data = $result->get_error_data();
+			status_header(is_array($data) && isset($data['status']) ? (int) $data['status'] : 400);
+			echo wp_json_encode([
+				'error' => [
+					'code' => $result->get_error_code(),
+					'message' => $result->get_error_message(),
+				],
+			]);
+			exit;
+		}
+
+		echo wp_json_encode($result);
 		exit;
 	}
 

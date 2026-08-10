@@ -360,6 +360,25 @@ class WireProtocol
 			? array_values(PARROTPOSTER_CAPABILITIES)
 			: ['push_events'];
 
+		return [
+			'migration_mode' => Settings::get_migration_mode(),
+			'capabilities' => $capabilities,
+			'plugin_version' => defined('PARROTPOSTER_VERSION') ? (string) PARROTPOSTER_VERSION : '',
+			'plugin_id' => Settings::plugin_id(),
+			'post_types' => self::post_type_options(),
+			'filter_capabilities' => SelectionFilterQuery::filter_capabilities(),
+		];
+	}
+
+	/**
+	 * Public post types as `SourceOption[]` (value/label). Shared by REST `/info`
+	 * and the WP-11 admin-ajax bridge (`wp_ajax_parrotposter_bridge_source_descriptor_root`,
+	 * SPEC-002-02 §3.3.1) — same set, same shape, no duplicated lookup.
+	 *
+	 * @return list<array{value: string, label: string}>
+	 */
+	public static function post_type_options(): array
+	{
 		$post_types = [];
 		foreach (WpPostHelpers::get_post_types('object') as $slug => $object) {
 			$label = '';
@@ -372,14 +391,7 @@ class WireProtocol
 			];
 		}
 
-		return [
-			'migration_mode' => Settings::get_migration_mode(),
-			'capabilities' => $capabilities,
-			'plugin_version' => defined('PARROTPOSTER_VERSION') ? (string) PARROTPOSTER_VERSION : '',
-			'plugin_id' => Settings::plugin_id(),
-			'post_types' => $post_types,
-			'filter_capabilities' => SelectionFilterQuery::filter_capabilities(),
-		];
+		return $post_types;
 	}
 
 	/**
@@ -446,6 +458,35 @@ class WireProtocol
 		$post_type = self::require_valid_post_type($request);
 		if (is_wp_error($post_type)) {
 			return $post_type;
+		}
+
+		return self::field_schema_for_post_type($post_type);
+	}
+
+	/**
+	 * Build `FieldSchema` for a post_type (SPEC-002-08 §3.2). Shared by REST
+	 * `/fields` (WP-04) and the WP-11 admin-ajax bridge
+	 * (`wp_ajax_parrotposter_bridge_field_schema`) — call this directly from the
+	 * bridge, no HTTP loopback onto this site's own REST route.
+	 *
+	 * @return array<string, mixed>|\WP_Error
+	 */
+	public static function field_schema_for_post_type(string $post_type)
+	{
+		if ($post_type === '') {
+			return new \WP_Error(
+				'invalid_post_type',
+				'post_type is required',
+				['status' => 400]
+			);
+		}
+		$allowed = WpPostHelpers::get_post_types('names');
+		if (!in_array($post_type, $allowed, true)) {
+			return new \WP_Error(
+				'invalid_post_type',
+				sprintf('Unknown post_type: %s', $post_type),
+				['status' => 400]
+			);
 		}
 
 		$legacy_fields = Fields::get_fields($post_type, ['text', 'link', 'date', 'image']);
@@ -1072,9 +1113,13 @@ class WireProtocol
 	/**
 	 * Extract post_type from source_path steps (`{ key: post_type, value: … }`).
 	 *
+	 * Public: also used by the WP-11 admin-ajax bridge
+	 * (`wp_ajax_parrotposter_bridge_field_schema`) to resolve `post_type` from the
+	 * `source_path` sent over postMessage, same as `items/next` / `items/batch`.
+	 *
 	 * @param list<mixed> $source_path
 	 */
-	private static function post_type_from_source_path(array $source_path): string
+	public static function post_type_from_source_path(array $source_path): string
 	{
 		foreach ($source_path as $step) {
 			if (!is_array($step)) {

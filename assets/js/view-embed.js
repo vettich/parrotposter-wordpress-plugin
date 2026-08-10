@@ -253,6 +253,100 @@
 					});
 				});
 		},
+		// WP-11: source-descriptor-root / -frame / field-schema over this bridge —
+		// PP backend is unreachable from the site, so the embedded front-app iframe
+		// asks the parent admin page to fetch them locally instead (DEC-002-06 D3).
+		// Same request/response pattern as request_token_refresh above.
+		source_descriptor_root: function () {
+			var ajaxUrl = typeof ajaxurl !== 'undefined' ? ajaxurl : '/wp-admin/admin-ajax.php';
+			var nonce = PP_AUTH2_NONCE || '';
+			fetch(ajaxUrl, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+				body: new URLSearchParams([
+					['action', 'parrotposter_bridge_source_descriptor_root'],
+					['parrotposter[nonce]', nonce],
+				]).toString(),
+				credentials: 'same-origin',
+			})
+				.then(function (r) {
+					return r.json();
+				})
+				.then(function (res) {
+					pp_send_message('source_descriptor_root_result', {
+						descriptor: res && !res.error ? res : null,
+						error: res && res.error ? res.error : null,
+					});
+				})
+				.catch(function () {
+					pp_send_message('source_descriptor_root_result', {
+						descriptor: null,
+						error: 'network',
+					});
+				});
+		},
+		source_descriptor_frame: function (data) {
+			var ajaxUrl = typeof ajaxurl !== 'undefined' ? ajaxurl : '/wp-admin/admin-ajax.php';
+			var nonce = PP_AUTH2_NONCE || '';
+			fetch(ajaxUrl, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+				body: new URLSearchParams([
+					['action', 'parrotposter_bridge_source_descriptor_frame'],
+					['parrotposter[nonce]', nonce],
+					['selections_prefix', JSON.stringify((data && data.selections_prefix) || [])],
+				]).toString(),
+				credentials: 'same-origin',
+			})
+				.then(function (r) {
+					return r.json();
+				})
+				.then(function (res) {
+					pp_send_message('source_descriptor_frame_result', {
+						descriptor: res && res.descriptor ? res.descriptor : null,
+						error: res && res.error ? res.error : null,
+					});
+				})
+				.catch(function () {
+					pp_send_message('source_descriptor_frame_result', {
+						descriptor: null,
+						error: 'network',
+					});
+				});
+		},
+		field_schema: function (data) {
+			var ajaxUrl = typeof ajaxurl !== 'undefined' ? ajaxurl : '/wp-admin/admin-ajax.php';
+			var nonce = PP_AUTH2_NONCE || '';
+			fetch(ajaxUrl, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+				body: new URLSearchParams([
+					['action', 'parrotposter_bridge_field_schema'],
+					['parrotposter[nonce]', nonce],
+					['source_path', JSON.stringify((data && data.source_path) || [])],
+				]).toString(),
+				credentials: 'same-origin',
+			})
+				.then(function (r) {
+					return r.json();
+				})
+				.then(function (res) {
+					pp_send_message('field_schema_result', {
+						fields: res && res.fields ? res.fields : [],
+						sections: res && res.sections ? res.sections : [],
+						filter_capabilities: res && res.filter_capabilities ? res.filter_capabilities : null,
+						error: res && res.error ? res.error : null,
+					});
+				})
+				.catch(function () {
+					pp_send_message('field_schema_result', {
+						fields: [],
+						sections: [],
+						filter_capabilities: null,
+						error: 'network',
+					});
+				});
+		},
 		resize: function (data) {
 			var iframe = document.getElementById('pp-iframe');
 			if (iframe) {
