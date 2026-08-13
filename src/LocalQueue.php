@@ -114,6 +114,10 @@ class LocalQueue
 	/**
 	 * Deferred pipeline push event (pluginPipelineEventIngest variables).
 	 *
+	 * CREATED/DELETED: coalesce only pending rows of the same event type (never touch
+	 * processing). UPDATED: coalesce pending UPDATED for this post+pipeline, then insert.
+	 * Each new logical delivery must already carry idempotencyKey in $variables.
+	 *
 	 * @param array<string, mixed> $variables
 	 */
 	public static function enqueue(string $operation, array $variables, int $wp_post_id = 0): void
@@ -127,6 +131,12 @@ class LocalQueue
 			return;
 		}
 
+		$event_type = isset($variables['eventType']) ? (string) $variables['eventType'] : '';
+		$op = self::pipeline_event_operation($pipeline_id, $event_type);
+		if ($op === '') {
+			return;
+		}
+
 		if ($wp_post_id <= 0 && !empty($variables['sourceItemId']) && is_string($variables['sourceItemId'])) {
 			$parts = explode(':', $variables['sourceItemId'], 2);
 			if (count($parts) === 2) {
@@ -134,11 +144,17 @@ class LocalQueue
 			}
 		}
 
+		if (empty($variables['idempotencyKey']) || !is_string($variables['idempotencyKey'])) {
+			$variables['idempotencyKey'] = self::new_pipeline_idempotency_key();
+		}
+
 		PP::log([
 			'LocalQueue::enqueue_pipeline_event',
 			'wp_post_id' => $wp_post_id,
 			'pipeline_id' => $pipeline_id,
-			'event_type' => $variables['eventType'] ?? null,
+			'event_type' => $event_type,
+			'operation' => $op,
+			'idempotency_key' => $variables['idempotencyKey'],
 		]);
 
 		$json = wp_json_encode($variables, JSON_UNESCAPED_UNICODE);
@@ -146,20 +162,61 @@ class LocalQueue
 			$json = '{}';
 		}
 
-		self::enqueue_pending_upsert(
-			$wp_post_id,
-			self::pipeline_event_operation($pipeline_id),
-			$json,
-			true
-		);
+		// Drop pending/failed same-type rows only — never mutate a processing delivery.
+		self::remove_op_unless_processing($op, $wp_post_id);
+		if (self::has_active_op($wp_post_id, $op)) {
+			// processing row still holds UNIQUE(wp_post_id, operation) — uniquify.
+			$op = $op . 'x' . substr(md5(uniqid((string) mt_rand(), true)), 0, 6);
+		}
+		self::insert_pending($wp_post_id, $op, $json);
 		self::schedule_wake_on_shutdown();
 	}
 
-	private static function pipeline_event_operation(string $pipeline_id): string
+	/**
+	 * @return string empty if event_type unknown
+	 */
+	private static function pipeline_event_operation(string $pipeline_id, string $event_type): string
 	{
+		$suffix = self::pipeline_event_suffix($event_type);
+		if ($suffix === '') {
+			return '';
+		}
 		$compact = str_replace('-', '', $pipeline_id);
 
-		return self::OP_PIPELINE_EVENT_PREFIX . substr($compact, 0, 17);
+		return self::OP_PIPELINE_EVENT_PREFIX . substr($compact, 0, 17) . '_' . $suffix;
+	}
+
+	private static function pipeline_event_suffix(string $event_type): string
+	{
+		switch (strtoupper($event_type)) {
+			case 'CREATED':
+				return 'C';
+			case 'UPDATED':
+				return 'U';
+			case 'DELETED':
+				return 'D';
+			default:
+				return '';
+		}
+	}
+
+	private static function new_pipeline_idempotency_key(): string
+	{
+		if (function_exists('wp_generate_uuid4')) {
+			return wp_generate_uuid4();
+		}
+
+		return sprintf(
+			'%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
+			mt_rand(0, 0xffff),
+			mt_rand(0, 0xffff),
+			mt_rand(0, 0xffff),
+			mt_rand(0, 0x0fff) | 0x4000,
+			mt_rand(0, 0x3fff) | 0x8000,
+			mt_rand(0, 0xffff),
+			mt_rand(0, 0xffff),
+			mt_rand(0, 0xffff)
+		);
 	}
 
 	public static function is_pipeline_event_operation(string $operation): bool
@@ -198,6 +255,41 @@ class LocalQueue
 			],
 			['%d', '%s', '%s']
 		);
+	}
+
+	/**
+	 * Remove pending/failed rows for an operation; leave processing alone.
+	 */
+	private static function remove_op_unless_processing(string $op, int $wp_post_id): void
+	{
+		global $wpdb;
+
+		$t = self::table();
+		$wpdb->query(
+			$wpdb->prepare(
+				"DELETE FROM {$t} WHERE wp_post_id = %d AND operation = %s AND status IN (%s, %s)",
+				$wp_post_id,
+				$op,
+				self::STATUS_PENDING,
+				self::STATUS_FAILED
+			)
+		);
+	}
+
+	private static function has_active_op(int $wp_post_id, string $op): bool
+	{
+		global $wpdb;
+
+		$t = self::table();
+		$id = $wpdb->get_var(
+			$wpdb->prepare(
+				"SELECT id FROM {$t} WHERE wp_post_id = %d AND operation = %s LIMIT 1",
+				$wp_post_id,
+				$op
+			)
+		);
+
+		return (int) $id > 0;
 	}
 
 	private static function recover_stale_processing(): void
@@ -293,6 +385,30 @@ class LocalQueue
 				self::STATUS_FAILED,
 				self::STATUS_FAILED,
 				self::STATUS_PENDING
+			)
+		);
+	}
+
+	/**
+	 * Plain INSERT for pipeline events (caller must free the unique slot first).
+	 * Never updates an existing processing row.
+	 */
+	private static function insert_pending(int $wp_post_id, string $operation, string $payload): void
+	{
+		global $wpdb;
+
+		$t = self::table();
+		$now = self::now_utc_for_db();
+		$wpdb->query(
+			$wpdb->prepare(
+				"INSERT INTO {$t} (wp_post_id, operation, payload, status, attempts, next_attempt_at, created_at, locked_until)
+				VALUES (%d, %s, %s, %s, 0, %s, %s, NULL)",
+				$wp_post_id,
+				$operation,
+				$payload,
+				self::STATUS_PENDING,
+				$now,
+				$now
 			)
 		);
 	}

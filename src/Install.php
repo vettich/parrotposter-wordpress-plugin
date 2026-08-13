@@ -158,7 +158,7 @@ class Install
 			CREATE TABLE {$wpdb->prefix}parrotposter_local_queue (
 				id bigint(20) unsigned NOT NULL auto_increment,
 				wp_post_id bigint(20) unsigned NOT NULL,
-				operation varchar(20) NOT NULL,
+				operation varchar(32) NOT NULL,
 				payload longtext NOT NULL,
 				status varchar(20) NOT NULL default 'pending',
 				attempts int NOT NULL default 0,

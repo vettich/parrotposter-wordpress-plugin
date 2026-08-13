@@ -130,21 +130,30 @@ class PushEventService
 			return;
 		}
 
+		$post = get_post($post_id);
 		if ($post_type === null || $post_type === '') {
-			$post = get_post($post_id);
 			$post_type = $post instanceof \WP_Post ? $post->post_type : 'post';
 		}
 
+		// Minimal payload: id/post_type for routing; title for TriggerRun.source_item_label
+		// (back-app ingress reads title/name — same as CREATED/UPDATED).
 		$payload = [
 			'id' => (string) $post_id,
 			'post_type' => (string) $post_type,
 		];
+		if ($post instanceof \WP_Post) {
+			$title = get_the_title($post);
+			if (is_string($title) && trim($title) !== '') {
+				$payload['title'] = $title;
+			}
+		}
 
 		$variables = [
 			'pipelineId' => $pipeline_id,
 			'eventType' => 'DELETED',
 			'contractVersion' => self::contract_version_for_pipeline($pipeline_id),
 			'sourceItemId' => self::source_item_id($post_type, $post_id),
+			'idempotencyKey' => self::new_idempotency_key(),
 			'payload' => self::payload_to_source_fields($payload),
 		];
 
@@ -260,6 +269,7 @@ class PushEventService
 			'eventType' => $event_type,
 			'contractVersion' => self::contract_version_for_pipeline($pipeline_id),
 			'sourceItemId' => self::source_item_id($post->post_type, (int) $post->ID),
+			'idempotencyKey' => self::new_idempotency_key(),
 			'payload' => self::payload_to_source_fields($payload),
 		];
 		if ($changed_fields !== null) {
@@ -267,6 +277,25 @@ class PushEventService
 		}
 
 		return $variables;
+	}
+
+	private static function new_idempotency_key(): string
+	{
+		if (function_exists('wp_generate_uuid4')) {
+			return wp_generate_uuid4();
+		}
+
+		return sprintf(
+			'%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
+			mt_rand(0, 0xffff),
+			mt_rand(0, 0xffff),
+			mt_rand(0, 0xffff),
+			mt_rand(0, 0x0fff) | 0x4000,
+			mt_rand(0, 0x3fff) | 0x8000,
+			mt_rand(0, 0xffff),
+			mt_rand(0, 0xffff),
+			mt_rand(0, 0xffff)
+		);
 	}
 
 	/**
