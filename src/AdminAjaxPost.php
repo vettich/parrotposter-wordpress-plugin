@@ -174,7 +174,8 @@ class AdminAjaxPost
 	 * as REST `/fields` (WP-04) directly, no HTTP loopback onto this site's own
 	 * REST route. Accepts either a full `source_path` (JSON-encoded
 	 * `SourceSelectionStep[]`, matching the wire `field_schema` op payload) or a
-	 * bare `post_type` for convenience.
+	 * bare `post_type` for convenience. Optional `locale`/`lang` (PP UI language)
+	 * matches `GET /fields?locale=` — labels only.
 	 */
 	public function bridge_field_schema(): void
 	{
@@ -194,7 +195,14 @@ class AdminAjaxPost
 			$post_type = sanitize_key(wp_unslash($_POST['post_type']));
 		}
 
-		$result = WireProtocol::field_schema_for_post_type($post_type);
+		$locale = null;
+		if (isset($_POST['locale']) && is_string($_POST['locale'])) {
+			$locale = wp_unslash($_POST['locale']);
+		} elseif (isset($_POST['lang']) && is_string($_POST['lang'])) {
+			$locale = wp_unslash($_POST['lang']);
+		}
+
+		$result = WireProtocol::field_schema_for_post_type($post_type, $locale);
 		if (is_wp_error($result)) {
 			$data = $result->get_error_data();
 			status_header(is_array($data) && isset($data['status']) ? (int) $data['status'] : 400);

@@ -317,14 +317,20 @@
 		field_schema: function (data) {
 			var ajaxUrl = typeof ajaxurl !== 'undefined' ? ajaxurl : '/wp-admin/admin-ajax.php';
 			var nonce = PP_AUTH2_NONCE || '';
+			var params = [
+				['action', 'parrotposter_bridge_field_schema'],
+				['parrotposter[nonce]', nonce],
+				['source_path', JSON.stringify((data && data.source_path) || [])],
+			];
+			// Optional PP UI locale — labels only (same as GET /fields?locale=).
+			var locale = (data && (data.locale || data.lang)) || '';
+			if (locale) {
+				params.push(['locale', String(locale)]);
+			}
 			fetch(ajaxUrl, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-				body: new URLSearchParams([
-					['action', 'parrotposter_bridge_field_schema'],
-					['parrotposter[nonce]', nonce],
-					['source_path', JSON.stringify((data && data.source_path) || [])],
-				]).toString(),
+				body: new URLSearchParams(params).toString(),
 				credentials: 'same-origin',
 			})
 				.then(function (r) {

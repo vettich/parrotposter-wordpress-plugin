@@ -84,6 +84,71 @@ if (!function_exists('__')) {
 	}
 }
 
+if (!defined('PARROTPOSTER_PLUGIN_FILE')) {
+	define('PARROTPOSTER_PLUGIN_FILE', dirname(__DIR__) . '/parrotposter.php');
+}
+if (!defined('PARROTPOSTER_PLUGIN_DIR')) {
+	define('PARROTPOSTER_PLUGIN_DIR', dirname(__DIR__) . '/');
+}
+
+$GLOBALS['pp_test_loaded_textdomains'] = [];
+$GLOBALS['pp_test_switch_to_locale_calls'] = [];
+$GLOBALS['pp_test_switch_to_locale_result'] = false;
+
+if (!function_exists('determine_locale')) {
+	function determine_locale()
+	{
+		return 'en_US';
+	}
+}
+
+if (!function_exists('switch_to_locale')) {
+	function switch_to_locale($locale)
+	{
+		$GLOBALS['pp_test_switch_to_locale_calls'][] = $locale;
+		return (bool) $GLOBALS['pp_test_switch_to_locale_result'];
+	}
+}
+
+if (!function_exists('restore_previous_locale')) {
+	function restore_previous_locale()
+	{
+		return true;
+	}
+}
+
+if (!function_exists('unload_textdomain')) {
+	function unload_textdomain($domain)
+	{
+		return true;
+	}
+}
+
+if (!function_exists('load_textdomain')) {
+	function load_textdomain($domain, $mofile)
+	{
+		$GLOBALS['pp_test_loaded_textdomains'][] = [
+			'domain' => $domain,
+			'mofile' => $mofile,
+		];
+		return is_readable($mofile);
+	}
+}
+
+if (!function_exists('load_plugin_textdomain')) {
+	function load_plugin_textdomain($domain, $deprecated = false, $plugin_rel_path = false)
+	{
+		return true;
+	}
+}
+
+if (!function_exists('plugin_basename')) {
+	function plugin_basename($file)
+	{
+		return 'parrotposter/parrotposter.php';
+	}
+}
+
 if (!function_exists('sanitize_key')) {
 	function sanitize_key($key)
 	{
@@ -230,6 +295,34 @@ assert_true('taxonomies section present (post has taxonomies)', in_array('taxono
 assert_true('woocommerce section absent for post_type=post', !in_array('woocommerce', $section_ids, true));
 
 assert_true('filter_capabilities present', isset($schema['filter_capabilities']['compare_ops']));
+
+// --- normalize_ui_locale(): PP UI codes → WP locales ---
+assert_eq('normalize_ui_locale(ru)', 'ru_RU', WireProtocol::normalize_ui_locale('ru'));
+assert_eq('normalize_ui_locale(en)', 'en_US', WireProtocol::normalize_ui_locale('en'));
+assert_eq('normalize_ui_locale(ru_RU)', 'ru_RU', WireProtocol::normalize_ui_locale('ru_RU'));
+assert_eq('normalize_ui_locale(ru-RU)', 'ru_RU', WireProtocol::normalize_ui_locale('ru-RU'));
+assert_true('normalize_ui_locale(empty) is null', WireProtocol::normalize_ui_locale('') === null);
+assert_true('normalize_ui_locale(bogus) is null', WireProtocol::normalize_ui_locale('!!!') === null);
+
+// locale=ru must load plugin .mo even when switch_to_locale fails (no WP core lang pack).
+$GLOBALS['pp_test_loaded_textdomains'] = [];
+$GLOBALS['pp_test_switch_to_locale_calls'] = [];
+$GLOBALS['pp_test_switch_to_locale_result'] = false;
+$schema_ru = WireProtocol::field_schema_for_post_type('post', 'ru');
+assert_true('field_schema_for_post_type(post, ru) is not a WP_Error', !is_wp_error($schema_ru));
+assert_true('switch_to_locale attempted for ru_RU', in_array('ru_RU', $GLOBALS['pp_test_switch_to_locale_calls'], true));
+$mo_loads = array_values(array_filter(
+	$GLOBALS['pp_test_loaded_textdomains'],
+	static function ($entry) {
+		return ($entry['domain'] ?? '') === 'parrotposter'
+			&& substr((string) ($entry['mofile'] ?? ''), -strlen('parrotposter-ru_RU.mo')) === 'parrotposter-ru_RU.mo';
+	}
+));
+assert_true('load_textdomain called with parrotposter-ru_RU.mo', count($mo_loads) > 0);
+assert_true(
+	'parrotposter-ru_RU.mo is readable',
+	is_readable(PARROTPOSTER_PLUGIN_DIR . 'languages/parrotposter-ru_RU.mo')
+);
 
 // page has no taxonomies registered in this stub -> no taxonomies section.
 $page_schema = WireProtocol::field_schema_for_post_type('page');

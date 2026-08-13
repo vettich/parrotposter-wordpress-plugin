@@ -561,6 +561,22 @@ msgctxt "wp_post_field"
 msgid "Product type"
 msgstr "Тип товара"
 
+#: src/WireProtocol.php
+msgid "Basic fields"
+msgstr "Основные поля"
+
+#: src/WireProtocol.php
+msgid "Media"
+msgstr "Медиа"
+
+#: src/WireProtocol.php
+msgid "Taxonomies"
+msgstr "Таксономии"
+
+#: src/WireProtocol.php
+msgid "WooCommerce"
+msgstr "WooCommerce"
+
 #: views/accounts/choice_list.php:25
 msgid "You have no accounts connected"
 msgstr "Нет подключенных аккаунтов"

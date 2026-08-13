@@ -467,7 +467,60 @@ class WireProtocol
 			return $post_type;
 		}
 
-		return self::field_schema_for_post_type($post_type);
+		$locale = self::locale_from_request($request);
+
+		return self::field_schema_for_post_type($post_type, $locale);
+	}
+
+	/**
+	 * Optional UI locale from wire `GET /fields` (`locale` preferred, `lang` alias).
+	 * Affects translated `label`/`sections` only — not field `key` semantics.
+	 *
+	 * @return string|null Normalized locale (e.g. `ru_RU`) or null to keep WP current.
+	 */
+	private static function locale_from_request(WP_REST_Request $request): ?string
+	{
+		$raw = $request->get_param('locale');
+		if (!is_string($raw) || $raw === '') {
+			$raw = $request->get_param('lang');
+		}
+		if (!is_string($raw) || $raw === '') {
+			return null;
+		}
+
+		return self::normalize_ui_locale($raw);
+	}
+
+	/**
+	 * Map PP UI codes (`ru`/`en`) and full WP locales to a loadable locale string.
+	 * Returns null when the value is empty/invalid (caller keeps current locale).
+	 */
+	public static function normalize_ui_locale(string $raw): ?string
+	{
+		$raw = str_replace('-', '_', trim($raw));
+		if ($raw === '') {
+			return null;
+		}
+
+		$short = strtolower(explode('_', $raw)[0]);
+		$aliases = [
+			'ru' => 'ru_RU',
+			'en' => 'en_US',
+		];
+		if (isset($aliases[$short]) && strpos($raw, '_') === false) {
+			return $aliases[$short];
+		}
+
+		// Accept already-qualified locales (ru_RU, en_US, …).
+		if (preg_match('/^[a-z]{2}(_[A-Z]{2})?$/', $raw)) {
+			$parts = explode('_', $raw);
+			if (count($parts) === 1) {
+				return $aliases[strtolower($parts[0])] ?? null;
+			}
+			return strtolower($parts[0]) . '_' . strtoupper($parts[1]);
+		}
+
+		return null;
 	}
 
 	/**
@@ -476,9 +529,13 @@ class WireProtocol
 	 * (`wp_ajax_parrotposter_bridge_field_schema`) — call this directly from the
 	 * bridge, no HTTP loopback onto this site's own REST route.
 	 *
+	 * @param string|null $locale Optional PP UI locale (`ru`/`en`/`ru_RU`). When set,
+	 *                            loads `parrotposter-{locale}.mo` directly (does **not**
+	 *                            require a WP core language pack) and best-effort
+	 *                            `switch_to_locale` for core taxonomy labels.
 	 * @return array<string, mixed>|\WP_Error
 	 */
-	public static function field_schema_for_post_type(string $post_type)
+	public static function field_schema_for_post_type(string $post_type, ?string $locale = null)
 	{
 		if ($post_type === '') {
 			return new \WP_Error(
@@ -496,6 +553,87 @@ class WireProtocol
 			);
 		}
 
+		$normalized = is_string($locale) && $locale !== ''
+			? self::normalize_ui_locale($locale)
+			: null;
+		$applied_ui_locale = false;
+		$switched = false;
+		if ($normalized !== null) {
+			// Best-effort: helps WP core taxonomy labels when the site has the lang pack.
+			// Must not gate plugin translations — switch_to_locale returns false when
+			// ru_RU (etc.) is not installed under wp-content/languages/.
+			if (function_exists('switch_to_locale')
+				&& function_exists('determine_locale')
+				&& $normalized !== determine_locale()
+			) {
+				$switched = (bool) switch_to_locale($normalized);
+			}
+			self::load_parrotposter_textdomain_for_locale($normalized);
+			$applied_ui_locale = true;
+		}
+
+		try {
+			return self::build_field_schema_for_post_type($post_type);
+		} finally {
+			if ($applied_ui_locale) {
+				if ($switched && function_exists('restore_previous_locale')) {
+					restore_previous_locale();
+				}
+				self::reload_parrotposter_textdomain();
+			}
+		}
+	}
+
+	/**
+	 * Load parrotposter translations for an explicit UI locale.
+	 *
+	 * Uses `load_textdomain` with the plugin `.mo` path so labels work even when
+	 * WordPress core does not have that language pack installed (standalone PP UI
+	 * on an English WP site is the common case).
+	 */
+	private static function load_parrotposter_textdomain_for_locale(string $locale): void
+	{
+		if (function_exists('unload_textdomain')) {
+			unload_textdomain('parrotposter');
+		}
+
+		// English source strings live in code — no .mo required.
+		if ($locale === 'en_US' || strpos(strtolower($locale), 'en') === 0) {
+			return;
+		}
+
+		$mofile = PARROTPOSTER_PLUGIN_DIR . 'languages/parrotposter-' . $locale . '.mo';
+		if (is_readable($mofile) && function_exists('load_textdomain')) {
+			load_textdomain('parrotposter', $mofile);
+			return;
+		}
+
+		// No matching .mo — fall back to WP's usual lookup for the current locale.
+		self::reload_parrotposter_textdomain();
+	}
+
+	/**
+	 * Reload parrotposter translations for the current WP locale (after restore).
+	 */
+	private static function reload_parrotposter_textdomain(): void
+	{
+		if (function_exists('unload_textdomain')) {
+			unload_textdomain('parrotposter');
+		}
+		if (function_exists('load_plugin_textdomain')) {
+			load_plugin_textdomain(
+				'parrotposter',
+				false,
+				dirname(plugin_basename(PARROTPOSTER_PLUGIN_FILE)) . '/languages'
+			);
+		}
+	}
+
+	/**
+	 * @return array<string, mixed>
+	 */
+	private static function build_field_schema_for_post_type(string $post_type): array
+	{
 		$legacy_fields = Fields::get_fields($post_type, ['text', 'link', 'date', 'image']);
 		$fields_by_key = [];
 		$order = 10;
