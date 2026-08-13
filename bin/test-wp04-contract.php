@@ -234,4 +234,40 @@ assert_true(
 	)
 );
 
+// remove_pipeline_id drops id + contract; leaves siblings intact
+Settings::set_pipeline_ids([
+	'11111111-1111-1111-1111-111111111111',
+	'22222222-2222-2222-2222-222222222222',
+]);
+Settings::set_pipeline_contract('11111111-1111-1111-1111-111111111111', [
+	'contract_version' => 3,
+	'required_fields' => ['title'],
+]);
+Settings::set_pipeline_contract('22222222-2222-2222-2222-222222222222', [
+	'contract_version' => 1,
+	'required_fields' => ['link'],
+]);
+Settings::remove_pipeline_id('11111111-1111-1111-1111-111111111111');
+assert_eq(
+	'remove_pipeline_id drops id from list',
+	['22222222-2222-2222-2222-222222222222'],
+	Settings::get_pipeline_ids()
+);
+assert_eq(
+	'remove_pipeline_id drops contract snapshot',
+	null,
+	Settings::get_pipeline_contract('11111111-1111-1111-1111-111111111111')
+);
+assert_eq(
+	'remove_pipeline_id keeps sibling contract',
+	1,
+	(int) (Settings::get_pipeline_contract('22222222-2222-2222-2222-222222222222')['contract_version'] ?? 0)
+);
+Settings::remove_pipeline_id('11111111-1111-1111-1111-111111111111');
+assert_eq(
+	'remove_pipeline_id is idempotent',
+	['22222222-2222-2222-2222-222222222222'],
+	Settings::get_pipeline_ids()
+);
+
 echo "\nAll WP-04 smoke tests passed.\n";
