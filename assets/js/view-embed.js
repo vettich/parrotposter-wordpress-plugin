@@ -353,6 +353,64 @@
 					});
 				});
 		},
+		// Latest published items for the template-preview picker. Same reason as
+		// field_schema: PP backend often cannot reach callback_url, so the iframe
+		// asks the parent admin page to run WP_Query locally (DEC-002-06 D3).
+		list_preview_items: function (data) {
+			var ajaxUrl = typeof ajaxurl !== 'undefined' ? ajaxurl : '/wp-admin/admin-ajax.php';
+			var nonce = PP_AUTH2_NONCE || '';
+			var params = [
+				['action', 'parrotposter_bridge_list_preview_items'],
+				['parrotposter[nonce]', nonce],
+				['source_path', JSON.stringify((data && data.source_path) || [])],
+			];
+			if (data && data.limit != null) {
+				params.push(['limit', String(data.limit)]);
+			}
+			if (data && data.offset != null) {
+				params.push(['offset', String(data.offset)]);
+			}
+			if (data && data.filter) {
+				params.push([
+					'filter',
+					typeof data.filter === 'string' ? data.filter : JSON.stringify(data.filter),
+				]);
+			}
+			if (data && data.required_fields) {
+				params.push([
+					'required_fields',
+					typeof data.required_fields === 'string'
+						? data.required_fields
+						: JSON.stringify(data.required_fields),
+				]);
+			}
+			if (data && data.pipeline_id) {
+				params.push(['pipeline_id', String(data.pipeline_id)]);
+			}
+			fetch(ajaxUrl, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+				body: new URLSearchParams(params).toString(),
+				credentials: 'same-origin',
+			})
+				.then(function (r) {
+					return r.json();
+				})
+				.then(function (res) {
+					pp_send_message('list_preview_items_result', {
+						items: res && res.items ? res.items : [],
+						next_offset: res && res.next_offset != null ? res.next_offset : null,
+						error: res && res.error ? res.error : null,
+					});
+				})
+				.catch(function () {
+					pp_send_message('list_preview_items_result', {
+						items: [],
+						next_offset: null,
+						error: 'network',
+					});
+				});
+		},
 		resize: function (data) {
 			var iframe = document.getElementById('pp-iframe');
 			if (iframe) {

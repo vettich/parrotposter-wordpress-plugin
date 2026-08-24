@@ -3,7 +3,8 @@
 
 /**
  * Smoke tests for WP-11: postMessage bridge helpers on WireProtocol —
- * `post_type_options()`, `post_type_from_source_path()`, `field_schema_for_post_type()`.
+ * `post_type_options()`, `post_type_from_source_path()`, `field_schema_for_post_type()`,
+ * `items_latest_for_post_type()` (validation only — no live WP_Query).
  *
  * These back the new `wp_ajax_parrotposter_bridge_*` handlers in AdminAjaxPost.php,
  * which call them directly (no HTTP loopback), same as REST `/info` and `/fields`.
@@ -337,5 +338,14 @@ assert_eq('unknown post_type error code', 'invalid_post_type', $err->get_error_c
 // Empty post_type (e.g. malformed source_path from the bridge) -> WP_Error, not a fatal.
 $empty_err = WireProtocol::field_schema_for_post_type('');
 assert_true('field_schema_for_post_type("") rejects empty post_type', is_wp_error($empty_err));
+
+// --- items_latest_for_post_type(): validation only (unknown/empty post_type, no WP_Query) ---
+$latest_empty = WireProtocol::items_latest_for_post_type('');
+assert_true('items_latest_for_post_type("") rejects empty post_type', is_wp_error($latest_empty));
+assert_eq('empty post_type latest error code', 'invalid_post_type', $latest_empty->get_error_code());
+
+$latest_unknown = WireProtocol::items_latest_for_post_type('no_such_type');
+assert_true('items_latest_for_post_type() rejects unknown post_type', is_wp_error($latest_unknown));
+assert_eq('unknown post_type latest error code', 'invalid_post_type', $latest_unknown->get_error_code());
 
 echo "\nAll WP-11 bridge smoke tests passed.\n";

@@ -68,7 +68,7 @@ When [`Settings::get_migration_mode()`](src/Settings.php) is `pipeline`, [`Pipel
 | `GET .../info` | `migration_mode`, `capabilities`, `plugin_version`, `filter_capabilities` |
 | `GET .../fields?post_type=&locale=` | `FieldSchema` (`fields` + `sections` + `filter_capabilities`); optional `locale`/`lang` for UI labels |
 | `GET .../items/{source_item_id}` | Single `SourceItem` for preview |
-| `GET .../items/latest?post_type=&limit=&offset=&filter=&required_fields=` | Latest published items for template preview; optional Expression AST `filter` scans until `limit` matches (returns `next_offset`); optional `required_fields` (JSON string array) merges into item payload beyond MVP keys |
+| `GET .../items/latest?post_type=&limit=&offset=&filter=&required_fields=` | Latest published items for template preview; optional Expression AST `filter` scans until `limit` matches (returns `next_offset`); optional `required_fields` (JSON string array) merges into item payload beyond MVP keys. Iframe wizard preview uses the same `WireProtocol::items_latest_for_post_type()` via postMessage `list_preview_items` → `wp_ajax_parrotposter_bridge_list_preview_items` (no HTTP loopback; same WP-11 pattern as `field_schema`) |
 | `POST .../items/next` | Sequential `fetch_next` (BE-18/WP-06 JSON: `pipeline_id`, `contract_version`, `source_path`, `selection_filter?`, `sort?`, `exclude_mode`, `published_ids` **or** `exclude_sync`, `run_exclude_ids`) → `{ item, contract_version, exclude_ack? }` |
 | `POST .../published_ids_sync` | Full published exclude snapshot pages (WP-06; PP pushes `source_item_ids` + `server_version`) |
 | `POST .../notify_contract` | PP→site contract push (`pipeline_id`, `contract_version`, `source_path`, …) |

@@ -1314,38 +1314,56 @@ class WireProtocol
 	/**
 	 * Latest published items for template preview (no pipeline required).
 	 *
-	 * Optional `filter` (Expression AST JSON) — scan newer→older until `limit`
-	 * matches (or scan budget exhausted). Optional `offset` for PP-side paging.
+	 * Shared by REST `GET /items/latest` and the admin-ajax iframe bridge
+	 * (`wp_ajax_parrotposter_bridge_list_preview_items`) — same query/filter
+	 * path, no HTTP loopback onto this site's own REST route.
 	 *
+	 * Optional `$filter` (Expression AST) — scan newer→older until `$limit`
+	 * matches (or scan budget exhausted). Optional `$offset` for PP-side paging.
+	 *
+	 * @param mixed $filter Expression AST array, or null/non-array for unfiltered latest.
+	 * @param mixed $required_fields JSON string or list of field keys.
 	 * @return array<string, mixed>|\WP_Error
 	 */
-	private static function handle_items_latest(WP_REST_Request $request)
-	{
-		$post_type = self::require_valid_post_type($request);
-		if (is_wp_error($post_type)) {
-			return $post_type;
+	public static function items_latest_for_post_type(
+		string $post_type,
+		int $limit = 5,
+		int $offset = 0,
+		$filter = null,
+		$required_fields = [],
+		?string $pipeline_id = null
+	) {
+		if ($post_type === '') {
+			return new \WP_Error(
+				'invalid_post_type',
+				'post_type is required',
+				['status' => 400]
+			);
+		}
+		$allowed = WpPostHelpers::get_post_types('names');
+		if (!in_array($post_type, $allowed, true)) {
+			return new \WP_Error(
+				'invalid_post_type',
+				sprintf('Unknown post_type: %s', $post_type),
+				['status' => 400]
+			);
 		}
 
-		$limit = (int) $request->get_param('limit');
 		if ($limit < 1) {
 			$limit = 5;
 		}
 		if ($limit > 50) {
 			$limit = 50;
 		}
-
-		$offset = (int) $request->get_param('offset');
 		if ($offset < 0) {
 			$offset = 0;
 		}
 
-		$filter = self::decode_json_param($request->get_param('filter'), null);
-		$pipeline_id = self::pipeline_id_from_request($request);
 		$extra_fields = array_values(
 			array_unique(
 				array_merge(
 					self::collect_expression_fields($filter),
-					self::parse_required_fields_param($request->get_param('required_fields'))
+					self::parse_required_fields_param($required_fields)
 				)
 			)
 		);
@@ -1427,6 +1445,28 @@ class WireProtocol
 			'items' => $matched,
 			'next_offset' => $scan_offset,
 		];
+	}
+
+	/**
+	 * REST wrapper around {@see items_latest_for_post_type()}.
+	 *
+	 * @return array<string, mixed>|\WP_Error
+	 */
+	private static function handle_items_latest(WP_REST_Request $request)
+	{
+		$post_type = self::require_valid_post_type($request);
+		if (is_wp_error($post_type)) {
+			return $post_type;
+		}
+
+		return self::items_latest_for_post_type(
+			$post_type,
+			(int) $request->get_param('limit'),
+			(int) $request->get_param('offset'),
+			self::decode_json_param($request->get_param('filter'), null),
+			$request->get_param('required_fields'),
+			self::pipeline_id_from_request($request)
+		);
 	}
 
 	/**

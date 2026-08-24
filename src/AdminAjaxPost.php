@@ -81,6 +81,7 @@ class AdminAjaxPost
 		add_action('wp_ajax_parrotposter_bridge_source_descriptor_root', [$this, 'bridge_source_descriptor_root']);
 		add_action('wp_ajax_parrotposter_bridge_source_descriptor_frame', [$this, 'bridge_source_descriptor_frame']);
 		add_action('wp_ajax_parrotposter_bridge_field_schema', [$this, 'bridge_field_schema']);
+		add_action('wp_ajax_parrotposter_bridge_list_preview_items', [$this, 'bridge_list_preview_items']);
 
 		// Pipeline migration (SPEC-002-17).
 		add_action('wp_ajax_pp_migrate_to_pipeline', [$this, 'migrate_to_pipeline']);
@@ -203,6 +204,90 @@ class AdminAjaxPost
 		}
 
 		$result = WireProtocol::field_schema_for_post_type($post_type, $locale);
+		if (is_wp_error($result)) {
+			$data = $result->get_error_data();
+			status_header(is_array($data) && isset($data['status']) ? (int) $data['status'] : 400);
+			echo wp_json_encode([
+				'error' => [
+					'code' => $result->get_error_code(),
+					'message' => $result->get_error_message(),
+				],
+			]);
+			exit;
+		}
+
+		echo wp_json_encode($result);
+		exit;
+	}
+
+	/**
+	 * Bridge: latest source items for template preview — same internals as REST
+	 * `GET /items/latest` (WP-05), no HTTP loopback. Used when the embedded
+	 * front-app iframe cannot reach the site through PP backend (DEC-002-06 D3).
+	 *
+	 * POST: `source_path` (JSON SourceSelectionStep[]), optional `post_type`,
+	 * `limit`, `offset`, `filter` (JSON Expression AST — compact domain shape,
+	 * same as REST `?filter=`), `required_fields` (JSON string array).
+	 */
+	public function bridge_list_preview_items(): void
+	{
+		self::ajax_guard();
+		nocache_headers();
+		header('Content-Type: application/json; charset=UTF-8');
+
+		$post_type = '';
+		if (isset($_POST['source_path'])) {
+			$raw = wp_unslash($_POST['source_path']);
+			$source_path = is_string($raw) ? json_decode($raw, true) : $raw;
+			if (is_array($source_path)) {
+				$post_type = WireProtocol::post_type_from_source_path($source_path);
+			}
+		}
+		if ($post_type === '' && isset($_POST['post_type']) && is_string($_POST['post_type'])) {
+			$post_type = sanitize_key(wp_unslash($_POST['post_type']));
+		}
+
+		$limit = isset($_POST['limit']) ? (int) $_POST['limit'] : 5;
+		$offset = isset($_POST['offset']) ? (int) $_POST['offset'] : 0;
+
+		$filter = null;
+		if (isset($_POST['filter'])) {
+			$raw_filter = wp_unslash($_POST['filter']);
+			if (is_string($raw_filter) && $raw_filter !== '') {
+				$decoded = json_decode($raw_filter, true);
+				$filter = is_array($decoded) ? $decoded : null;
+			} elseif (is_array($raw_filter)) {
+				$filter = $raw_filter;
+			}
+		}
+
+		$required_fields = [];
+		if (isset($_POST['required_fields'])) {
+			$raw_fields = wp_unslash($_POST['required_fields']);
+			if (is_string($raw_fields) && $raw_fields !== '') {
+				$decoded = json_decode($raw_fields, true);
+				$required_fields = is_array($decoded) ? $decoded : [];
+			} elseif (is_array($raw_fields)) {
+				$required_fields = $raw_fields;
+			}
+		}
+
+		$pipeline_id = null;
+		if (isset($_POST['pipeline_id']) && is_string($_POST['pipeline_id'])) {
+			$pipeline_id = sanitize_text_field(wp_unslash($_POST['pipeline_id']));
+			if ($pipeline_id === '') {
+				$pipeline_id = null;
+			}
+		}
+
+		$result = WireProtocol::items_latest_for_post_type(
+			$post_type,
+			$limit,
+			$offset,
+			$filter,
+			$required_fields,
+			$pipeline_id
+		);
 		if (is_wp_error($result)) {
 			$data = $result->get_error_data();
 			status_header(is_array($data) && isset($data['status']) ? (int) $data['status'] : 400);
