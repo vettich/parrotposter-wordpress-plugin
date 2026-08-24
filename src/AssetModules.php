@@ -12,6 +12,7 @@ class AssetModules
 		'header',
 		'modal',
 		'block',
+		'settings',
 		'nav-tab',
 		'notice',
 		'input',

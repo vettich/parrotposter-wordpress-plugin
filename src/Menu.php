@@ -18,7 +18,7 @@ class Menu
 		$scheduler_or_pipelines = Settings::get_migration_mode() === Settings::MIGRATION_MODE_PIPELINE
 			? [
 				'id' => 'parrotposter_pipelines',
-				'label' => _x('Pipelines', 'menu', 'parrotposter'),
+				'label' => _x('Automation', 'menu', 'parrotposter'),
 			]
 			: [
 				'id' => 'parrotposter_scheduler',

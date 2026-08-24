@@ -55,7 +55,7 @@ msgstr "Посты еще не созданы"
 msgid "Post published at"
 msgstr "Время публикации"
 
-#: assets/js/post-meta-box.js:69 src/PostsListTable.php:39
+#: assets/js/post-meta-box.js:69 src/PostsListTable.php:39 views/local-queue/modal.php
 msgid "Status"
 msgstr "Статус"
 
@@ -276,9 +276,9 @@ msgstr "Текст"
 msgid "Publish at"
 msgstr "Время публикации"
 
-#: src/PostsListTable.php:58
+#: src/PostsListTable.php:58 views/local-queue/notice.php
 msgid "View"
-msgstr "Просмотр"
+msgstr "Посмотреть"
 
 #: src/Profile.php:23
 msgctxt "tariff expired"
@@ -1710,10 +1710,6 @@ msgid "You paid successfully. Thank you!"
 msgstr "Вы успешно оплатили. Спасибо!"
 
 #: views/local-queue/notice.php
-msgid "View"
-msgstr "Посмотреть"
-
-#: views/local-queue/notice.php
 msgid "Temporary tasks on your site: changes to WordPress posts that the plugin is still sending to ParrotPoster. The page stays fast; sync runs in the background."
 msgstr "Временные задания на сайте: изменения записей WordPress, которые плагин ещё передаёт в ParrotPoster. Страница остаётся быстрой; синхронизация идёт в фоне."
 
@@ -1747,10 +1743,6 @@ msgstr "Запись WP"
 #: views/local-queue/modal.php
 msgid "Operation"
 msgstr "Операция"
-
-#: views/local-queue/modal.php
-msgid "Status"
-msgstr "Статус"
 
 #: views/local-queue/modal.php
 msgid "Attempts"
@@ -1857,6 +1849,117 @@ msgstr "Некорректный элемент очереди."
 #: assets/js/local-queue-admin.js
 msgid "Could not process the queue item."
 msgstr "Не удалось обработать элемент очереди."
+
+#: src/Menu.php:21
+msgctxt "menu"
+msgid "Automation"
+msgstr "Автоматизация"
+
+#: src/Menu.php:44
+msgctxt "menu"
+msgid "Settings"
+msgstr "Настройки"
+
+#: views/settings/index.php:28 views/settings/index.php:114
+msgid "Unknown"
+msgstr "Неизвестно"
+
+#: views/settings/index.php:37 views/settings/index.php:45
+msgid "No requests yet"
+msgstr "Запросов ещё не было"
+
+#: views/settings/index.php:51
+#, php-format
+msgid "%s ago"
+msgstr "%s назад"
+
+#: views/settings/index.php:75
+msgid "Settings"
+msgstr "Настройки"
+
+#: views/settings/index.php:90
+msgid "Account"
+msgstr "Аккаунт"
+
+#: views/settings/index.php:93
+msgid "Active"
+msgstr "Активен"
+
+#: views/settings/index.php:93
+msgid "Expired"
+msgstr "Истёк"
+
+#: views/settings/index.php:143
+msgid "Web application"
+msgstr "Веб-приложение"
+
+#: views/settings/index.php:150
+msgid "Manage social accounts, templates, and publishing in the ParrotPoster app."
+msgstr "Управляйте аккаунтами соцсетей, шаблонами и публикациями в приложении ParrotPoster."
+
+#: views/settings/index.php:158
+msgid "Open web application"
+msgstr "Открыть веб-приложение"
+
+#: views/settings/index.php:164
+msgid "Signed in on this WordPress site"
+msgstr "Вы вошли на этом сайте WordPress"
+
+#: views/settings/index.php:179
+msgid "Site integration"
+msgstr "Интеграция сайта"
+
+#: views/settings/index.php:182
+msgid "Connected"
+msgstr "Подключено"
+
+#: views/settings/index.php:187
+msgid "This site is linked to your ParrotPoster account and can exchange publishing data with the service."
+msgstr "Этот сайт привязан к вашему аккаунту ParrotPoster и может обмениваться данными для публикации с сервисом."
+
+#: views/settings/index.php:192
+msgid "WordPress to ParrotPoster"
+msgstr "Запросы с сайта"
+
+#: views/settings/index.php:198
+msgid "ParrotPoster to WordPress"
+msgstr "Обращения к сайту"
+
+#: views/settings/index.php:207
+msgid "Danger zone"
+msgstr "Опасная зона"
+
+#: views/settings/index.php:208
+msgid "Disconnect this WordPress site from ParrotPoster automation. Your ParrotPoster account will stay active."
+msgstr "Отключите этот сайт WordPress от автоматизации ParrotPoster. Ваш аккаунт ParrotPoster останется активным."
+
+#: views/settings/index.php:213
+msgid "Disconnect this site from ParrotPoster automation?"
+msgstr "Отключить этот сайт от автоматизации ParrotPoster?"
+
+#: views/settings/index.php:214
+msgid "Disconnect site"
+msgstr "Отключить сайт"
+
+#: views/settings/index.php:224
+msgid "Pipelines"
+msgstr "Pipelines"
+
+#: views/settings/index.php:229
+msgid "Legacy templates are still available. You can keep the reminder visible or revert this site to the old scheduler."
+msgstr "Старые шаблоны всё ещё доступны. Можно оставить напоминание или вернуть этот сайт к прежнему планировщику."
+
+#: views/settings/index.php:243
+msgid "Show migration notice on Pipelines page"
+msgstr "Показывать уведомление о миграции на странице Pipelines"
+
+#: views/settings/index.php:254 views/partials/migration-banner-pipeline-active.php:47
+msgid "Revert to Scheduler"
+msgstr "Вернуться к планировщику"
+
+#: views/settings/index.php:69 views/partials/migration-banner-pipeline-active.php:24
+msgid "Revert to legacy scheduler? Pipelines will stay on the server but triggers will be disabled."
+msgstr "Вернуться к старому планировщику? Pipelines останутся на сервере, но триггеры будут отключены."
 
 #~ msgid ""
 #~ "For security reasons, Instagram may reset your password. Before "
@@ -2149,9 +2252,6 @@ msgstr "Не удалось обработать элемент очереди."
 
 #~ msgid "Post details"
 #~ msgstr "Подробности поста"
-
-#~ msgid "Close"
-#~ msgstr "Закрыть"
 
 #~ msgid ""
 #~ "1. Create your telegram bot <br>\n"

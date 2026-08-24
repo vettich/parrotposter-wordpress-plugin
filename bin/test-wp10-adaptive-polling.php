@@ -250,7 +250,7 @@ assert_true(
 );
 
 // =====================================================================================
-// 8. Settings::last_primary_call_at() / touch_last_primary_call(): UTC storage convention.
+// 8. Settings connection activity timestamps: UTC storage convention and disconnect cleanup.
 // =====================================================================================
 
 reset_options();
@@ -261,5 +261,14 @@ assert_true('touch_last_primary_call() stores a non-empty UTC Y-m-d H:i:s string
 // Round-trips through is_watchdog_active() using "now" as the true current UTC time (matches
 // how OutboundPollScheduler consumes it in production, no injected clock).
 assert_true('a just-touched last_primary_call_at is watchdog-active against the real current time', Scheduler::is_watchdog_active($stored, time()));
+
+assert_true('last_site_to_pp_call_at() is null before any site-to-PP call was recorded', Settings::last_site_to_pp_call_at() === null);
+Settings::touch_last_site_to_pp_call();
+$site_to_pp_stored = Settings::last_site_to_pp_call_at();
+assert_true('touch_last_site_to_pp_call() stores a non-empty UTC Y-m-d H:i:s string', is_string($site_to_pp_stored) && preg_match('/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/', $site_to_pp_stored) === 1);
+
+Settings::disconnect();
+assert_true('disconnect() clears last_primary_call_at()', Settings::last_primary_call_at() === null);
+assert_true('disconnect() clears last_site_to_pp_call_at()', Settings::last_site_to_pp_call_at() === null);
 
 echo "\nAll WP-10 adaptive polling smoke tests passed.\n";

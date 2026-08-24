@@ -682,6 +682,8 @@ class Api
 					return ['error' => $parsed];
 				}
 
+				Settings::touch_last_site_to_pp_call();
+
 				return ['data' => isset($decoded['data']) && is_array($decoded['data']) ? $decoded['data'] : []];
 			}
 		}

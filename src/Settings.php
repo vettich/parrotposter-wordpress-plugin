@@ -52,6 +52,9 @@ class Settings
 	 */
 	private const LAST_PRIMARY_CALL_AT_KEY = 'parrotposter_last_primary_call_at';
 
+	/** Last successful machine-path GraphQL response for site→PP traffic, stored in UTC. */
+	private const LAST_SITE_TO_PP_CALL_AT_KEY = 'parrotposter_last_site_to_pp_call_at';
+
 	private const SECRET_CIPHER_PREFIX = 'PP1:';
 
 	public static function get_migration_mode(): string
@@ -105,6 +108,19 @@ class Settings
 		return is_string($value) && $value !== '' ? $value : null;
 	}
 
+	public static function touch_last_site_to_pp_call(): void
+	{
+		update_option(self::LAST_SITE_TO_PP_CALL_AT_KEY, gmdate('Y-m-d H:i:s'));
+	}
+
+	/** UTC `Y-m-d H:i:s`, or null if this site has not completed a site→PP call yet. */
+	public static function last_site_to_pp_call_at(): ?string
+	{
+		$value = get_option(self::LAST_SITE_TO_PP_CALL_AT_KEY, '');
+
+		return is_string($value) && $value !== '' ? $value : null;
+	}
+
 	public static function is_connected(): bool
 	{
 		return self::plugin_id() !== '' && self::site_to_pp_secret() !== '';
@@ -129,6 +145,8 @@ class Settings
 		delete_option(self::SITE_TO_PP_KEY);
 		delete_option(self::PP_TO_SITE_HASH_KEY);
 		delete_option(self::PP_TO_SITE_PREV_HASH_KEY);
+		delete_option(self::LAST_PRIMARY_CALL_AT_KEY);
+		delete_option(self::LAST_SITE_TO_PP_CALL_AT_KEY);
 		self::set_migration_mode(self::MIGRATION_MODE_LEGACY);
 		self::set_pipeline_ids([]);
 		delete_option(self::PIPELINE_CONTRACTS_KEY);

@@ -1,0 +1,278 @@
+.parrotposter-settings {
+	display: flex;
+	flex-direction: column;
+	gap: 24px;
+	width: 900px;
+	max-width: calc(100% - 10px);
+	margin: 24px 0;
+}
+
+.parrotposter-settings .parrotposter-block {
+	margin: 0;
+	max-width: none;
+}
+
+.parrotposter-settings__grid {
+	display: grid;
+	grid-template-columns: minmax(0, 1.55fr) minmax(300px, 0.75fr);
+	gap: 24px;
+	align-items: stretch;
+}
+
+.parrotposter-settings-card {
+	width: auto;
+	box-sizing: border-box;
+	border: 1px solid #E2E8F0;
+	border-radius: 8px;
+	box-shadow: 0 1px 2px rgba(16, 21, 23, 0.04);
+}
+
+.parrotposter-settings-card__header {
+	display: flex;
+	align-items: flex-start;
+	justify-content: space-between;
+	gap: 16px;
+	margin-bottom: 8px;
+}
+
+.parrotposter-settings-card .parrotposter-block__heading {
+	margin: 0;
+}
+
+.parrotposter-settings-card__description {
+	margin: 0;
+	color: #50575E;
+	font-size: 14px;
+	line-height: 22px;
+}
+
+.parrotposter-settings-badge {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	padding: 3px 10px;
+	border-radius: 999px;
+	font-size: 12px;
+	font-weight: 600;
+	line-height: 18px;
+	white-space: nowrap;
+}
+
+.parrotposter-settings-badge--success {
+	color: #0F5132;
+	background-color: #DFF7EA;
+}
+
+.parrotposter-settings-badge--error {
+	color: #842029;
+	background-color: #F8D7DA;
+}
+
+.parrotposter-block__value--success {
+	color: #0F7A4F;
+}
+
+.parrotposter-settings-facts {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 18px 24px;
+}
+
+.parrotposter-settings-fact {
+	min-width: 0;
+}
+
+.parrotposter-settings-fact .parrotposter-block__value {
+	overflow-wrap: anywhere;
+}
+
+.parrotposter-settings-activity {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 16px;
+	margin-top: 16px;
+}
+
+.parrotposter-settings-activity-card {
+	position: relative;
+	min-width: 0;
+	padding: 14px 14px 14px 36px;
+	border: 1px solid #E2E8F0;
+	border-radius: 6px;
+	background-color: #F8FAFC;
+}
+
+.parrotposter-settings-activity-card:before {
+	content: "";
+	position: absolute;
+	left: 14px;
+	top: 18px;
+	width: 10px;
+	height: 10px;
+	border-radius: 999px;
+	background-color: #20E2AC;
+	box-shadow: 0 0 0 4px rgba(32, 226, 172, 0.16);
+}
+
+.parrotposter-settings-activity-card .parrotposter-block__value {
+	overflow-wrap: anywhere;
+}
+
+.parrotposter-settings-usage {
+	padding-top: 18px;
+	margin-top: 6px;
+	border-top: 1px solid #E2E8F0;
+}
+
+.parrotposter-settings-usage__row {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 16px;
+	margin-bottom: 8px;
+}
+
+.parrotposter-settings-usage__value {
+	font-size: 14px;
+	font-weight: 600;
+	line-height: 20px;
+}
+
+.parrotposter-settings-progress {
+	overflow: hidden;
+	height: 8px;
+	border-radius: 999px;
+	background-color: #E8EEF4;
+}
+
+.parrotposter-settings-progress span {
+	display: block;
+	height: 100%;
+	border-radius: inherit;
+	background: linear-gradient(90deg, #20E2AC, #2271B1);
+}
+
+.parrotposter-settings-card--webapp {
+	justify-content: space-between;
+}
+
+.parrotposter-settings-launch {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 10px;
+	padding: 14px;
+	margin-top: 4px;
+	border-radius: 8px;
+	text-align: center;
+	background: linear-gradient(180deg, #F5FBFF 0%, #FFFFFF 100%);
+}
+
+.parrotposter-settings-launch__mark {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 40px;
+	height: 40px;
+	border-radius: 14px;
+	color: #FFFFFF;
+	font-size: 14px;
+	font-weight: 700;
+	line-height: 1;
+	background: linear-gradient(135deg, #20E2AC 0%, #2271B1 100%);
+	box-shadow: 0 8px 18px rgba(34, 113, 177, 0.18);
+}
+
+.parrotposter-settings-launch__button {
+	margin-top: 2px !important;
+}
+
+.parrotposter-settings-session {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+	padding-top: 12px;
+	margin-top: 12px;
+	border-top: 1px solid #E2E8F0;
+	color: #646970;
+	font-size: 12px;
+	line-height: 18px;
+}
+
+.parrotposter-settings-session form {
+	margin: 0;
+}
+
+.parrotposter-settings-danger {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 20px;
+	padding: 16px;
+	margin-top: 8px;
+	border: 1px solid #F1B8B8;
+	border-radius: 6px;
+	background-color: #FFF8F8;
+}
+
+.parrotposter-settings-danger__title {
+	margin-bottom: 4px;
+	color: #842029;
+	font-weight: 600;
+}
+
+.parrotposter-settings-danger p {
+	margin: 0;
+	color: #50575E;
+	font-size: 13px;
+	line-height: 20px;
+}
+
+.parrotposter-settings-pipelines {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: space-between;
+	gap: 16px;
+	margin-top: 8px;
+}
+
+.parrotposter-settings-pipelines form {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 12px;
+	margin: 0;
+}
+
+.parrotposter-settings-checkbox {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+@media screen and (max-width: 900px) {
+	.parrotposter-settings {
+		width: calc(100% - 10px);
+	}
+
+	.parrotposter-settings__grid {
+		grid-template-columns: 1fr;
+	}
+}
+
+@media screen and (max-width: 600px) {
+	.parrotposter-settings-facts,
+	.parrotposter-settings-activity {
+		grid-template-columns: 1fr;
+	}
+
+	.parrotposter-settings-card__header,
+	.parrotposter-settings-danger,
+	.parrotposter-settings-session,
+	.parrotposter-settings-usage__row {
+		align-items: flex-start;
+		flex-direction: column;
+	}
+}
