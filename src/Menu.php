@@ -30,11 +30,11 @@ class Menu
 				'id' => 'parrotposter_posts',
 				'label' => _x('Posts', 'menu', 'parrotposter'),
 			],
+			$scheduler_or_pipelines,
 			[
 				'id' => 'parrotposter_accounts',
 				'label' => _x('Accounts', 'menu', 'parrotposter'),
 			],
-			$scheduler_or_pipelines,
 			[
 				'id' => 'parrotposter_tariffs',
 				'label' => _x('Tariffs', 'menu', 'parrotposter'),
