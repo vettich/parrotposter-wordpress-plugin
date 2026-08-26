@@ -410,9 +410,21 @@ class Settings
 			return;
 		}
 
+		$incoming_version = null;
+		if (isset($snapshot['contractVersion'])) {
+			$incoming_version = (int) $snapshot['contractVersion'];
+		} elseif (isset($snapshot['contract_version'])) {
+			$incoming_version = (int) $snapshot['contract_version'];
+		}
+
 		$contract = self::get_pipeline_contract($pipeline_id);
 		if (!is_array($contract)) {
 			$contract = [];
+		}
+
+		$cached_version = (int) ($contract['contract_version'] ?? 0);
+		if ($incoming_version !== null && $incoming_version > 0 && $cached_version > 0 && $incoming_version < $cached_version) {
+			return;
 		}
 
 		if (isset($snapshot['contractVersion'])) {

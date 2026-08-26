@@ -169,6 +169,25 @@ assert_eq(
 	Settings::resolve_scope_filter($stored)
 );
 
+Settings::apply_pipeline_contract_snapshot([
+	'pipeline_id' => 'pipe-1',
+	'contract_version' => 1,
+	'required_fields' => ['stale'],
+	'source_filters' => ['scope_filter' => $scope_post],
+]);
+$stored = Settings::get_pipeline_contract('pipe-1');
+assert_eq(
+	'stale lower contract_version is ignored',
+	['title', 'content'],
+	$stored['required_fields'] ?? null
+);
+assert_eq('stale notify does not roll back contract_version', 2, (int) ($stored['contract_version'] ?? 0));
+assert_eq(
+	'stale notify does not roll back scope_filter',
+	$scope_page,
+	Settings::resolve_scope_filter($stored)
+);
+
 // Taxonomy / set ops (Content Rules select parity with legacy scheduler term IDs)
 $taxonomy_filter = [
 	'kind' => 'compare',
