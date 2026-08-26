@@ -82,6 +82,7 @@ class AdminAjaxPost
 		add_action('wp_ajax_parrotposter_bridge_source_descriptor_frame', [$this, 'bridge_source_descriptor_frame']);
 		add_action('wp_ajax_parrotposter_bridge_field_schema', [$this, 'bridge_field_schema']);
 		add_action('wp_ajax_parrotposter_bridge_list_preview_items', [$this, 'bridge_list_preview_items']);
+		add_action('wp_ajax_parrotposter_bridge_notify_contract', [$this, 'bridge_notify_contract']);
 
 		// Pipeline migration (SPEC-002-17).
 		add_action('wp_ajax_pp_migrate_to_pipeline', [$this, 'migrate_to_pipeline']);
@@ -301,6 +302,34 @@ class AdminAjaxPost
 		}
 
 		echo wp_json_encode($result);
+		exit;
+	}
+
+	/**
+	 * Bridge: apply a pipeline contract snapshot locally (same as REST notify_contract).
+	 * Used when the embedded front-app iframe cannot rely on PP→site HTTP after save.
+	 *
+	 * POST: `snapshot` (JSON object, camelCase or snake_case keys accepted by
+	 * {@see Settings::apply_pipeline_contract_snapshot()}).
+	 */
+	public function bridge_notify_contract(): void
+	{
+		self::ajax_guard();
+		nocache_headers();
+		header('Content-Type: application/json; charset=UTF-8');
+
+		$raw = isset($_POST['snapshot']) ? wp_unslash($_POST['snapshot']) : '';
+		$snapshot = is_string($raw) ? json_decode($raw, true) : null;
+		if (!is_array($snapshot)) {
+			echo wp_json_encode([
+				'ok' => false,
+				'error' => 'invalid_payload',
+			]);
+			exit;
+		}
+
+		Settings::apply_pipeline_contract_snapshot($snapshot);
+		echo wp_json_encode(['ok' => true]);
 		exit;
 	}
 

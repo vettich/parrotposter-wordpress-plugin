@@ -353,6 +353,43 @@
 					});
 				});
 		},
+		notify_contract: function (data) {
+			var ajaxUrl = typeof ajaxurl !== 'undefined' ? ajaxurl : '/wp-admin/admin-ajax.php';
+			var nonce = PP_AUTH2_NONCE || '';
+			var snapshot = {};
+			if (data && typeof data === 'object') {
+				Object.keys(data).forEach(function (key) {
+					if (key !== 'type') {
+						snapshot[key] = data[key];
+					}
+				});
+			}
+			fetch(ajaxUrl, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+				body: new URLSearchParams([
+					['action', 'parrotposter_bridge_notify_contract'],
+					['parrotposter[nonce]', nonce],
+					['snapshot', JSON.stringify(snapshot)],
+				]).toString(),
+				credentials: 'same-origin',
+			})
+				.then(function (r) {
+					return r.json();
+				})
+				.then(function (res) {
+					pp_send_message('notify_contract_result', {
+						ok: !!(res && res.ok),
+						error: res && res.error ? res.error : null,
+					});
+				})
+				.catch(function () {
+					pp_send_message('notify_contract_result', {
+						ok: false,
+						error: 'network',
+					});
+				});
+		},
 		// Latest published items for the template-preview picker. Same reason as
 		// field_schema: PP backend often cannot reach callback_url, so the iframe
 		// asks the parent admin page to run WP_Query locally (DEC-002-06 D3).

@@ -28,7 +28,7 @@ Legacy autopost lives in [`Scheduler`](src/Scheduler.php) when `migration_mode =
 
 `GET info` · `GET fields?post_type=&locale=` · `GET items/{source_item_id}` · `GET items/latest` · `POST items/next` · `POST items/batch` · `POST published_ids_sync` · `POST notify_contract`
 
-Iframe wizard must not HTTP-loopback to these routes: use AJAX (`field_schema`, `list_preview_items`) that calls the same `WireProtocol` helpers. Optional `locale`/`lang` on fields is labels only — keys stay stable.
+Iframe wizard must not HTTP-loopback to these routes: use AJAX (`field_schema`, `list_preview_items`, `notify_contract`) that calls the same `WireProtocol` / `Settings` helpers. Optional `locale`/`lang` on fields is labels only — keys stay stable.
 
 Bind is server-to-server: [`PluginConnect::silent_bind()`](src/PluginConnect.php) (`createPluginAuthCode` → `completePluginBinding`). SSO to the web app is a separate `issueSessionKey` URL. Greenfield bind returns `migration_mode = legacy` until migration runs.
 
