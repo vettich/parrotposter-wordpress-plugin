@@ -28,3 +28,5 @@ if (isset($_GET['parrotposter_success_data'])) {
 	</div>
 <?php endif ?>
 
+<?php parrotposter\PP::include_view('outbound-poll-notice'); ?>
+

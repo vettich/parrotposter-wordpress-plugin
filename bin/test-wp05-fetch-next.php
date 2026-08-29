@@ -84,8 +84,48 @@ $ok = SelectionFilterQuery::apply($query, [
 	'value' => ['42', '7'],
 ], 'post');
 assert_true('includes_any category compiles', $ok === true);
-assert_true('tax_query set', isset($query['tax_query']['taxonomy']) && $query['tax_query']['taxonomy'] === 'category');
-assert_true('tax terms', $query['tax_query']['terms'] === [42, 7]);
+assert_true(
+	'tax_query wrapped for WP_Tax_Query',
+	isset($query['tax_query'][0]['taxonomy']) && $query['tax_query'][0]['taxonomy'] === 'category'
+);
+assert_true('tax terms', $query['tax_query'][0]['terms'] === [42, 7]);
+assert_true('tax operator IN', ($query['tax_query'][0]['operator'] ?? '') === 'IN');
+
+$query = ['post_type' => 'post', 'posts_per_page' => 1];
+$ok = SelectionFilterQuery::apply($query, [
+	'kind' => 'compare',
+	'field' => 'post_tag',
+	'op' => 'includes_any',
+	'value' => ['3'],
+], 'post');
+assert_true('includes_any post_tag compiles', $ok === true);
+assert_true(
+	'post_tag tax_query wrapped',
+	isset($query['tax_query'][0]['taxonomy']) && $query['tax_query'][0]['taxonomy'] === 'post_tag'
+);
+assert_true('post_tag terms', $query['tax_query'][0]['terms'] === [3]);
+
+$query = ['post_type' => 'post', 'posts_per_page' => 1];
+$ok = SelectionFilterQuery::apply($query, [
+	'kind' => 'and',
+	'children' => [
+		[
+			'kind' => 'compare',
+			'field' => 'category',
+			'op' => 'includes_any',
+			'value' => [1],
+		],
+		[
+			'kind' => 'compare',
+			'field' => 'post_tag',
+			'op' => 'includes_any',
+			'value' => [3],
+		],
+	],
+], 'post');
+assert_true('and two taxonomies compiles', $ok === true);
+assert_true('and tax relation AND', ($query['tax_query']['relation'] ?? '') === 'AND');
+assert_true('and tax has two children', isset($query['tax_query'][0], $query['tax_query'][1]));
 
 $query = ['post_type' => 'post', 'posts_per_page' => 1];
 $err = SelectionFilterQuery::apply($query, [

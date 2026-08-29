@@ -271,4 +271,26 @@ Settings::disconnect();
 assert_true('disconnect() clears last_primary_call_at()', Settings::last_primary_call_at() === null);
 assert_true('disconnect() clears last_site_to_pp_call_at()', Settings::last_site_to_pp_call_at() === null);
 
+// =====================================================================================
+// 9. Lease diagnostics / admin banner (DEC-002-08 polling evidence).
+// =====================================================================================
+
+reset_options();
+$t_now = 1_700_000_000;
+assert_true('banner hidden when never leased (WP-Cron on)', Scheduler::should_show_poll_banner($t_now) === false);
+Scheduler::record_lease_contact(true, null, $t_now);
+assert_eq('last_lease_at after successful contact', $t_now, Scheduler::last_lease_at());
+assert_true('banner hidden after a fresh lease', Scheduler::should_show_poll_banner($t_now) === false);
+assert_true(
+	'lease is stale after MAX*2 without another success',
+	Scheduler::is_lease_stale($t_now + Scheduler::MAX_INTERVAL_SEC * 2 + 1)
+);
+assert_true(
+	'banner shown when lease is stale',
+	Scheduler::should_show_poll_banner($t_now + Scheduler::MAX_INTERVAL_SEC * 2 + 1)
+);
+Scheduler::record_lease_contact(false, 'timeout', $t_now + 10);
+assert_eq('last_lease_error after failed contact', 'timeout', Scheduler::last_lease_error());
+assert_eq('failed contact does not wipe last_lease_at', $t_now, Scheduler::last_lease_at());
+
 echo "\nAll WP-10 adaptive polling smoke tests passed.\n";

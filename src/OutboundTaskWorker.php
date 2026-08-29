@@ -123,6 +123,7 @@ class OutboundTaskWorker
 
 		if (!empty($res['error'])) {
 			PP::log(['OutboundTaskWorker::lease_failed', 'error' => $res['error']]);
+			OutboundPollScheduler::record_lease_contact(false, (string) $res['error']);
 			// No server signal to go on this round — fall back to the standard backoff/local-
 			// heuristic path (WP-10) rather than leaving next_due_at stale, so a persistent lease
 			// failure still widens the retry interval instead of retrying every single cron tick.
@@ -142,6 +143,7 @@ class OutboundTaskWorker
 			? (int) $payload['recommendedPollIntervalS']
 			: null;
 
+		OutboundPollScheduler::record_lease_contact(true);
 		OutboundPollScheduler::record_lease_outcome($primary_health, $recommended_poll_interval_s, $tasks !== []);
 
 		if ($tasks !== []) {
@@ -399,11 +401,9 @@ class OutboundTaskWorker
 			return; // stays unreported locally; retried next tick via claim_next_unreported()
 		}
 
-		OutboundTaskQueue::mark_reported($task_id);
-
-		// SPEC-002-01 §6 step 3 (commit): when this report's `confirm` committed a rotation, PP
-		// mints a fresh `site_to_pp` and returns it here, one-time plaintext — the only channel
-		// the plugin has to learn it (RotateSecretsConfirmInput doc comment, back-app dto.rs).
+		// SPEC-002-01 §6 step 3 (commit) / V2-F065: apply newSiteToPpSecret *before*
+		// mark_reported so a crash after HTTP success still retries report and receives
+		// idempotent re-delivery (V2-F063) instead of permanently locking out machine-auth.
 		if ($confirm !== null) {
 			$payload = $res['data']['pluginOutboundTaskReport'] ?? null;
 			$new_site_to_pp = is_array($payload) && !empty($payload['newSiteToPpSecret'])
@@ -416,6 +416,8 @@ class OutboundTaskWorker
 				Settings::clear_pp_to_site_prev_secret();
 			}
 		}
+
+		OutboundTaskQueue::mark_reported($task_id);
 	}
 
 	private static function to_report_status(string $local_status): ?string

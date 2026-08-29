@@ -126,6 +126,12 @@
 	var ppViewportBroadcastOn = false;
 	var ppViewportTimer = null;
 	var ppViewportRaf = 0;
+	var ppModalSavedScrollY = null;
+
+	function pp_admin_bar_height() {
+		var adminBar = document.getElementById('wpadminbar');
+		return adminBar ? adminBar.offsetHeight : 0;
+	}
 
 	function pp_collect_viewport_for_iframe() {
 		var iframe = document.getElementById('pp-iframe');
@@ -134,15 +140,18 @@
 		}
 		var rect = iframe.getBoundingClientRect();
 		var iframeAbsTop = rect.top + window.scrollY;
-		var adminBar = document.getElementById('wpadminbar');
-		var adminBarHeight = adminBar ? adminBar.offsetHeight : 0;
+		var chrome = pp_admin_bar_height();
+		var visibleTop = Math.max(rect.top, chrome);
+		var visibleBottom = Math.min(rect.bottom, window.innerHeight);
+		var visibleHeight = Math.max(0, visibleBottom - visibleTop);
 		return {
 			scrollY: window.scrollY,
-			viewportHeight: window.innerHeight,
+			viewportHeight: visibleHeight,
 			viewportWidth: window.innerWidth,
 			iframeAbsTop: iframeAbsTop,
 			iframeLeft: rect.left,
-			adminBarHeight: adminBarHeight,
+			adminBarHeight: chrome,
+			vpTop: visibleTop - rect.top,
 		};
 	}
 
@@ -459,6 +468,15 @@
 		modal_open: function () {
 			pp_show_parent_backdrop();
 			pp_start_viewport_broadcast();
+			ppModalSavedScrollY = window.scrollY;
+			var iframe = document.getElementById('pp-iframe');
+			if (iframe) {
+				var rect = iframe.getBoundingClientRect();
+				var targetTop = pp_admin_bar_height() + 16;
+				if (rect.top > targetTop) {
+					window.scrollBy(0, rect.top - targetTop);
+				}
+			}
 			document.documentElement.style.overflow = 'hidden';
 			var payload = pp_collect_viewport_for_iframe();
 			if (!payload) {
@@ -469,6 +487,7 @@
 					iframeAbsTop: window.scrollY,
 					iframeLeft: 0,
 					adminBarHeight: 0,
+					vpTop: 0,
 				});
 				return;
 			}
@@ -477,6 +496,10 @@
 		modal_close: function () {
 			pp_hide_parent_backdrop();
 			document.documentElement.style.overflow = '';
+			if (ppModalSavedScrollY !== null) {
+				window.scrollTo(0, ppModalSavedScrollY);
+				ppModalSavedScrollY = null;
+			}
 			pp_send_message('modal_close_result', {});
 		},
 		prepare_callback: function () {

@@ -698,17 +698,37 @@ class SelectionFilterQuery
 			return;
 		}
 		if (!empty($parts['tax_query']) && is_array($parts['tax_query'])) {
-			$query_args['tax_query'] = $parts['tax_query'];
+			// WP_Tax_Query iterates top-level entries as clauses. A bare first-order
+			// assoc (`taxonomy`/`terms`/…) is ignored — wrap it in a list.
+			$query_args['tax_query'] = self::normalize_query_group($parts['tax_query']);
 		}
 		if (!empty($parts['meta_query']) && is_array($parts['meta_query'])) {
-			$query_args['meta_query'] = $parts['meta_query'];
+			$query_args['meta_query'] = self::normalize_query_group($parts['meta_query']);
 		}
 		if (!empty($parts['date_query']) && is_array($parts['date_query'])) {
-			$query_args['date_query'] = $parts['date_query'];
+			$query_args['date_query'] = self::normalize_query_group($parts['date_query']);
 		}
 		if (!empty($parts['where_clauses']) && is_array($parts['where_clauses'])) {
 			$query_args['_pp_where_clauses'] = $parts['where_clauses'];
 		}
+	}
+
+	/**
+	 * Ensure a tax/meta/date query group is valid for WP_*_Query constructors.
+	 *
+	 * @param array<string, mixed> $group
+	 * @return array<int|string, mixed>
+	 */
+	private static function normalize_query_group(array $group): array
+	{
+		if ($group === []) {
+			return $group;
+		}
+		if (isset($group['relation']) || self::is_list($group)) {
+			return $group;
+		}
+
+		return [$group];
 	}
 
 	/**

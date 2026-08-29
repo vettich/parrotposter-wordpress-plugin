@@ -182,7 +182,7 @@ class OutboundPollScheduler
 	// ---- Orchestration (WP options-backed state) ----
 
 	/**
-	 * @return array{consecutive_empty: int, grace_until: int, next_due_at: int}
+	 * @return array{consecutive_empty: int, grace_until: int, next_due_at: int, last_lease_at: int, last_lease_error: string}
 	 */
 	private static function load_state(): array
 	{
@@ -195,15 +195,77 @@ class OutboundPollScheduler
 			'consecutive_empty' => max(0, (int) ($raw['consecutive_empty'] ?? 0)),
 			'grace_until' => max(0, (int) ($raw['grace_until'] ?? 0)),
 			'next_due_at' => max(0, (int) ($raw['next_due_at'] ?? 0)),
+			'last_lease_at' => max(0, (int) ($raw['last_lease_at'] ?? 0)),
+			'last_lease_error' => is_string($raw['last_lease_error'] ?? null)
+				? (string) $raw['last_lease_error']
+				: '',
 		];
 	}
 
 	/**
-	 * @param array{consecutive_empty: int, grace_until: int, next_due_at: int} $state
+	 * @param array<string, int|string> $state
 	 */
 	private static function save_state(array $state): void
 	{
-		update_option(self::STATE_KEY, $state, false);
+		$merged = array_merge(self::load_state(), $state);
+		update_option(self::STATE_KEY, $merged, false);
+	}
+
+	public static function last_lease_at(): ?int
+	{
+		$ts = self::load_state()['last_lease_at'];
+
+		return $ts > 0 ? $ts : null;
+	}
+
+	public static function last_lease_error(): ?string
+	{
+		$error = self::load_state()['last_lease_error'];
+
+		return $error !== '' ? $error : null;
+	}
+
+	/** Unix timestamp of a successful or failed lease attempt (diagnostics). */
+	public static function record_lease_contact(bool $ok, ?string $error = null, ?int $now_ts = null): void
+	{
+		$now_ts = $now_ts ?? time();
+		if ($ok) {
+			self::save_state([
+				'last_lease_at' => $now_ts,
+				'last_lease_error' => '',
+			]);
+
+			return;
+		}
+		self::save_state([
+			'last_lease_error' => $error !== null && $error !== '' ? $error : 'lease_failed',
+		]);
+	}
+
+	/** True when no successful lease happened within `MAX_INTERVAL_SEC * 2`. */
+	public static function is_lease_stale(?int $now_ts = null): bool
+	{
+		$now_ts = $now_ts ?? time();
+		$last = self::last_lease_at();
+		if ($last === null) {
+			return true;
+		}
+
+		return ($now_ts - $last) > (self::MAX_INTERVAL_SEC * 2);
+	}
+
+	public static function should_show_poll_banner(?int $now_ts = null): bool
+	{
+		$wp_cron_disabled = defined('DISABLE_WP_CRON') && DISABLE_WP_CRON;
+		$stale = self::is_lease_stale($now_ts);
+		if (!$stale) {
+			return false;
+		}
+		if (self::last_lease_at() === null && self::last_lease_error() === null && !$wp_cron_disabled) {
+			return false;
+		}
+
+		return true;
 	}
 
 	/**
