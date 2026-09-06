@@ -53,23 +53,14 @@ class ApiHelpers
 			return [];
 		}
 
+		$fallback = PP::asset('images/no-photo.svg');
 		foreach ($accounts as $key => $account) {
-			if (!isset($account['photo'])) {
-				$accounts[$key]['photo'] = PP::asset('images/no-photo.svg');
-				continue;
-			}
-			$res = wp_remote_get($account['photo']);
-
-			$res_code = wp_remote_retrieve_response_code($res);
-			if ($res_code != "200") {
-				$accounts[$key]['photo'] = PP::asset('images/no-photo.svg');
-			}
-
-			$corp_header = wp_remote_retrieve_header($res, 'cross-origin-resource-policy');
-			if ($corp_header == 'same-origin') {
-				$accounts[$key]['photo'] = PP::asset('images/no-photo.svg');
+			$photo = isset($account['photo']) ? trim((string) $account['photo']) : '';
+			if ($photo === '') {
+				$accounts[$key]['photo'] = $fallback;
 			}
 		}
+
 		return $accounts;
 	}
 
@@ -92,10 +83,23 @@ class ApiHelpers
 		return $d->getTimestamp();
 	}
 
+	/**
+	 * Social type from `{user_id}:{type}:{group_id}` (and aliases like `ig` → `insta`).
+	 */
+	public static function get_account_social_type($account_id)
+	{
+		$parts = explode(':', (string) $account_id);
+		$type = isset($parts[1]) ? strtolower($parts[1]) : '';
+		if ($type === 'ig' || $type === 'instagram' || $type === 'inst') {
+			return 'insta';
+		}
+
+		return $type;
+	}
+
 	public static function get_social_network_name($account_id)
 	{
-		list($user_id, $type, $network_id) = explode(':', $account_id);
-		switch ($type) {
+		switch (self::get_account_social_type($account_id)) {
 		case 'vk':
 			return __('VKontakte', 'parrotposter');
 		case 'fb':
@@ -115,13 +119,96 @@ class ApiHelpers
 	public static function list_social_network_names($account_ids, $return_string = true)
 	{
 		$names = [];
+		$seen = [];
+		if (!is_array($account_ids)) {
+			$account_ids = [];
+		}
 		foreach ($account_ids as $id) {
-			$names[] = self::get_social_network_name($id);
+			$name = self::get_social_network_name($id);
+			if ($name === '' || isset($seen[$name])) {
+				continue;
+			}
+			$seen[$name] = true;
+			$names[] = $name;
 		}
 		if ($return_string) {
 			return implode(', ', $names);
 		}
 		return $names;
+	}
+
+	/**
+	 * Unique social types from account ids, for icon rendering (no links).
+	 *
+	 * @param array $account_ids
+	 * @return list<array{type: string, link: string}>
+	 */
+	public static function socials_from_account_ids($account_ids)
+	{
+		$socials = [];
+		$seen = [];
+		if (!is_array($account_ids)) {
+			return $socials;
+		}
+		foreach ($account_ids as $id) {
+			$type = self::get_account_social_type($id);
+			if ($type === '' || isset($seen[$type])) {
+				continue;
+			}
+			$seen[$type] = true;
+			$socials[] = [
+				'type' => $type,
+				'link' => '',
+			];
+		}
+
+		return $socials;
+	}
+
+	/**
+	 * id → {name, photo, type} from REST `accounts`, cached in a transient.
+	 *
+	 * @return array<string, array{name: string, photo: string, type: string}>
+	 */
+	public static function accounts_directory(): array
+	{
+		$key = 'parrotposter_accounts_dir';
+		if (function_exists('get_transient')) {
+			$cached = get_transient($key);
+			if (is_array($cached)) {
+				return $cached;
+			}
+		}
+
+		$dir = [];
+		if (!class_exists(__NAMESPACE__ . '\\Api', false)) {
+			return $dir;
+		}
+
+		list($accounts, $error) = Api::list_accounts();
+		if (empty($error) && is_array($accounts)) {
+			foreach ($accounts as $account) {
+				if (!is_array($account)) {
+					continue;
+				}
+				$id = isset($account['id']) ? (string) $account['id'] : '';
+				if ($id === '') {
+					continue;
+				}
+				$dir[$id] = [
+					'name' => isset($account['name']) ? (string) $account['name'] : '',
+					'photo' => isset($account['photo']) ? (string) $account['photo'] : '',
+					'type' => isset($account['type']) ? (string) $account['type'] : '',
+				];
+			}
+		}
+
+		if (function_exists('set_transient')) {
+			$ttl = defined('MINUTE_IN_SECONDS') ? 15 * MINUTE_IN_SECONDS : 900;
+			set_transient($key, $dir, $ttl);
+		}
+
+		return $dir;
 	}
 
 	public static function get_post_status_text($status)
@@ -135,6 +222,14 @@ class ApiHelpers
 			return __('In queue', 'parrotposter');
 		case 'queue':
 			return __('Publishing in progress', 'parrotposter');
+		case 'prepare':
+			return __('Preparing', 'parrotposter');
+		case 'updating':
+			return __('Updating', 'parrotposter');
+		case 'deleting':
+			return __('Deleting', 'parrotposter');
+		default:
+			return (string) $status;
 		}
 	}
 }

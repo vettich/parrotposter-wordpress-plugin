@@ -33,6 +33,7 @@ class AdminAjaxPost
 		add_action('admin_post_parrotposter_forgot_password', [$this, 'forgot_password']);
 		add_action('admin_post_parrotposter_reset_password', [$this, 'reset_password']);
 		add_action('admin_post_parrotposter_logout', [$this, 'logout']);
+		add_action('admin_post_parrotposter_open_webapp', [$this, 'open_webapp']);
 		add_action('admin_post_parrotposter_save_settings', [$this, 'save_settings']);
 
 		// tariffs
@@ -49,6 +50,9 @@ class AdminAjaxPost
 		add_action('wp_ajax_parrotposter_autoposting_enable', [$this, 'autoposting_enable']);
 		add_action('wp_ajax_parrotposter_publish_post_via_template', [$this, 'publish_post_via_template']);
 		add_action('wp_ajax_parrotposter_has_post_duplicates', [$this, 'has_post_duplicates']);
+		add_action('wp_ajax_parrotposter_pipeline_publish_modal_data', [$this, 'pipeline_publish_modal_data']);
+		add_action('wp_ajax_parrotposter_pipeline_publish', [$this, 'pipeline_publish_post']);
+		add_action('wp_ajax_parrotposter_pipeline_column_batch', [$this, 'pipeline_column_batch']);
 		add_action('wp_ajax_parrotposter_local_queue_list', [$this, 'local_queue_list']);
 		add_action('wp_ajax_parrotposter_process_local_queue_admin', [$this, 'process_local_queue_admin']);
 
@@ -100,7 +104,32 @@ class AdminAjaxPost
 		nocache_headers();
 		header('Content-Type: application/json; charset=UTF-8');
 		$res = Api::issue_session_key();
+		if (!empty($res['token'])) {
+			Api::store_iframe_session_key((string) $res['token']);
+		}
 		echo wp_json_encode($res);
+		exit;
+	}
+
+	/**
+	 * Mint a fresh session key and redirect to the PP web app (SSO). Opens in the
+	 * form's target=_blank tab; does not write the iframe session-key cache.
+	 */
+	public function open_webapp(): void
+	{
+		FormHelpers::must_be_post_nonce();
+		if (!current_user_can('manage_options')) {
+			FormHelpers::post_error('forbidden');
+		}
+
+		$sso = Api::build_sso_url('/app');
+		if (!empty($sso['error']) || empty($sso['url'])) {
+			FormHelpers::post_error(
+				!empty($sso['error']) ? $sso['error'] : __('Failed to open the web application.', 'parrotposter')
+			);
+		}
+
+		wp_redirect($sso['url']);
 		exit;
 	}
 
@@ -357,8 +386,19 @@ class AdminAjaxPost
 			$config_ids = [];
 		} elseif (isset($_POST['config_ids']) && is_array($_POST['config_ids'])) {
 			$config_ids = [];
-			foreach ($_POST['config_ids'] as $id) {
-				$config_ids[] = sanitize_text_field(wp_unslash((string) $id));
+			$seen = [];
+			foreach ($_POST['config_ids'] as $raw) {
+				$parts = preg_split('/\s*,\s*/', sanitize_text_field(wp_unslash((string) $raw)));
+				if (!is_array($parts)) {
+					continue;
+				}
+				foreach ($parts as $id) {
+					if ($id === '' || isset($seen[$id])) {
+						continue;
+					}
+					$seen[$id] = true;
+					$config_ids[] = $id;
+				}
 			}
 		}
 
@@ -485,6 +525,24 @@ class AdminAjaxPost
 			echo wp_json_encode(['error' => 'bad_nonce']);
 			exit;
 		}
+	}
+
+	private static function pipeline_column_back_url(): string
+	{
+		$referer = function_exists('wp_get_referer') ? wp_get_referer() : false;
+		if (!is_string($referer) || $referer === '') {
+			$referer = isset($_SERVER['HTTP_REFERER']) ? (string) $_SERVER['HTTP_REFERER'] : '';
+		}
+		if ($referer === '') {
+			return '/wp-admin/edit.php';
+		}
+		$path = wp_parse_url($referer, PHP_URL_PATH);
+		$query = wp_parse_url($referer, PHP_URL_QUERY);
+		if (!is_string($path) || $path === '') {
+			return '/wp-admin/edit.php';
+		}
+
+		return $query ? $path . '?' . $query : $path;
 	}
 
 	private static function api_error($error)
@@ -968,6 +1026,183 @@ class AdminAjaxPost
 		FormHelpers::post_success('true');
 	}
 
+	public function pipeline_publish_modal_data()
+	{
+		self::ajax_guard();
+
+		$wp_post_id = isset($_POST['parrotposter']['wp_post_id']) ? absint($_POST['parrotposter']['wp_post_id']) : 0;
+		$post = get_post($wp_post_id);
+		if (!$post instanceof \WP_Post) {
+			FormHelpers::post_error('not_found');
+		}
+
+		$source_path = PushEventService::source_path_for_post_type((string) $post->post_type);
+		$pipelines_res = Api::list_pipelines_for_publish($source_path);
+		$api_pipelines = [];
+		if (!empty($pipelines_res['response']['pipelines']) && is_array($pipelines_res['response']['pipelines'])) {
+			$api_pipelines = $pipelines_res['response']['pipelines'];
+		}
+
+		$local_by_id = [];
+		foreach (Settings::get_pipelines_for_post($post) as $row) {
+			$local_by_id[$row['pipeline_id']] = $row;
+		}
+
+		$pipelines = [];
+		foreach ($api_pipelines as $pipeline) {
+			$pipeline_id = isset($pipeline['id']) ? (string) $pipeline['id'] : '';
+			if ($pipeline_id === '' || !isset($local_by_id[$pipeline_id])) {
+				continue;
+			}
+			$contract = $local_by_id[$pipeline_id]['contract'];
+			if (!PushEventService::post_passes_scope_filter($post, $contract)) {
+				continue;
+			}
+			$account_ids = isset($pipeline['account_ids']) && is_array($pipeline['account_ids'])
+				? $pipeline['account_ids']
+				: [];
+			$pipelines[] = [
+				'id' => $pipeline_id,
+				'name' => isset($pipeline['name']) ? (string) $pipeline['name'] : '',
+				'account_ids' => $account_ids,
+				'networks' => ApiHelpers::list_social_network_names($account_ids, true),
+				'socials_html' => PublishColumnCache::render_social_icons(
+					ApiHelpers::socials_from_account_ids($account_ids),
+					false
+				),
+			];
+		}
+
+		$existing = [];
+		$posts_res = Api::list_posts_by_cms_source($wp_post_id, (string) $post->post_type);
+		if (!empty($posts_res['response']['posts']) && is_array($posts_res['response']['posts'])) {
+			foreach ($posts_res['response']['posts'] as $ep) {
+				if (!is_array($ep)) {
+					continue;
+				}
+				$status = isset($ep['status']) ? (string) $ep['status'] : '';
+				$from = PublishColumnCache::from_posts([$ep]);
+				$ep['status_text'] = (string) ApiHelpers::get_post_status_text($status);
+				$ep['accounts'] = PublishColumnCache::accounts_for_modal($from['socials']);
+				$existing[] = $ep;
+			}
+		}
+
+		FormHelpers::post_success([
+			'pipelines' => $pipelines,
+			'existing_posts' => $existing,
+		]);
+	}
+
+	public function pipeline_publish_post()
+	{
+		self::ajax_guard();
+
+		$wp_post_id = isset($_POST['parrotposter']['wp_post_id']) ? absint($_POST['parrotposter']['wp_post_id']) : 0;
+		$pipeline_id = isset($_POST['parrotposter']['pipeline_id'])
+			? sanitize_text_field(wp_unslash($_POST['parrotposter']['pipeline_id']))
+			: '';
+
+		$post = get_post($wp_post_id);
+		if (!$post instanceof \WP_Post) {
+			FormHelpers::post_error('not_found');
+		}
+		if ($post->post_status !== 'publish') {
+			FormHelpers::post_error(__('The post must be published before sending it to social networks.', 'parrotposter'));
+		}
+
+		$matched = null;
+		foreach (Settings::get_pipelines_for_post($post) as $row) {
+			if ($row['pipeline_id'] === $pipeline_id) {
+				$matched = $row;
+				break;
+			}
+		}
+		if ($matched === null || !PushEventService::post_passes_scope_filter($post, $matched['contract'])) {
+			status_header(403);
+			FormHelpers::post_error('forbidden');
+		}
+
+		PushEventService::send_created_event($post, $pipeline_id, $matched['contract']);
+		PublishColumnCache::invalidate($wp_post_id);
+
+		FormHelpers::post_success('true');
+	}
+
+	public function pipeline_column_batch()
+	{
+		self::ajax_guard();
+
+		$ids = [];
+		$raw_ids = isset($_POST['parrotposter']['wp_post_ids']) && is_array($_POST['parrotposter']['wp_post_ids'])
+			? $_POST['parrotposter']['wp_post_ids']
+			: [];
+		foreach ($raw_ids as $id) {
+			$id = absint($id);
+			if ($id > 0) {
+				$ids[] = $id;
+			}
+			if (count($ids) >= 100) {
+				break;
+			}
+		}
+		$ids = array_values(array_unique($ids));
+
+		$source_to_wp = [];
+		$source_ids = [];
+		foreach ($ids as $wp_post_id) {
+			$post = get_post($wp_post_id);
+			if (!$post instanceof \WP_Post) {
+				continue;
+			}
+			$source_item_id = PushEventService::source_item_id((string) $post->post_type, $wp_post_id);
+			$source_to_wp[$source_item_id] = $wp_post_id;
+			$source_ids[] = $source_item_id;
+		}
+
+		$items = [];
+		if (empty($source_ids) || Settings::site_to_pp_secret() === '') {
+			FormHelpers::post_success(['cells' => []]);
+		}
+
+		$res = Api::list_posts_by_cms_source_batch($source_ids);
+		if (!empty($res['error'])) {
+			FormHelpers::post_success(['cells' => []]);
+		}
+		if (!empty($res['response']['items']) && is_array($res['response']['items'])) {
+			$items = $res['response']['items'];
+		}
+
+		$posts_by_source = [];
+		foreach ($items as $item) {
+			if (!is_array($item)) {
+				continue;
+			}
+			$source_item_id = isset($item['source_item_id']) ? (string) $item['source_item_id'] : '';
+			$posts_by_source[$source_item_id] = isset($item['posts']) && is_array($item['posts']) ? $item['posts'] : [];
+		}
+
+		$back_url = self::pipeline_column_back_url();
+		$cells = [];
+		foreach ($source_to_wp as $source_item_id => $wp_post_id) {
+			$posts = isset($posts_by_source[$source_item_id]) ? $posts_by_source[$source_item_id] : [];
+			$data = PublishColumnCache::from_posts($posts);
+			PublishColumnCache::set($wp_post_id, $data);
+			$link = sprintf(
+				'admin.php?page=parrotposter_posts&view=publish-post&post_id=%s&back_url=%s',
+				$wp_post_id,
+				$back_url
+			);
+			$cells[(string) $wp_post_id] = [
+				'has_posts' => !empty($data['has_posts']),
+				'socials' => $data['socials'],
+				'html' => PublishColumnCache::render_cell($wp_post_id, $data, $link),
+			];
+		}
+
+		FormHelpers::post_success(['cells' => $cells]);
+	}
+
 	public function get_post_html()
 	{
 		self::ajax_guard();
@@ -1015,16 +1250,13 @@ class AdminAjaxPost
 			FormHelpers::post_error('wrong input data');
 		}
 
-		$filter = [
-			'user_id' => Options::user_id(),
-			'fields.extra.wp_post_id' => intval($_POST['parrotposter']['wp_post_id']),
-		];
+		$wp_post_id = isset($_POST['parrotposter']['wp_post_id'])
+			? intval($_POST['parrotposter']['wp_post_id'])
+			: 0;
+		$wp_post = $wp_post_id > 0 ? get_post($wp_post_id) : null;
+		$post_type = ($wp_post && !empty($wp_post->post_type)) ? (string) $wp_post->post_type : 'post';
 
-		$res = Api::list_posts($filter, [], [
-			'page' => 1,
-			'size' => 50,
-			'skip_total' => true,
-		]);
+		$res = Api::list_posts_by_cms_source($wp_post_id, $post_type);
 		if (!empty($res['response']['posts'])) {
 			foreach ($res['response']['posts'] as $i => $post) {
 				$res['response']['posts'][$i]['status_view'] = ApiHelpers::get_post_status_text($post['status']);

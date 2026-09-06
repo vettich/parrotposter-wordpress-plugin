@@ -10,7 +10,7 @@ defined('ABSPATH') || exit;
 class MigrationService
 {
 	/**
-	 * @param list<string>|null $config_ids Autoposting template ids; null = all rows.
+	 * @param list<string>|null $config_ids Autoposting template ids; null = all rows; [] = fresh start.
 	 * @return array{success: bool, pipelines_created?: int, error?: string, warnings?: list<string>}
 	 */
 	public static function migrate_to_pipeline(?array $config_ids = null): array
@@ -20,25 +20,49 @@ class MigrationService
 			return ['success' => false, 'error' => 'plugin_id is not configured'];
 		}
 
-		if ($config_ids === null) {
-			$config_ids = self::all_autoposting_config_ids();
-		}
+		$configs = [];
+		if ($config_ids !== []) {
+			$wanted = null;
+			if ($config_ids !== null) {
+				$wanted = [];
+				foreach (self::expand_config_ids($config_ids) as $id) {
+					$wanted[$id] = true;
+				}
+				if ($wanted === []) {
+					return [
+						'success' => false,
+						'error' => __('Select at least one template to migrate.', 'parrotposter'),
+					];
+				}
+			}
 
-		$normalized_ids = [];
-		foreach ($config_ids as $id) {
-			if (!is_string($id) && !is_numeric($id)) {
-				continue;
+			$rows = [];
+			foreach (DBAutopostingTable::get_all(false) as $row) {
+				if (!is_array($row)) {
+					continue;
+				}
+				$id = isset($row['id']) ? (string) $row['id'] : '';
+				if ($id === '') {
+					continue;
+				}
+				if ($wanted !== null && !isset($wanted[$id])) {
+					continue;
+				}
+				$rows[] = $row;
 			}
-			$id = trim((string) $id);
-			if ($id !== '') {
-				$normalized_ids[] = $id;
+
+			if ($wanted !== null && $rows === []) {
+				return ['success' => false, 'error' => 'migration.no_matching_configs'];
+			}
+
+			foreach (Migration\TemplateClusterer::cluster($rows) as $cluster) {
+				$configs[] = Migration\PayloadBuilder::from_cluster($cluster);
 			}
 		}
-		$normalized_ids = array_values(array_unique($normalized_ids));
 
 		$res = Api::graphql_user_mutation('migratePluginToPipeline', [
 			'pluginId' => $plugin_id,
-			'configIds' => $normalized_ids,
+			'configs' => $configs,
 		]);
 
 		if (!empty($res['error'])) {
@@ -152,26 +176,6 @@ class MigrationService
 	}
 
 	/**
-	 * @return list<string>
-	 */
-	private static function all_autoposting_config_ids(): array
-	{
-		$rows = DBAutopostingTable::get_all(false);
-		$ids = [];
-		foreach ($rows as $row) {
-			if (!is_array($row)) {
-				continue;
-			}
-			$id = isset($row['id']) ? (string) $row['id'] : '';
-			if ($id !== '') {
-				$ids[] = $id;
-			}
-		}
-
-		return $ids;
-	}
-
-	/**
 	 * @param array<string, mixed> $data
 	 * @return array<string, mixed>|null
 	 */
@@ -195,5 +199,33 @@ class MigrationService
 		}
 
 		return $data['revertPluginToLegacy'];
+	}
+
+	/**
+	 * @param list<mixed> $config_ids
+	 * @return list<string>
+	 */
+	private static function expand_config_ids(array $config_ids)
+	{
+		$out = [];
+		$seen = [];
+		foreach ($config_ids as $raw) {
+			if (!is_string($raw) && !is_numeric($raw)) {
+				continue;
+			}
+			$parts = preg_split('/\s*,\s*/', trim((string) $raw));
+			if (!is_array($parts)) {
+				continue;
+			}
+			foreach ($parts as $id) {
+				if ($id === '' || isset($seen[$id])) {
+					continue;
+				}
+				$seen[$id] = true;
+				$out[] = $id;
+			}
+		}
+
+		return $out;
 	}
 }

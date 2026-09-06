@@ -23,7 +23,7 @@ if ($data !== false) {
 		'post_text' => "{title}{br}\n{br}\n{excerpt}",
 		'post_link' => '{link}',
 		'post_tags' => '{post_tag}',
-		'post_images' => ['{content_images}'],
+		'post_images' => ['{images_in_content}'],
 		'utm_enable' => 0,
 		'utm_source' => '{social_code}',
 		'account_ids' => [],

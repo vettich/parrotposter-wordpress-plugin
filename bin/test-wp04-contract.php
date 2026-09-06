@@ -200,6 +200,21 @@ assert_true(
 	ExpressionEval::evaluate($taxonomy_filter, ['category' => ['12', '99']])
 );
 assert_true(
+	'includes_any matches {id, name} objects by id',
+	ExpressionEval::evaluate($taxonomy_filter, [
+		'category' => [
+			['id' => '12', 'name' => 'News'],
+			['id' => '99', 'name' => 'Other'],
+		],
+	])
+);
+assert_true(
+	'includes_any rejects {id, name} objects with no overlapping id',
+	!ExpressionEval::evaluate($taxonomy_filter, [
+		'category' => [['id' => '99', 'name' => 'Other']],
+	])
+);
+assert_true(
 	'includes_any rejects non-overlapping term ids',
 	!ExpressionEval::evaluate($taxonomy_filter, ['category' => ['99']])
 );

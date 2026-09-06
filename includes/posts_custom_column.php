@@ -2,6 +2,8 @@
 
 use parrotposter\AssetModules;
 use parrotposter\PP;
+use parrotposter\PublishColumnCache;
+use parrotposter\Settings;
 use parrotposter\WpPostHelpers;
 
 add_action('admin_init', function () {
@@ -20,29 +22,43 @@ function parrotposter_manage_posts_columns($columns)
 	return $columns + $pp_cols;
 }
 
+function parrotposter_publish_column_url($wp_post_id)
+{
+	return sprintf(
+		'admin.php?page=parrotposter_posts&view=publish-post&post_id=%s&back_url=%s',
+		$wp_post_id,
+		isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : ''
+	);
+}
+
 function parrotposter_manage_posts_custom_column($col_name)
 {
 	if ($col_name !== 'parrotposter_col') {
 		return;
 	}
 
-	$link = sprintf(
-		'admin.php?page=parrotposter_posts&view=publish-post&post_id=%s&back_url=%s',
-		get_the_ID(),
-		$_SERVER['REQUEST_URI'],
-	);
+	$wp_post_id = (int) get_the_ID();
+	$link = parrotposter_publish_column_url($wp_post_id);
+
+	if (Settings::get_migration_mode() === Settings::MIGRATION_MODE_PIPELINE) {
+		echo PublishColumnCache::render_cell($wp_post_id, PublishColumnCache::get($wp_post_id), $link);
+		return;
+	}
 
 	printf(
 		'<a class="parrotposter-publish" title="%s" href="%s" data-wp-post-id="%s"></a>',
-		__('Publish to social networks', 'parrotposter'),
-		$link,
-		get_the_ID(),
+		esc_attr(__('Publish to social networks', 'parrotposter')),
+		esc_url($link),
+		$wp_post_id
 	);
 }
 
 add_action('admin_print_footer_scripts-edit.php', 'parrotposter_print_custom_columns_styles');
 function parrotposter_print_custom_columns_styles()
 {
+	if (Settings::get_migration_mode() === Settings::MIGRATION_MODE_PIPELINE) {
+		return;
+	}
 ?>
 	<style>
 		.column-parrotposter_col {
@@ -98,7 +114,21 @@ function parrotposter_show_view_publish_via_template()
 }
 
 add_action('admin_enqueue_scripts', 'parrotposter_assets_for_view_publish_via_template', 100);
-function parrotposter_assets_for_view_publish_via_template()
+function parrotposter_assets_for_view_publish_via_template($hook_suffix = '')
 {
+	$is_edit = is_string($hook_suffix) && strpos($hook_suffix, 'edit.php') === 0;
+	$is_post = $hook_suffix === 'post.php' || $hook_suffix === 'post-new.php';
+	if (!$is_edit && !$is_post) {
+		return;
+	}
+
+	if (Settings::get_migration_mode() === Settings::MIGRATION_MODE_PIPELINE) {
+		AssetModules::enqueue(['modal', 'common', 'loading', 'publish-via-pipeline']);
+		if ($is_edit) {
+			AssetModules::enqueue(['publish-column']);
+		}
+		return;
+	}
+
 	AssetModules::enqueue(['modal', 'common', 'loading', 'publish-via-template']);
 }

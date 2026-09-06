@@ -23,6 +23,10 @@ services:
       - ../:/var/www/html/wp-content/plugins/parrotposter
       - ../logs:/var/www/html/wp-content/plugins/parrotposter/logs
       - ./mu-plugins/00-disable-wp-cron.php:/var/www/html/wp-content/mu-plugins/00-disable-wp-cron.php:ro
+      - ./ensure-uploads-writable.sh:/usr/local/bin/ensure-uploads-writable.sh:ro
+    # Compose nulls image CMD when entrypoint is overridden — keep apache2-foreground.
+    entrypoint: ["/bin/bash", "/usr/local/bin/ensure-uploads-writable.sh"]
+    command: ["apache2-foreground"]
     extra_hosts:
       - "pp.l2.vettich.ru:82.146.42.244"
     networks:

@@ -206,7 +206,7 @@ class PushEventService
 			if (array_key_exists($tax_key, $payload)) {
 				continue;
 			}
-			$payload[$tax_key] = self::taxonomy_term_ids($tax_key, $post);
+			$payload[$tax_key] = self::taxonomy_terms($tax_key, $post);
 		}
 
 		foreach ($required_fields as $field) {
@@ -382,6 +382,26 @@ class PushEventService
 		return $post_type . ':' . $post_id;
 	}
 
+	/**
+	 * Canonical source_path for a WP post type (HMAC `pluginPipelinesForPublish`).
+	 *
+	 * @return list<array{key: string, label: string, value: string}>
+	 */
+	public static function source_path_for_post_type(string $post_type): array
+	{
+		if ($post_type === '') {
+			$post_type = 'post';
+		}
+
+		return [
+			[
+				'key' => 'post_type',
+				'label' => '',
+				'value' => $post_type,
+			],
+		];
+	}
+
 	private static function contract_version_for_pipeline(string $pipeline_id): int
 	{
 		$contract = Settings::get_pipeline_contract($pipeline_id);
@@ -411,9 +431,9 @@ class PushEventService
 			return self::field_media_items($field, $post);
 		}
 
-		// Wire/pipeline filters compare term_id[]; legacy TextProcessor still uses names.
+		// Wire/pipeline taxonomy: [{id, name}]; legacy TextProcessor still uses names.
 		if (taxonomy_exists($field)) {
-			return self::taxonomy_term_ids($field, $post);
+			return self::taxonomy_terms($field, $post);
 		}
 
 		$value = Fields::get_field_value($field, $post);
@@ -428,21 +448,38 @@ class PushEventService
 	}
 
 	/**
-	 * @return list<string>
+	 * Taxonomy payload canon: `[{id, name}, …]` (SPEC-002-07 §6.2).
+	 *
+	 * @return list<array{id: string, name: string}>
 	 */
-	private static function taxonomy_term_ids(string $taxonomy, \WP_Post $post): array
+	private static function taxonomy_terms(string $taxonomy, \WP_Post $post): array
 	{
-		$terms = wp_get_post_terms($post->ID, $taxonomy, ['fields' => 'ids']);
+		$terms = wp_get_post_terms($post->ID, $taxonomy);
 		if (is_wp_error($terms) || !is_array($terms)) {
 			return [];
 		}
 
-		$ids = [];
-		foreach ($terms as $term_id) {
-			$ids[] = (string) (int) $term_id;
+		$out = [];
+		foreach ($terms as $term) {
+			if (is_object($term) && isset($term->term_id)) {
+				$id = (string) (int) $term->term_id;
+				$name = isset($term->name) ? (string) $term->name : $id;
+				$out[] = [
+					'id' => $id,
+					'name' => $name,
+				];
+				continue;
+			}
+			if (is_numeric($term)) {
+				$id = (string) (int) $term;
+				$out[] = [
+					'id' => $id,
+					'name' => $id,
+				];
+			}
 		}
 
-		return $ids;
+		return $out;
 	}
 
 	/**

@@ -205,10 +205,15 @@ class ExpressionEval
 	private static function value_as_string_set($value): array
 	{
 		if (is_array($value)) {
+			if (self::is_ref_object($value)) {
+				$id = self::set_member_as_string($value);
+				return $id !== null ? [$id] : [];
+			}
 			$out = [];
 			foreach ($value as $item) {
-				if (is_string($item) || is_numeric($item)) {
-					$out[] = (string) $item;
+				$as_id = self::set_member_as_string($item);
+				if ($as_id !== null) {
+					$out[] = $as_id;
 				}
 			}
 
@@ -222,6 +227,41 @@ class ExpressionEval
 		}
 
 		return [];
+	}
+
+	/**
+	 * @param mixed $item
+	 * @return string|null
+	 */
+	private static function set_member_as_string($item)
+	{
+		if (is_string($item) || is_numeric($item)) {
+			return (string) $item;
+		}
+		if (!is_array($item)) {
+			return null;
+		}
+		foreach (['id', 'value'] as $key) {
+			if (!array_key_exists($key, $item)) {
+				continue;
+			}
+			$raw = $item[$key];
+			if (is_string($raw) || is_numeric($raw)) {
+				return (string) $raw;
+			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * Associative `{id, name}` / `{value, label}` (not a list of members).
+	 *
+	 * @param array<mixed> $value
+	 */
+	private static function is_ref_object(array $value): bool
+	{
+		return array_key_exists('id', $value) || array_key_exists('value', $value);
 	}
 
 	/**

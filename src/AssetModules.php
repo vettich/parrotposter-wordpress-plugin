@@ -28,6 +28,8 @@ class AssetModules
 		'post-meta-box',
 		'publish-post',
 		'publish-via-template',
+		'publish-via-pipeline',
+		'publish-column',
 		'help',
 		'local-queue-admin',
 		'pipeline-migration',

@@ -93,7 +93,7 @@ class Settings
 	 * TASK-002-WP-10: record "PP just authenticated a primary call" — called once from
 	 * {@see WireProtocol::authorize_request()}, the single permission_callback shared by every
 	 * registered wire route (`/info`, `/fields`, `/items/*`, `/notify_contract`,
-	 * `/published_ids_sync`, `/autopost-configs`), so this never needs duplicating per-handler.
+	 * `/published_ids_sync`), so this never needs duplicating per-handler.
 	 */
 	public static function touch_last_primary_call(): void
 	{
@@ -666,12 +666,7 @@ class Settings
 			if (!is_array($step)) {
 				continue;
 			}
-			$key = '';
-			if (isset($step['key']) && is_string($step['key'])) {
-				$key = $step['key'];
-			} elseif (isset($step['step']) && is_string($step['step'])) {
-				$key = $step['step'];
-			}
+			$key = isset($step['key']) && is_string($step['key']) ? $step['key'] : '';
 			$value = isset($step['value']) ? (string) $step['value'] : '';
 			if ($key === 'post_type' || $key === 'wp_post_type') {
 				return $value === '' || $value === $post_type;

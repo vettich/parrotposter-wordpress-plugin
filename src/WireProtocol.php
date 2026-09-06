@@ -83,7 +83,6 @@ class WireProtocol
 			'fields',
 			'items/latest',
 			'items/(?P<item_id>[^/]+)',
-			'autopost-configs',
 		];
 		foreach ($get_suffixes as $suffix) {
 			foreach ([$suffix, 'pp/v1/' . $suffix] as $route) {
@@ -238,7 +237,7 @@ class WireProtocol
 
 		// TASK-002-WP-10: single shared choke point for "PP just reached this site directly" —
 		// every registered wire route (`/info`, `/fields`, `/items/*`, `/notify_contract`,
-		// `/published_ids_sync`, `/autopost-configs`) uses this method as its
+		// `/published_ids_sync`) uses this method as its
 		// permission_callback, so one call here covers all of them without per-handler
 		// duplication. Feeds OutboundPollScheduler's local watchdog heuristic.
 		Settings::touch_last_primary_call();
@@ -296,9 +295,6 @@ class WireProtocol
 			}
 
 			return self::respond($result);
-		}
-		if (strpos($route, '/autopost-configs') !== false) {
-			return self::respond(self::handle_autopost_configs());
 		}
 
 		return self::respond(self::handle_info());
@@ -399,62 +395,6 @@ class WireProtocol
 		}
 
 		return $post_types;
-	}
-
-	/**
-	 * Legacy autoposting templates for migration wizard (SPEC-002-17 §3.2).
-	 *
-	 * @return array<string, mixed>
-	 */
-	private static function handle_autopost_configs(): array
-	{
-		$rows = DBAutopostingTable::get_all(false);
-		$configs = [];
-		foreach ($rows as $row) {
-			if (!is_array($row)) {
-				continue;
-			}
-			$id = isset($row['id']) ? (string) $row['id'] : '';
-			if ($id === '') {
-				continue;
-			}
-			$account_ids = [];
-			if (isset($row['account_ids']) && is_array($row['account_ids'])) {
-				foreach ($row['account_ids'] as $aid) {
-					if (is_string($aid) || is_numeric($aid)) {
-						$account_ids[] = (string) $aid;
-					}
-				}
-			}
-			$post_images = [];
-			if (isset($row['post_images']) && is_array($row['post_images'])) {
-				foreach ($row['post_images'] as $img_field) {
-					if (!is_string($img_field) && !is_numeric($img_field)) {
-						continue;
-					}
-					$key = self::normalize_field_key((string) $img_field);
-					if ($key !== '') {
-						$post_images[] = $key;
-					}
-				}
-			}
-			$conditions = isset($row['conditions']) && is_array($row['conditions'])
-				? $row['conditions']
-				: [];
-			$configs[] = [
-				'id' => $id,
-				'name' => isset($row['name']) ? (string) $row['name'] : '',
-				'post_type' => isset($row['wp_post_type']) ? (string) $row['wp_post_type'] : 'post',
-				'template' => isset($row['post_text']) ? (string) $row['post_text'] : '',
-				'post_link' => isset($row['post_link']) ? (string) $row['post_link'] : '',
-				'post_images' => $post_images,
-				'accounts' => $account_ids,
-				'conditions' => $conditions,
-				'enabled' => !empty($row['enable']),
-			];
-		}
-
-		return ['configs' => $configs];
 	}
 
 	/**
@@ -975,8 +915,9 @@ class WireProtocol
 	 * Same skeleton as handle_items_next(), paginated instead of LIMIT 1:
 	 *  - date_query: half-open window [window_from, window_to), D13/DEC-002-01 window §.
 	 *  - post__not_in: excluded_digest_ids only (D11 — no exclude_sync branch for
-	 *    Digest; PP always sends inline ids within the window, exclude_mode /
-	 *    digest_included_ids_sync are out of scope here).
+	 *    Digest). PP sends at most L inline ids; a larger window exclude set is
+	 *    filtered on PP after fetch (V2-F045). exclude_mode /
+	 *    digest_included_ids_sync are out of scope here.
 	 *  - orderby: DigestBatchQuery::apply_sort_with_tiebreak() — mandatory ID DESC
 	 *    tiebreak so identical post_date values don't reorder between pages (D13).
 	 *  - no_found_rows must stay false: has_more needs WP_Query::$found_posts.
@@ -1095,8 +1036,9 @@ class WireProtocol
 			);
 		}
 
-		// D11: excluded_digest_ids is always inline and window-bounded (PP caps it
-		// there); no exclude_sync / digest_included_ids_sync branch for Digest.
+		// D11: excluded_digest_ids is always inline (no exclude_sync). PP caps the
+		// array at L even when the real exclude set is larger and filters the
+		// remainder itself (V2-F045).
 		$excluded_digest_ids = isset($body['excluded_digest_ids']) && is_array($body['excluded_digest_ids'])
 			? $body['excluded_digest_ids']
 			: [];

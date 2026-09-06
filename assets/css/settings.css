@@ -183,6 +183,10 @@
 	box-shadow: 0 8px 18px rgba(34, 113, 177, 0.18);
 }
 
+.parrotposter-settings-launch__form {
+	margin: 0;
+}
+
 .parrotposter-settings-launch__button {
 	margin-top: 2px !important;
 }

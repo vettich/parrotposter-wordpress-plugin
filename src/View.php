@@ -37,7 +37,7 @@ class View
 	 */
 	private static function iframe_config(string $endpoint): string
 	{
-		$session = Api::issue_session_key();
+		$session = Api::iframe_session_key();
 		$token = '';
 		if (empty($session['error']) && !empty($session['token'])) {
 			$token = $session['token'];

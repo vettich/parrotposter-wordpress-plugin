@@ -221,12 +221,42 @@ class OutboundPollScheduler
 	public static function last_lease_error(): ?string
 	{
 		$error = self::load_state()['last_lease_error'];
+		if ($error === '' || $error === 'Array') {
+			return null;
+		}
 
-		return $error !== '' ? $error : null;
+		return $error;
 	}
 
-	/** Unix timestamp of a successful or failed lease attempt (diagnostics). */
-	public static function record_lease_contact(bool $ok, ?string $error = null, ?int $now_ts = null): void
+	/**
+	 * Banner-safe message from a GraphQL/transport error payload.
+	 * `(string)` on PHP arrays yields the literal "Array" — never use that for display.
+	 *
+	 * @param mixed $error
+	 */
+	public static function format_lease_error($error): string
+	{
+		if (is_array($error)) {
+			$msg = $error['msg'] ?? '';
+			if (is_scalar($msg) && (string) $msg !== '') {
+				return (string) $msg;
+			}
+
+			return 'lease_failed';
+		}
+		if (!is_string($error) || $error === '' || $error === 'Array') {
+			return 'lease_failed';
+		}
+
+		return $error;
+	}
+
+	/**
+	 * Unix timestamp of a successful or failed lease attempt (diagnostics).
+	 *
+	 * @param mixed $error GraphQL error array (`['msg' => ...]`), string, or null
+	 */
+	public static function record_lease_contact(bool $ok, $error = null, ?int $now_ts = null): void
 	{
 		$now_ts = $now_ts ?? time();
 		if ($ok) {
@@ -238,7 +268,7 @@ class OutboundPollScheduler
 			return;
 		}
 		self::save_state([
-			'last_lease_error' => $error !== null && $error !== '' ? $error : 'lease_failed',
+			'last_lease_error' => self::format_lease_error($error),
 		]);
 	}
 

@@ -8,7 +8,6 @@ use parrotposter\AssetModules;
 use parrotposter\Profile;
 use parrotposter\Settings;
 use parrotposter\UserPreferences;
-use parrotposter\Api;
 
 AssetModules::enqueue(['common', 'block', 'settings']);
 
@@ -54,9 +53,6 @@ $format_connection_activity = static function (?string $utc_value): array {
 };
 $site_to_pp_activity = $format_connection_activity(Settings::last_site_to_pp_call_at());
 $pp_to_site_activity = $format_connection_activity(Settings::last_primary_call_at());
-
-$sso = Api::build_sso_url('/app');
-$sso_url = empty($sso['error']) && !empty($sso['url']) ? (string) $sso['url'] : '';
 
 $show_pipelines_section = $migration_mode === Settings::MIGRATION_MODE_PIPELINE
 	&& Settings::has_enabled_legacy_templates();
@@ -149,15 +145,20 @@ $revert_confirm = __(
 				<p class="parrotposter-settings-card__description">
 					<?php _e('Manage social accounts, templates, and publishing in the ParrotPoster app.', 'parrotposter') ?>
 				</p>
-				<?php if ($sso_url !== ''): ?>
-					<a
-						class="button button-primary parrotposter-settings-launch__button parrotposter-external-link parrotposter-external-link--white"
-						href="<?php echo esc_url($sso_url) ?>"
-						target="_blank"
-						rel="noopener noreferrer">
+				<form
+					class="parrotposter-settings-launch__form"
+					action="<?php echo esc_url(admin_url('admin-post.php')) ?>"
+					method="post"
+					target="_blank">
+					<?php FormHelpers::the_nonce() ?>
+					<input type="hidden" name="action" value="parrotposter_open_webapp">
+					<input type="hidden" name="back_url" value="admin.php?page=parrotposter_settings">
+					<button
+						type="submit"
+						class="button button-primary parrotposter-settings-launch__button parrotposter-external-link parrotposter-external-link--white">
 						<?php _e('Open web application', 'parrotposter') ?>
-					</a>
-				<?php endif ?>
+					</button>
+				</form>
 			</div>
 
 			<div class="parrotposter-settings-session">

@@ -79,6 +79,14 @@ msgstr ""
 msgid "Publish to social networks"
 msgstr ""
 
+#: src/PublishColumnCache.php
+msgid "Open publication"
+msgstr ""
+
+#: assets/js/publish-column.js
+msgid "Open post"
+msgstr ""
+
 #: src/AdminAjaxPost.php:98 src/AdminAjaxPost.php:123
 #: src/AdminAjaxPost.php:148
 msgid "Email is empty"

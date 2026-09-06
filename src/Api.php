@@ -16,6 +16,9 @@ class Api
 
 	private const PP_DOWN_CIRCUIT_TTL_SEC = 30;
 
+	/** Iframe session-key transient TTL; shorter than Redis idle (30 min). */
+	private const IFRAME_SESSION_KEY_TTL_SEC = 900;
+
 	private const CURL_NETWORK_STYLE_ERRORS = [
 		'http_request_failed',
 	];
@@ -385,6 +388,299 @@ class Api
 	}
 
 	/**
+	 * GraphQL query with site_to_pp Bearer + HMAC (machine-path).
+	 *
+	 * @param array<string, mixed> $variables
+	 * @param array<string, mixed> $opts      curl_timeout, curl_connect_timeout
+	 * @return array{data?: array, error?: array{msg: string, code?: int|string, extensions?: array}}
+	 */
+	public static function graphql_query(string $operation, array $variables = [], array $opts = []): array
+	{
+		$secret = Settings::site_to_pp_secret();
+		if ($secret === '') {
+			return ['error' => ['msg' => 'site_to_pp secret is empty']];
+		}
+
+		$query = self::build_graphql_query($operation);
+		if ($query === '') {
+			return ['error' => ['msg' => 'unknown graphql operation']];
+		}
+
+		return self::do_graphql_site_request($query, $variables, array_merge($opts, [
+			'bearer_token' => $secret,
+			'sign_with_site_to_pp' => true,
+			'log_label' => $operation,
+		]));
+	}
+
+	/**
+	 * PP posts linked to a WP post: HMAC GraphQL when bound, otherwise REST with site domain.
+	 *
+	 * @return array{response?: array{posts: array}, error?: array}
+	 */
+	public static function list_posts_by_cms_source(int $wp_post_id, string $post_type = 'post'): array
+	{
+		$wp_post_id = (int) $wp_post_id;
+		if ($wp_post_id < 1) {
+			return ['response' => ['posts' => []]];
+		}
+		if ($post_type === '') {
+			$post_type = 'post';
+		}
+
+		$site_domain = WpPostHelpers::get_site_domain();
+		$source_item_id = PushEventService::source_item_id($post_type, $wp_post_id);
+
+		if (Settings::site_to_pp_secret() !== '') {
+			$res = self::graphql_query('pluginWpPostsBySourceItem', [
+				'sourceItemId' => $source_item_id,
+				'wpPostId' => $wp_post_id,
+				'siteDomain' => $site_domain,
+			]);
+			if (!empty($res['error'])) {
+				return $res;
+			}
+			$nodes = [];
+			if (isset($res['data']['pluginWpPostsBySourceItem']) && is_array($res['data']['pluginWpPostsBySourceItem'])) {
+				$nodes = $res['data']['pluginWpPostsBySourceItem'];
+			}
+
+			return ['response' => ['posts' => self::plugin_cms_source_posts_to_wp_list($nodes)]];
+		}
+
+		$filter = [
+			'user_id' => Options::user_id(),
+			'fields.extra.wp_post_id' => $wp_post_id,
+			'fields.extra.wp_site_domain' => $site_domain,
+		];
+
+		$posts = [];
+		$page = 1;
+		$page_size = 100;
+		$max_pages = 50;
+		while ($page <= $max_pages) {
+			$res = self::list_posts($filter, [], [
+				'page' => $page,
+				'size' => $page_size,
+				'skip_total' => true,
+			]);
+			if (!empty($res['error'])) {
+				return $res;
+			}
+			$batch = [];
+			if (!empty($res['response']['posts']) && is_array($res['response']['posts'])) {
+				$batch = $res['response']['posts'];
+			}
+			foreach ($batch as $post) {
+				$posts[] = $post;
+			}
+			if (count($batch) < $page_size) {
+				break;
+			}
+			$page++;
+		}
+
+		return ['response' => ['posts' => $posts]];
+	}
+
+	/**
+	 * Pipelines the HMAC plugin may offer in a publish picker for this source path.
+	 *
+	 * @param list<array{key?: string, label?: string, value?: string}> $source_path
+	 * @return array{response?: array{pipelines: list<array{id: string, name: string, account_ids: list<string>}>}, error?: array}
+	 */
+	public static function list_pipelines_for_publish(array $source_path): array
+	{
+		$steps = [];
+		foreach ($source_path as $step) {
+			if (!is_array($step)) {
+				continue;
+			}
+			$key = isset($step['key']) ? (string) $step['key'] : '';
+			$value = isset($step['value']) ? (string) $step['value'] : '';
+			if ($key === '' || $value === '') {
+				continue;
+			}
+			$steps[] = [
+				'key' => $key,
+				'label' => isset($step['label']) ? (string) $step['label'] : '',
+				'value' => $value,
+			];
+		}
+		if (empty($steps)) {
+			return ['response' => ['pipelines' => []]];
+		}
+
+		$res = self::graphql_query('pluginPipelinesForPublish', [
+			'sourcePath' => $steps,
+		]);
+		if (!empty($res['error'])) {
+			return $res;
+		}
+		$nodes = [];
+		if (isset($res['data']['pluginPipelinesForPublish']) && is_array($res['data']['pluginPipelinesForPublish'])) {
+			$nodes = $res['data']['pluginPipelinesForPublish'];
+		}
+
+		return ['response' => ['pipelines' => self::plugin_pipelines_for_publish_to_wp_list($nodes)]];
+	}
+
+	/**
+	 * Batched CMS lookup of PP posts by `source_item_id` (HMAC GraphQL).
+	 * Passes `siteDomain` so the backend can union the legacy v1 index
+	 * (`extra.wp_post_id`) with v2 provenance — same as `list_posts_by_cms_source`.
+	 *
+	 * @param list<string> $source_item_ids
+	 * @return array{response?: array{items: list<array{source_item_id: string, posts: list<array>}>}, error?: array}
+	 */
+	public static function list_posts_by_cms_source_batch(array $source_item_ids): array
+	{
+		$ids = [];
+		$seen = [];
+		foreach ($source_item_ids as $id) {
+			$id = trim((string) $id);
+			if ($id === '' || isset($seen[$id])) {
+				continue;
+			}
+			$seen[$id] = true;
+			$ids[] = $id;
+			if (count($ids) >= 100) {
+				break;
+			}
+		}
+		if (empty($ids)) {
+			return ['response' => ['items' => []]];
+		}
+
+		$res = self::graphql_query('pluginWpPostsBySourceItemsBatch', [
+			'sourceItemIds' => $ids,
+			'siteDomain' => WpPostHelpers::get_site_domain(),
+		]);
+		if (!empty($res['error'])) {
+			return $res;
+		}
+		$nodes = [];
+		if (isset($res['data']['pluginWpPostsBySourceItemsBatch']) && is_array($res['data']['pluginWpPostsBySourceItemsBatch'])) {
+			$nodes = $res['data']['pluginWpPostsBySourceItemsBatch'];
+		}
+
+		$items = [];
+		foreach ($nodes as $node) {
+			if (!is_array($node)) {
+				continue;
+			}
+			$source_item_id = isset($node['sourceItemId']) ? (string) $node['sourceItemId'] : '';
+			if ($source_item_id === '') {
+				continue;
+			}
+			$posts = [];
+			if (isset($node['posts']) && is_array($node['posts'])) {
+				$posts = self::plugin_cms_source_posts_to_wp_list($node['posts']);
+			}
+			$items[] = [
+				'source_item_id' => $source_item_id,
+				'posts' => $posts,
+			];
+		}
+
+		return ['response' => ['items' => $items]];
+	}
+
+	/**
+	 * Map HMAC `pluginPipelinesForPublish` nodes.
+	 *
+	 * @param list<array<string, mixed>> $nodes
+	 * @return list<array{id: string, name: string, account_ids: list<string>}>
+	 */
+	public static function plugin_pipelines_for_publish_to_wp_list(array $nodes): array
+	{
+		$pipelines = [];
+		foreach ($nodes as $node) {
+			if (!is_array($node)) {
+				continue;
+			}
+			$id = isset($node['id']) ? (string) $node['id'] : '';
+			if ($id === '') {
+				continue;
+			}
+			$account_ids = [];
+			if (!empty($node['accountIds']) && is_array($node['accountIds'])) {
+				foreach ($node['accountIds'] as $account_id) {
+					$account_ids[] = (string) $account_id;
+				}
+			}
+			$pipelines[] = [
+				'id' => $id,
+				'name' => isset($node['name']) ? (string) $node['name'] : '',
+				'account_ids' => $account_ids,
+			];
+		}
+
+		return $pipelines;
+	}
+
+	/**
+	 * Map HMAC `pluginWpPostsBySourceItem` nodes to the REST-like posts list used by the meta-box.
+	 *
+	 * @param list<array<string, mixed>> $nodes
+	 * @return list<array<string, mixed>>
+	 */
+	public static function plugin_cms_source_posts_to_wp_list(array $nodes): array
+	{
+		$posts = [];
+		foreach ($nodes as $node) {
+			if (!is_array($node)) {
+				continue;
+			}
+			$id = isset($node['id']) ? (string) $node['id'] : '';
+			if ($id === '') {
+				continue;
+			}
+			$extra = [];
+			if (array_key_exists('legacyAutopostingId', $node) && $node['legacyAutopostingId'] !== null && $node['legacyAutopostingId'] !== '') {
+				$extra['wp_autoposting_id'] = (int) $node['legacyAutopostingId'];
+			}
+			$posts[] = [
+				'id' => $id,
+				'publish_at' => isset($node['publishAt']) ? (string) $node['publishAt'] : '',
+				'status' => isset($node['status']) ? (string) $node['status'] : '',
+				'fields' => [
+					'extra' => $extra,
+				],
+				'results' => self::plugin_cms_source_post_results_to_wp_list(
+					isset($node['results']) && is_array($node['results']) ? $node['results'] : []
+				),
+			];
+		}
+
+		return $posts;
+	}
+
+	/**
+	 * @param list<mixed> $nodes
+	 * @return list<array{account_id: string, social_type: string, success: mixed, link: string, published_at: string, error: string}>
+	 */
+	public static function plugin_cms_source_post_results_to_wp_list(array $nodes): array
+	{
+		$results = [];
+		foreach ($nodes as $row) {
+			if (!is_array($row)) {
+				continue;
+			}
+			$results[] = [
+				'account_id' => isset($row['accountId']) ? (string) $row['accountId'] : '',
+				'social_type' => isset($row['socialType']) ? (string) $row['socialType'] : '',
+				'success' => array_key_exists('success', $row) ? $row['success'] : null,
+				'link' => isset($row['linkToSocialPost']) ? (string) $row['linkToSocialPost'] : '',
+				'published_at' => isset($row['publishedAt']) ? (string) $row['publishedAt'] : '',
+				'error' => isset($row['errorMessage']) ? (string) $row['errorMessage'] : '',
+			];
+		}
+
+		return $results;
+	}
+
+	/**
 	 * GraphQL mutation with user session Bearer (admin UI path, SPEC-002-17).
 	 *
 	 * @param array<string, mixed> $variables Mutation variables
@@ -457,6 +753,20 @@ class Api
 				return 'mutation MigratePluginToPipeline($input: MigratePluginInput!) { migratePluginToPipeline(input: $input) { plugin { id migrationMode pipelineIdsFromMigration } pipelines { id name } warnings errors { message code } } }';
 			case 'revertPluginToLegacy':
 				return 'mutation RevertPluginToLegacy($pluginId: ID!) { revertPluginToLegacy(pluginId: $pluginId) { plugin { id migrationMode pipelineIdsFromMigration } errors { message code } } }';
+			default:
+				return '';
+		}
+	}
+
+	private static function build_graphql_query(string $operation): string
+	{
+		switch ($operation) {
+			case 'pluginWpPostsBySourceItem':
+					return 'query PluginWpPostsBySourceItem($sourceItemId: String!, $wpPostId: Int, $siteDomain: String) { pluginWpPostsBySourceItem(sourceItemId: $sourceItemId, wpPostId: $wpPostId, siteDomain: $siteDomain) { id publishAt status legacyAutopostingId results { accountId socialType success linkToSocialPost publishedAt errorMessage } } }';
+			case 'pluginPipelinesForPublish':
+				return 'query PluginPipelinesForPublish($sourcePath: [SourceSelectionStepInput!]!) { pluginPipelinesForPublish(sourcePath: $sourcePath) { id name accountIds } }';
+			case 'pluginWpPostsBySourceItemsBatch':
+					return 'query PluginWpPostsBySourceItemsBatch($sourceItemIds: [String!]!, $siteDomain: String) { pluginWpPostsBySourceItemsBatch(sourceItemIds: $sourceItemIds, siteDomain: $siteDomain) { sourceItemId posts { id publishAt status legacyAutopostingId results { accountId socialType success linkToSocialPost publishedAt errorMessage } } } }';
 			default:
 				return '';
 		}
@@ -749,7 +1059,7 @@ class Api
 	}
 
 	/**
-	 * Короткоживущий токен для iframe (GraphQL).
+	 * Короткоживущий токен для iframe (GraphQL). Always mints a new key.
 	 *
 	 * @return array{token: string}|array{error: array{msg: string, code?: int}}
 	 */
@@ -779,6 +1089,75 @@ class Api
 		}
 
 		return ['token' => (string) $session_token];
+	}
+
+	/**
+	 * Session key for iframe embed: reuse a 15-minute transient, otherwise mint.
+	 *
+	 * @return array{token: string}|array{error: array{msg: string, code?: int}}
+	 */
+	public static function iframe_session_key(): array
+	{
+		$cached = self::read_iframe_session_key_cache();
+		if ($cached !== null) {
+			return ['token' => $cached];
+		}
+
+		$res = self::issue_session_key();
+		if (!empty($res['token'])) {
+			self::store_iframe_session_key((string) $res['token']);
+		}
+
+		return $res;
+	}
+
+	/**
+	 * Persist a freshly minted session key for the next iframe embed (not for SSO).
+	 */
+	public static function store_iframe_session_key(string $token): void
+	{
+		$key = self::iframe_session_key_cache_key();
+		if ($key === null || $token === '') {
+			return;
+		}
+
+		$ttl = defined('MINUTE_IN_SECONDS')
+			? 15 * MINUTE_IN_SECONDS
+			: self::IFRAME_SESSION_KEY_TTL_SEC;
+		set_transient($key, $token, (int) $ttl);
+	}
+
+	public static function invalidate_iframe_session_key_cache(): void
+	{
+		$key = self::iframe_session_key_cache_key();
+		if ($key !== null) {
+			delete_transient($key);
+		}
+	}
+
+	private static function iframe_session_key_cache_key(): ?string
+	{
+		$bearer = Options::token();
+		if ($bearer === '') {
+			return null;
+		}
+
+		return 'pp_session_key_v1_' . hash('sha256', $bearer) . '_ro0';
+	}
+
+	private static function read_iframe_session_key_cache(): ?string
+	{
+		$key = self::iframe_session_key_cache_key();
+		if ($key === null) {
+			return null;
+		}
+
+		$cached = get_transient($key);
+		if (!is_string($cached) || $cached === '') {
+			return null;
+		}
+
+		return $cached;
 	}
 
 	/**

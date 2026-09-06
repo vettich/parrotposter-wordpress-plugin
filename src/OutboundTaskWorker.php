@@ -123,7 +123,7 @@ class OutboundTaskWorker
 
 		if (!empty($res['error'])) {
 			PP::log(['OutboundTaskWorker::lease_failed', 'error' => $res['error']]);
-			OutboundPollScheduler::record_lease_contact(false, (string) $res['error']);
+			OutboundPollScheduler::record_lease_contact(false, $res['error']);
 			// No server signal to go on this round — fall back to the standard backoff/local-
 			// heuristic path (WP-10) rather than leaving next_due_at stale, so a persistent lease
 			// failure still widens the retry interval instead of retrying every single cron tick.

@@ -79,6 +79,14 @@ msgstr "Успешно удалено"
 msgid "Publish to social networks"
 msgstr "Опубликовать в социальные сети"
 
+#: src/PublishColumnCache.php
+msgid "Open publication"
+msgstr "Открыть публикацию"
+
+#: assets/js/publish-column.js
+msgid "Open post"
+msgstr "Открыть пост"
+
 #: src/AdminAjaxPost.php:98 src/AdminAjaxPost.php:123 src/AdminAjaxPost.php:148
 msgid "Email is empty"
 msgstr "Email пустой"
@@ -1960,6 +1968,43 @@ msgstr "Вернуться к планировщику"
 #: views/settings/index.php:69 views/partials/migration-banner-pipeline-active.php:24
 msgid "Revert to legacy scheduler? Pipelines will stay on the server but triggers will be disabled."
 msgstr "Вернуться к старому планировщику? Pipelines останутся на сервере, но триггеры будут отключены."
+
+#: views/posts/publish-via-template.php
+msgid "Publish post"
+msgstr "Опубликовать пост"
+
+#: views/posts/publish-via-template.php
+msgid "Choose an automation"
+msgstr "Выберите автоматизацию"
+
+#: views/posts/publish-via-template.php
+msgid "Publish again"
+msgstr "Опубликовать ещё"
+
+#: views/posts/publish-via-template.php
+#, php-format
+msgid "And %d more"
+msgstr "Ещё %d"
+
+#: views/posts/publish-via-template.php
+msgid "Could not load publication data."
+msgstr "Не удалось загрузить данные публикации."
+
+#: views/posts/publish-via-template.php
+msgid "On social networks"
+msgstr "В соцсетях"
+
+#: views/posts/publish-via-template.php
+msgid "There are no automations available for this post."
+msgstr "Для этого поста нет доступных автоматизаций."
+
+#: views/posts/publish-via-template.php
+msgid "Open Automation"
+msgstr "Открыть автоматизации"
+
+#: views/posts/publish-via-template.php
+msgid "This will create another publication. If this automation already published the post, a duplicate may be skipped."
+msgstr "Будет создана ещё одна публикация. Если эта автоматизация уже публиковала пост, дубль может быть пропущен."
 
 #~ msgid ""
 #~ "For security reasons, Instagram may reset your password. Before "

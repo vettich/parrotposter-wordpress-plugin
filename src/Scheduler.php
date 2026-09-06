@@ -656,89 +656,97 @@ class Scheduler
 			$needed_post_ids[$apid] = true;
 		}
 
-		if (empty($needed_post_ids)) {
+		$wp_post = get_post($wp_post_id);
+		$post_type = ($wp_post && !empty($wp_post->post_type)) ? (string) $wp_post->post_type : 'post';
+		$lookup = self::fetch_cms_source_posts($wp_post_id, $post_type);
+		$publish_by_id = $lookup['publish_by_id'];
+		$by_autoposting = $lookup['by_autoposting'];
+
+		if (!empty($needed_post_ids)) {
+			foreach ($template_ids as $tid_raw) {
+				$aid = (int) $tid_raw;
+				if ($aid < 1 || empty($by_template[$aid])) {
+					continue;
+				}
+				$ids = $by_template[$aid];
+				$best = self::max_publish_at_among_post_ids($ids, $publish_by_id);
+				if ($best !== null) {
+					$out[$tid_raw] = $best;
+					continue;
+				}
+				$out[$tid_raw] = Api::get_last_post_publish_at($ids);
+			}
+
 			return $out;
 		}
 
-		$publish_by_id = self::fetch_publish_at_map_for_wp_post($wp_post_id, array_keys($needed_post_ids));
-
 		foreach ($template_ids as $tid_raw) {
 			$aid = (int) $tid_raw;
-			if ($aid < 1 || empty($by_template[$aid])) {
+			if ($aid < 1 || empty($by_autoposting[$aid])) {
 				continue;
 			}
-			$ids = $by_template[$aid];
-			$best = self::max_publish_at_among_post_ids($ids, $publish_by_id);
+			$best = self::max_publish_at_among_post_ids($by_autoposting[$aid], $publish_by_id);
 			if ($best !== null) {
 				$out[$tid_raw] = $best;
-				continue;
 			}
-			$out[$tid_raw] = Api::get_last_post_publish_at($ids);
 		}
 
 		return $out;
 	}
 
 	/**
-	 * @param string[] $needed_post_ids
-	 * @return array<string, string> post_id => publish_at (ISO)
+	 * @return array{publish_by_id: array<string, string>, by_autoposting: array<int, string[]>}
 	 */
-	private static function fetch_publish_at_map_for_wp_post($wp_post_id, array $needed_post_ids)
+	private static function fetch_cms_source_posts($wp_post_id, $post_type)
 	{
-		$wp_post_id = (int) $wp_post_id;
-		$needed = [];
-		foreach ($needed_post_ids as $pid) {
-			$pid = (string) $pid;
-			if ($pid !== '') {
-				$needed[$pid] = true;
-			}
-		}
-		if ($wp_post_id < 1 || empty($needed)) {
-			return [];
-		}
-
 		$publish_by_id = [];
-		$page = 1;
-		$page_size = 100;
-		$max_pages = 50;
-
-		$filter = [
-			'user_id' => Options::user_id(),
-			'fields.extra.wp_post_id' => $wp_post_id,
-		];
-
-		while ($page <= $max_pages) {
-			$res = Api::list_posts($filter, [], [
-				'page' => $page,
-				'size' => $page_size,
-				'skip_total' => true,
-			]);
-			if (!empty($res['error']) || empty($res['response']['posts']) || !is_array($res['response']['posts'])) {
-				break;
+		$by_autoposting = [];
+		$res = Api::list_posts_by_cms_source((int) $wp_post_id, (string) $post_type);
+		if (!empty($res['error']) || empty($res['response']['posts']) || !is_array($res['response']['posts'])) {
+			return [
+				'publish_by_id' => $publish_by_id,
+				'by_autoposting' => $by_autoposting,
+			];
+		}
+		foreach ($res['response']['posts'] as $post) {
+			if (!is_array($post)) {
+				continue;
 			}
-			$posts = $res['response']['posts'];
-			foreach ($posts as $post) {
-				if (!is_array($post)) {
-					continue;
+			$pid = isset($post['id']) ? (string) $post['id'] : '';
+			if ($pid === '') {
+				continue;
+			}
+			if (!empty($post['publish_at'])) {
+				$publish_by_id[$pid] = (string) $post['publish_at'];
+			}
+			$aid = self::post_wp_autoposting_id($post);
+			if ($aid > 0) {
+				if (!isset($by_autoposting[$aid])) {
+					$by_autoposting[$aid] = [];
 				}
-				$pid = isset($post['id']) ? (string) $post['id'] : '';
-				if ($pid === '' || !isset($needed[$pid])) {
-					continue;
-				}
-				if (!empty($post['publish_at'])) {
-					$publish_by_id[$pid] = (string) $post['publish_at'];
-				}
+				$by_autoposting[$aid][] = $pid;
 			}
-			if (count($posts) < $page_size) {
-				break;
-			}
-			if (count($publish_by_id) >= count($needed)) {
-				break;
-			}
-			$page++;
 		}
 
-		return $publish_by_id;
+		return [
+			'publish_by_id' => $publish_by_id,
+			'by_autoposting' => $by_autoposting,
+		];
+	}
+
+	/**
+	 * @param array<string, mixed> $post
+	 */
+	private static function post_wp_autoposting_id(array $post)
+	{
+		$extra = [];
+		if (isset($post['fields']['extra']) && is_array($post['fields']['extra'])) {
+			$extra = $post['fields']['extra'];
+		} elseif (isset($post['fields']['extra']) && is_object($post['fields']['extra'])) {
+			$extra = (array) $post['fields']['extra'];
+		}
+
+		return isset($extra['wp_autoposting_id']) ? (int) $extra['wp_autoposting_id'] : 0;
 	}
 
 	/**

@@ -26,7 +26,12 @@
 		if (mode === 'import') {
 			var ids = [];
 			$banner.find('input[name="pp_migration_config[]"]:checked').each(function () {
-				ids.push($(this).val());
+				String($(this).val() || '').split(',').forEach(function (id) {
+					id = $.trim(id);
+					if (id) {
+						ids.push(id);
+					}
+				});
 			});
 			payload.config_ids = ids;
 		}

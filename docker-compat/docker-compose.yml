@@ -1,0 +1,79 @@
+# Ephemeral WordPress for PHP/WP compatibility smoke.
+# Bind-mounts the plugin-wordpress working tree. Not daily (:10121) and not upgrade (:10122).
+# No host ports — tests talk to service hostname `wordpress` on the compose network.
+#
+# Usage: docker-compat/run.sh (sets WORDPRESS_IMAGE_TAG / WPCLI_IMAGE and -p per cell).
+
+services:
+  wordpress:
+    image: wordpress:${WORDPRESS_IMAGE_TAG:-php8.3-apache}
+    restart: "no"
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_NAME: ${DB_NAME:-wordpress}
+      WORDPRESS_DB_USER: ${DB_USER:-wordpress}
+      WORDPRESS_DB_PASSWORD: ${DB_PASSWORD:-wordpress}
+      WORDPRESS_DEBUG: "1"
+      # Unreachable on purpose: admin iframe / DomainSelector must not hit production PP.
+      PARROTPOSTER_DOMAINS: ${PARROTPOSTER_DOMAINS:-http://127.0.0.1:1}
+      PARROTPOSTER_LOG_ENABLED: ${PARROTPOSTER_LOG_ENABLED:-false}
+      WORDPRESS_CONFIG_EXTRA: |
+        define('PARROTPOSTER_DOMAINS', getenv('PARROTPOSTER_DOMAINS'));
+        define('PARROTPOSTER_LOG_ENABLED', getenv('PARROTPOSTER_LOG_ENABLED'));
+        if (!defined('WP_DEBUG_LOG')) { define('WP_DEBUG_LOG', true); }
+        if (!defined('WP_DEBUG_DISPLAY')) { define('WP_DEBUG_DISPLAY', false); }
+        if (!defined('DISABLE_WP_CRON')) { define('DISABLE_WP_CRON', true); }
+    volumes:
+      - wp_compat_data:/var/www/html
+      - ../:/var/www/html/wp-content/plugins/parrotposter
+    networks:
+      - pp-compat
+
+  db:
+    image: mariadb:10.11
+    restart: "no"
+    environment:
+      MARIADB_DATABASE: ${DB_NAME:-wordpress}
+      MARIADB_USER: ${DB_USER:-wordpress}
+      MARIADB_PASSWORD: ${DB_PASSWORD:-wordpress}
+      MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-root}
+    volumes:
+      - db_compat_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 2s
+      timeout: 5s
+      retries: 30
+    networks:
+      - pp-compat
+
+  wpcli:
+    image: wordpress:${WPCLI_IMAGE:-cli-php8.3}
+    depends_on:
+      wordpress:
+        condition: service_started
+      db:
+        condition: service_healthy
+    environment:
+      HOME: /tmp
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_NAME: ${DB_NAME:-wordpress}
+      WORDPRESS_DB_USER: ${DB_USER:-wordpress}
+      WORDPRESS_DB_PASSWORD: ${DB_PASSWORD:-wordpress}
+    volumes:
+      - wp_compat_data:/var/www/html
+      - ../:/var/www/html/wp-content/plugins/parrotposter
+    networks:
+      - pp-compat
+    user: "33:33"
+    entrypoint: ["wp", "--path=/var/www/html"]
+
+volumes:
+  wp_compat_data:
+  db_compat_data:
+
+networks:
+  pp-compat:

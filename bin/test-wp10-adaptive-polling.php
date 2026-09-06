@@ -292,5 +292,18 @@ assert_true(
 Scheduler::record_lease_contact(false, 'timeout', $t_now + 10);
 assert_eq('last_lease_error after failed contact', 'timeout', Scheduler::last_lease_error());
 assert_eq('failed contact does not wipe last_lease_at', $t_now, Scheduler::last_lease_at());
+assert_eq(
+	'format_lease_error extracts GraphQL msg (not PHP Array)',
+	'server is unavailable',
+	Scheduler::format_lease_error(['msg' => 'server is unavailable', 'code' => 503])
+);
+assert_eq('format_lease_error rejects PHP Array string', 'lease_failed', Scheduler::format_lease_error('Array'));
+assert_eq('format_lease_error empty array is lease_failed', 'lease_failed', Scheduler::format_lease_error([]));
+Scheduler::record_lease_contact(false, ['msg' => 'site_to_pp secret is empty'], $t_now + 11);
+assert_eq('record_lease_contact stores GraphQL msg', 'site_to_pp secret is empty', Scheduler::last_lease_error());
+Scheduler::record_lease_contact(false, 'Array', $t_now + 12);
+assert_eq('record_lease_contact coerces PHP Array string', 'lease_failed', Scheduler::last_lease_error());
+$GLOBALS['pp_test_options']['parrotposter_outbound_poll_state']['last_lease_error'] = 'Array';
+assert_true('legacy stored PHP Array string is hidden from banner', Scheduler::last_lease_error() === null);
 
 echo "\nAll WP-10 adaptive polling smoke tests passed.\n";

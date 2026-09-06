@@ -85,8 +85,20 @@ $GLOBALS['pp_test_taxonomies'] = [
 	],
 ];
 
-/** @var array<int, array<string, list<int>>> */
+/** @var array<int, array<string, list<object>>> */
 $GLOBALS['pp_test_post_terms'] = [];
+
+/**
+ * @return object{term_id: int, name: string}
+ */
+function test_term($id, $name)
+{
+	$term = new stdClass();
+	$term->term_id = (int) $id;
+	$term->name = (string) $name;
+
+	return $term;
+}
 
 if (!function_exists('is_wp_error')) {
 	function is_wp_error($thing)
@@ -120,7 +132,18 @@ if (!function_exists('get_object_taxonomies')) {
 if (!function_exists('wp_get_post_terms')) {
 	function wp_get_post_terms($post_id, $taxonomy, $args = [])
 	{
-		return $GLOBALS['pp_test_post_terms'][$post_id][$taxonomy] ?? [];
+		$terms = $GLOBALS['pp_test_post_terms'][$post_id][$taxonomy] ?? [];
+		$fields = isset($args['fields']) ? (string) $args['fields'] : 'all';
+		if ($fields === 'ids') {
+			$ids = [];
+			foreach ($terms as $term) {
+				$ids[] = is_object($term) ? (int) $term->term_id : (int) $term;
+			}
+
+			return $ids;
+		}
+
+		return $terms;
 	}
 }
 
@@ -197,22 +220,33 @@ function assert_eq(string $name, $expected, $actual): void
 }
 
 // Case A: post_type='post', category (show_ui=true) with terms [3, 7].
-$GLOBALS['pp_test_post_terms'][101] = ['category' => [3, 7]];
+$GLOBALS['pp_test_post_terms'][101] = ['category' => [test_term(3, 'News'), test_term(7, 'Music')]];
 $post_a = new WP_Post(['ID' => 101, 'post_title' => 'Hello', 'post_type' => 'post']);
 $payload_a = PushEventService::build_item_payload($post_a);
 assert_true('category present in payload for post_type=post', array_key_exists('category', $payload_a));
-assert_eq('category term ids match wp_get_post_terms result', ['3', '7'], $payload_a['category']);
+assert_eq(
+	'category terms are {id, name}',
+	[
+		['id' => '3', 'name' => 'News'],
+		['id' => '7', 'name' => 'Music'],
+	],
+	$payload_a['category']
+);
 
 // Case B: taxonomy with show_ui=false is excluded.
 assert_true('hidden_tax (show_ui=false) absent from payload', !array_key_exists('hidden_tax', $payload_a));
 
 // Case C: post_type='product' — product_cat (taxonomy) and product_regular_price
 // (hardcoded WooCommerce field) both present, no collisions.
-$GLOBALS['pp_test_post_terms'][202] = ['product_cat' => [12]];
+$GLOBALS['pp_test_post_terms'][202] = ['product_cat' => [test_term(12, 'Widgets')]];
 $post_c = new WP_Post(['ID' => 202, 'post_title' => 'Widget', 'post_type' => 'product']);
 $payload_c = PushEventService::build_item_payload($post_c);
 assert_true('product_cat present in payload for post_type=product', array_key_exists('product_cat', $payload_c));
-assert_eq('product_cat term ids match wp_get_post_terms result', ['12'], $payload_c['product_cat']);
+assert_eq(
+	'product_cat terms are {id, name}',
+	[['id' => '12', 'name' => 'Widgets']],
+	$payload_c['product_cat']
+);
 assert_true(
 	'product_regular_price (hardcoded WooCommerce field) still present',
 	array_key_exists('product_regular_price', $payload_c)
@@ -221,6 +255,13 @@ assert_true(
 // Case D: required_fields explicitly includes an already-added taxonomy — no
 // duplication/crash from the array_key_exists guard in the required_fields loop.
 $payload_d = PushEventService::build_item_payload($post_a, ['category']);
-assert_eq('required_fields does not override/duplicate taxonomy already in payload', ['3', '7'], $payload_d['category']);
+assert_eq(
+	'required_fields does not override/duplicate taxonomy already in payload',
+	[
+		['id' => '3', 'name' => 'News'],
+		['id' => '7', 'name' => 'Music'],
+	],
+	$payload_d['category']
+);
 
 echo "\nAll taxonomy payload smoke tests passed.\n";

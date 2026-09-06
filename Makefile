@@ -18,3 +18,11 @@ docker-down:
 docker-logs:
 	cd docker && docker compose logs -f wordpress
 
+compat-php:
+	./bin/compat-php.sh
+
+compat-wp:
+	./docker-compat/run.sh
+
+compat: compat-php compat-wp
+
