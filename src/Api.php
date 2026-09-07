@@ -1385,7 +1385,7 @@ class Api
 			return ['error' => ['msg' => 'token is empty']];
 		}
 
-		$q = 'mutation DisablePlugin($id: ID!) { disablePlugin(id: $id) }';
+		$q = 'mutation DisablePlugin($id: ID!) { disablePlugin(id: $id) { ok siteNotified } }';
 		$res = self::do_graphql_request($q, ['id' => $plugin_id], [
 			'bearer_token' => $bearer,
 			'log_label' => 'disablePlugin',
@@ -1395,12 +1395,38 @@ class Api
 			return $res;
 		}
 
-		$ok = $res['data']['disablePlugin'] ?? null;
+		$payload = $res['data']['disablePlugin'] ?? null;
+		$ok = is_array($payload) ? ($payload['ok'] ?? null) : $payload;
 		if ($ok !== true) {
 			return ['error' => ['msg' => 'disablePlugin failed']];
 		}
 
 		return ['ok' => true];
+	}
+
+	/**
+	 * User-session plugin row for this site (settings-page remote status sync).
+	 *
+	 * @return array{data?: array{plugin?: array{id?: string, status?: string}|null}, error?: array{msg: string, code?: int|string}}
+	 */
+	public static function plugin_status(string $plugin_id): array
+	{
+		$plugin_id = trim($plugin_id);
+		if ($plugin_id === '') {
+			return ['error' => ['msg' => 'plugin_id is empty']];
+		}
+
+		$bearer = Options::token();
+		if ($bearer === '') {
+			return ['error' => ['msg' => 'token is empty']];
+		}
+
+		$q = 'query PluginStatus($id: ID!) { plugin(id: $id) { id status } }';
+
+		return self::do_graphql_request($q, ['id' => $plugin_id], [
+			'bearer_token' => $bearer,
+			'log_label' => 'pluginStatus',
+		]);
 	}
 
 	/**

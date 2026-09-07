@@ -6,6 +6,7 @@ use parrotposter\PP;
 use parrotposter\FormHelpers;
 use parrotposter\AssetModules;
 use parrotposter\Profile;
+use parrotposter\PluginConnect;
 use parrotposter\Settings;
 use parrotposter\UserPreferences;
 
@@ -28,6 +29,7 @@ $expiry_text = $expiry_ts !== false ? wp_date(get_option('date_format'), $expiry
 if (!empty($profile['left'])) {
 	$expiry_text .= ' ' . (string) $profile['left'];
 }
+PluginConnect::sync_remote_status();
 $migration_mode = Settings::get_migration_mode();
 $is_connected = Settings::is_connected();
 $format_connection_activity = static function (?string $utc_value): array {
@@ -215,6 +217,29 @@ $revert_confirm = __(
 					<?php _e('Disconnect site', 'parrotposter') ?>
 				</a>
 			</div>
+		</section>
+	<?php else: ?>
+		<section class="parrotposter-block parrotposter-settings-card">
+			<div class="parrotposter-settings-card__header">
+				<div>
+					<h2 class="parrotposter-block__heading"><?php _e('Site integration', 'parrotposter') ?></h2>
+				</div>
+				<span class="parrotposter-settings-badge parrotposter-settings-badge--error">
+					<?php _e('Not connected', 'parrotposter') ?>
+				</span>
+			</div>
+
+			<p class="parrotposter-settings-card__description">
+				<?php _e('This site is not linked to ParrotPoster automation. Connect it to exchange publishing data with the service.', 'parrotposter') ?>
+			</p>
+
+			<form action="<?php echo esc_url(admin_url('admin-post.php')) ?>" method="post">
+				<?php FormHelpers::the_nonce() ?>
+				<input type="hidden" name="action" value="parrotposter_connect_reconnect">
+				<button type="submit" class="button button-primary">
+					<?php _e('Connect site', 'parrotposter') ?>
+				</button>
+			</form>
 		</section>
 	<?php endif ?>
 

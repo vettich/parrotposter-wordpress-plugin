@@ -129,6 +129,14 @@ class WireProtocol
 				'permission_callback' => [self::class, 'authorize_request'],
 			]);
 		}
+
+		foreach (['disconnect', 'pp/v1/disconnect'] as $route) {
+			register_rest_route('parrotposter/v1', $route, [
+				'methods' => \WP_REST_Server::CREATABLE,
+				'callback' => [self::class, 'dispatch_disconnect'],
+				'permission_callback' => [self::class, 'authorize_request'],
+			]);
+		}
 	}
 
 	/**
@@ -237,7 +245,7 @@ class WireProtocol
 
 		// TASK-002-WP-10: single shared choke point for "PP just reached this site directly" —
 		// every registered wire route (`/info`, `/fields`, `/items/*`, `/notify_contract`,
-		// `/published_ids_sync`) uses this method as its
+		// `/published_ids_sync`, `/disconnect`) uses this method as its
 		// permission_callback, so one call here covers all of them without per-handler
 		// duplication. Feeds OutboundPollScheduler's local watchdog heuristic.
 		Settings::touch_last_primary_call();
@@ -334,6 +342,19 @@ class WireProtocol
 		Settings::apply_pipeline_contract_snapshot($body);
 
 		return new WP_REST_Response(['cached' => true], 200);
+	}
+
+	/**
+	 * PP-initiated unbind: clear local plugin_id / secrets after dashboard disable.
+	 *
+	 * @param WP_REST_Request $request
+	 * @return WP_REST_Response
+	 */
+	public static function dispatch_disconnect(WP_REST_Request $request)
+	{
+		Settings::disconnect();
+
+		return new WP_REST_Response(['ok' => true], 200);
 	}
 
 	/**

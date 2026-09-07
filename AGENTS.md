@@ -26,7 +26,9 @@ Legacy autopost lives in [`Scheduler`](src/Scheduler.php) when `migration_mode =
 
 [`WireProtocol`](src/WireProtocol.php) at `parrotposter/v1` and `parrotposter/v1/pp/v1`. Auth: Bearer `pp_to_site` or `X-ParrotPoster-Secret`.
 
-`GET info` · `GET fields?post_type=&locale=` · `GET items/{source_item_id}` · `GET items/latest` · `POST items/next` · `POST items/batch` · `POST published_ids_sync` · `POST notify_contract`
+`GET info` · `GET fields?post_type=&locale=` · `GET items/{source_item_id}` · `GET items/latest` · `POST items/next` · `POST items/batch` · `POST published_ids_sync` · `POST notify_contract` · `POST disconnect`
+
+Remote `Plugin.status` is revalidated only on the settings page (`PluginConnect::sync_remote_status`); fail-open on network errors. Dashboard `disablePlugin` first POSTs `disconnect` (pp_to_site), then wipes secrets.
 
 Iframe wizard must not HTTP-loopback to these routes: use AJAX (`field_schema`, `list_preview_items`, `notify_contract`) that calls the same `WireProtocol` / `Settings` helpers. Optional `locale`/`lang` on fields is labels only — keys stay stable.
 

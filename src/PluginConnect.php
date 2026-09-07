@@ -12,6 +12,7 @@ class PluginConnect
 	public static function init(): void
 	{
 		add_action('admin_post_parrotposter_connect_disconnect', [self::class, 'handle_disconnect']);
+		add_action('admin_post_parrotposter_connect_reconnect', [self::class, 'handle_reconnect']);
 	}
 
 	/**
@@ -120,6 +121,51 @@ class PluginConnect
 	}
 
 	/**
+	 * Settings page only: if PP says this plugin is no longer active, clear local bind.
+	 * Network / PP errors are fail-open (keep local secrets).
+	 */
+	public static function sync_remote_status(): void
+	{
+		if (!Settings::is_connected()) {
+			return;
+		}
+		if (Options::token() === '') {
+			return;
+		}
+
+		self::apply_remote_status_result(Api::plugin_status(Settings::plugin_id()));
+	}
+
+	/**
+	 * Apply a `plugin(id)` GraphQL result to local bind state.
+	 *
+	 * @param array{data?: mixed, error?: mixed} $res
+	 * @return bool true when local secrets were cleared
+	 */
+	public static function apply_remote_status_result(array $res): bool
+	{
+		if (!empty($res['error'])) {
+			return false;
+		}
+
+		$plugin = is_array($res['data'] ?? null) ? ($res['data']['plugin'] ?? null) : null;
+		if (!is_array($plugin)) {
+			Settings::disconnect();
+
+			return true;
+		}
+
+		$status = strtoupper((string) ($plugin['status'] ?? ''));
+		if ($status !== 'ACTIVE') {
+			Settings::disconnect();
+
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
 	 * After bind: auto-switch to pipeline when no active legacy templates exist.
 	 */
 	public static function maybe_auto_migrate_to_pipeline(): void
@@ -157,6 +203,32 @@ class PluginConnect
 
 		self::redirect_with_notice(
 			__('Сайт отключён от автоматизации ParrotPoster.', 'parrotposter'),
+			'success',
+			$redirect_back
+		);
+	}
+
+	public static function handle_reconnect(): void
+	{
+		if (!current_user_can('manage_options')) {
+			wp_die(esc_html__('Forbidden', 'parrotposter'), '', ['response' => 403]);
+		}
+		if (!FormHelpers::check_post_nonce()) {
+			wp_die(esc_html__('Forbidden', 'parrotposter'), '', ['response' => 403]);
+		}
+
+		$redirect_back = admin_url('admin.php?page=parrotposter_settings');
+		$bind = self::silent_bind();
+		if (!empty($bind['error'])) {
+			self::redirect_with_notice(
+				__('Не удалось подключить сайт к автоматизации ParrotPoster.', 'parrotposter'),
+				'error',
+				$redirect_back
+			);
+		}
+
+		self::redirect_with_notice(
+			__('Сайт подключён к автоматизации ParrotPoster.', 'parrotposter'),
 			'success',
 			$redirect_back
 		);

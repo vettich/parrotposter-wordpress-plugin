@@ -93,7 +93,7 @@ class Settings
 	 * TASK-002-WP-10: record "PP just authenticated a primary call" — called once from
 	 * {@see WireProtocol::authorize_request()}, the single permission_callback shared by every
 	 * registered wire route (`/info`, `/fields`, `/items/*`, `/notify_contract`,
-	 * `/published_ids_sync`), so this never needs duplicating per-handler.
+	 * `/published_ids_sync`, `/disconnect`), so this never needs duplicating per-handler.
 	 */
 	public static function touch_last_primary_call(): void
 	{
