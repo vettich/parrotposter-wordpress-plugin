@@ -13,21 +13,22 @@ if (Settings::get_migration_mode() !== Settings::MIGRATION_MODE_LEGACY) {
 	return;
 }
 
-if (!Settings::has_enabled_legacy_templates()) {
-	return;
-}
-
 AssetModules::enqueue(['pipeline-migration']);
 $templates = DBAutopostingTable::get_all(true);
+$has_templates = !empty($templates);
 ?>
 
 <div class="pp-migration-banner">
 	<div class="pp-migration-banner__title">
 		<?php _e('Upgrade to Pipelines', 'parrotposter') ?>
 	</div>
-	<p><?php _e('ParrotPoster now uses Pipelines for automation. Migrate your active autoposting templates or start fresh.', 'parrotposter') ?></p>
+	<?php if ($has_templates): ?>
+		<p><?php _e('ParrotPoster now uses Pipelines for automation. Migrate your active autoposting templates or start fresh.', 'parrotposter') ?></p>
+	<?php else: ?>
+		<p><?php _e('ParrotPoster now uses Pipelines for automation. Switch to pipeline mode — you can create pipelines in the dashboard.', 'parrotposter') ?></p>
+	<?php endif ?>
 
-	<?php if (!empty($templates)): ?>
+	<?php if ($has_templates): ?>
 		<ul class="pp-migration-banner__list">
 			<?php foreach (TemplateClusterer::cluster($templates) as $cluster): ?>
 				<?php
@@ -76,11 +77,17 @@ $templates = DBAutopostingTable::get_all(true);
 	<?php endif ?>
 
 	<div class="pp-migration-banner__actions">
-		<button type="button" class="button button-primary pp-migration-start" data-mode="import">
-			<?php _e('Migrate selected templates', 'parrotposter') ?>
-		</button>
-		<button type="button" class="button button-secondary pp-migration-start" data-mode="fresh">
-			<?php _e('Start from scratch', 'parrotposter') ?>
-		</button>
+		<?php if ($has_templates): ?>
+			<button type="button" class="button button-primary pp-migration-start" data-mode="import">
+				<?php _e('Migrate selected templates', 'parrotposter') ?>
+			</button>
+			<button type="button" class="button button-secondary pp-migration-start" data-mode="fresh">
+				<?php _e('Start from scratch', 'parrotposter') ?>
+			</button>
+		<?php else: ?>
+			<button type="button" class="button button-primary pp-migration-start" data-mode="fresh">
+				<?php _e('Switch to Pipelines', 'parrotposter') ?>
+			</button>
+		<?php endif ?>
 	</div>
 </div>

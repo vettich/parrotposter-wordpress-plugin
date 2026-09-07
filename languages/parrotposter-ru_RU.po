@@ -2006,6 +2006,30 @@ msgstr "Открыть автоматизации"
 msgid "This will create another publication. If this automation already published the post, a duplicate may be skipped."
 msgstr "Будет создана ещё одна публикация. Если эта автоматизация уже публиковала пост, дубль может быть пропущен."
 
+#: views/scheduler/migration-banner.php:23
+msgid "Upgrade to Pipelines"
+msgstr "Перейти на Pipelines"
+
+#: views/scheduler/migration-banner.php:26
+msgid "ParrotPoster now uses Pipelines for automation. Migrate your active autoposting templates or start fresh."
+msgstr "ParrotPoster теперь использует Pipelines для автоматизации. Перенесите активные шаблоны автопостинга или начните с нуля."
+
+#: views/scheduler/migration-banner.php:28
+msgid "ParrotPoster now uses Pipelines for automation. Switch to pipeline mode — you can create pipelines in the dashboard."
+msgstr "ParrotPoster теперь использует Pipelines для автоматизации. Переключитесь в режим pipeline — автоматизации можно создать в кабинете."
+
+#: views/scheduler/migration-banner.php:82
+msgid "Migrate selected templates"
+msgstr "Перенести выбранные шаблоны"
+
+#: views/scheduler/migration-banner.php:85
+msgid "Start from scratch"
+msgstr "Начать с нуля"
+
+#: views/scheduler/migration-banner.php:89
+msgid "Switch to Pipelines"
+msgstr "Перейти на Pipelines"
+
 #~ msgid ""
 #~ "For security reasons, Instagram may reset your password. Before "
 #~ "connecting your account, please make sure you have access to the email or "
