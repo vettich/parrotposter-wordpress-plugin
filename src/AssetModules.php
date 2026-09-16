@@ -12,6 +12,7 @@ class AssetModules
 		'header',
 		'modal',
 		'block',
+		'settings',
 		'nav-tab',
 		'notice',
 		'input',
@@ -27,8 +28,11 @@ class AssetModules
 		'post-meta-box',
 		'publish-post',
 		'publish-via-template',
+		'publish-via-pipeline',
+		'publish-column',
 		'help',
 		'local-queue-admin',
+		'pipeline-migration',
 	];
 
 	private static $libs = [
@@ -138,6 +142,10 @@ class AssetModules
 			$deps = ['parrotposter-admin-bootstrap'];
 			if ($module === 'local-queue-admin') {
 				$deps[] = 'parrotposter-modal';
+			}
+			if ($module === 'pipeline-migration') {
+				$deps[] = 'jquery';
+				$deps[] = 'wp-i18n';
 			}
 			wp_register_script("parrotposter-$module", PP::asset($js), $deps, PARROTPOSTER_VERSION, true);
 			self::$registered[$module]['js'] = true;

@@ -43,6 +43,7 @@ class Options
 
 	public static function set_user_data($userId, $token)
 	{
+		Api::invalidate_iframe_session_key_cache();
 		update_option(self::USER_ID_KEY, $userId);
 		if ($token === null || $token === '') {
 			update_option(self::TOKEN_KEY, '');
@@ -58,6 +59,7 @@ class Options
 
 	public static function delete_data()
 	{
+		Api::invalidate_iframe_session_key_cache();
 		delete_option(self::USER_ID_KEY);
 		delete_option(self::TOKEN_KEY);
 	}

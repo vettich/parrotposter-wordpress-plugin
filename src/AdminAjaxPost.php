@@ -33,6 +33,8 @@ class AdminAjaxPost
 		add_action('admin_post_parrotposter_forgot_password', [$this, 'forgot_password']);
 		add_action('admin_post_parrotposter_reset_password', [$this, 'reset_password']);
 		add_action('admin_post_parrotposter_logout', [$this, 'logout']);
+		add_action('admin_post_parrotposter_open_webapp', [$this, 'open_webapp']);
+		add_action('admin_post_parrotposter_save_settings', [$this, 'save_settings']);
 
 		// tariffs
 		add_action('admin_post_parrotposter_set_tariff', [$this, 'set_tariff']);
@@ -48,6 +50,9 @@ class AdminAjaxPost
 		add_action('wp_ajax_parrotposter_autoposting_enable', [$this, 'autoposting_enable']);
 		add_action('wp_ajax_parrotposter_publish_post_via_template', [$this, 'publish_post_via_template']);
 		add_action('wp_ajax_parrotposter_has_post_duplicates', [$this, 'has_post_duplicates']);
+		add_action('wp_ajax_parrotposter_pipeline_publish_modal_data', [$this, 'pipeline_publish_modal_data']);
+		add_action('wp_ajax_parrotposter_pipeline_publish', [$this, 'pipeline_publish_post']);
+		add_action('wp_ajax_parrotposter_pipeline_column_batch', [$this, 'pipeline_column_batch']);
 		add_action('wp_ajax_parrotposter_local_queue_list', [$this, 'local_queue_list']);
 		add_action('wp_ajax_parrotposter_process_local_queue_admin', [$this, 'process_local_queue_admin']);
 
@@ -69,6 +74,24 @@ class AdminAjaxPost
 
 		// Session token refresh for the iframe (triggered via postMessage from the front-end).
 		add_action('wp_ajax_parrotposter_refresh_session_token', [$this, 'refresh_session_token']);
+
+		// Reconnect the site after a remote (PP-side) disable — clears stale local secrets and
+		// re-binds (triggered via postMessage from the iframe pipelines-list banner).
+		add_action('wp_ajax_parrotposter_reconnect_plugin', [$this, 'reconnect_plugin']);
+
+		// Pipeline source bridge (WP-11): source-descriptor-root / -frame / field-schema
+		// over the postMessage bridge, reusing WireProtocol's /info and /fields logic
+		// directly (no HTTP loopback) — DEC-002-06 D3.
+		add_action('wp_ajax_parrotposter_bridge_source_descriptor_root', [$this, 'bridge_source_descriptor_root']);
+		add_action('wp_ajax_parrotposter_bridge_source_descriptor_frame', [$this, 'bridge_source_descriptor_frame']);
+		add_action('wp_ajax_parrotposter_bridge_field_schema', [$this, 'bridge_field_schema']);
+		add_action('wp_ajax_parrotposter_bridge_list_preview_items', [$this, 'bridge_list_preview_items']);
+		add_action('wp_ajax_parrotposter_bridge_notify_contract', [$this, 'bridge_notify_contract']);
+
+		// Pipeline migration (SPEC-002-17).
+		add_action('wp_ajax_pp_migrate_to_pipeline', [$this, 'migrate_to_pipeline']);
+		add_action('wp_ajax_pp_revert_migration', [$this, 'revert_migration']);
+		add_action('wp_ajax_pp_dismiss_migration_banner', [$this, 'dismiss_migration_banner']);
 	}
 
 	/**
@@ -81,8 +104,367 @@ class AdminAjaxPost
 		nocache_headers();
 		header('Content-Type: application/json; charset=UTF-8');
 		$res = Api::issue_session_key();
+		if (!empty($res['token'])) {
+			Api::store_iframe_session_key((string) $res['token']);
+		}
 		echo wp_json_encode($res);
 		exit;
+	}
+
+	/**
+	 * Mint a fresh session key and redirect to the PP web app (SSO). Opens in the
+	 * form's target=_blank tab; does not write the iframe session-key cache.
+	 */
+	public function open_webapp(): void
+	{
+		FormHelpers::must_be_post_nonce();
+		if (!current_user_can('manage_options')) {
+			FormHelpers::post_error('forbidden');
+		}
+
+		$sso = Api::build_sso_url('/app');
+		if (!empty($sso['error']) || empty($sso['url'])) {
+			FormHelpers::post_error(
+				!empty($sso['error']) ? $sso['error'] : __('Failed to open the web application.', 'parrotposter')
+			);
+		}
+
+		wp_redirect($sso['url']);
+		exit;
+	}
+
+	/**
+	 * Re-binds the site after a remote (PP-side) disable.
+	 *
+	 * `Settings::disconnect(false)` clears the stale local plugin_id/secrets first (without
+	 * skipping auto-bind) — otherwise `PluginConnect::silent_bind()` would short-circuit on
+	 * `Settings::is_connected()` still being true (it only checks local state, not whether PP
+	 * still honors those secrets) and never actually re-bind.
+	 */
+	public function reconnect_plugin(): void
+	{
+		self::ajax_guard();
+		nocache_headers();
+		header('Content-Type: application/json; charset=UTF-8');
+
+		Settings::disconnect(false);
+		$bind = PluginConnect::silent_bind();
+
+		echo wp_json_encode([
+			'success' => empty($bind['error']),
+			'error' => $bind['error'] ?? null,
+		]);
+		exit;
+	}
+
+	/**
+	 * Bridge: source-descriptor-root (SPEC-002-02 §3.3, WP-11) — same post_type set
+	 * as REST `/info.post_types`, wrapped as a root `SourceStepDescriptor`. Called
+	 * via postMessage `source_descriptor_root` from the embedded front-app iframe
+	 * when PP backend can't reach the site directly (DEC-002-06 D3).
+	 */
+	public function bridge_source_descriptor_root(): void
+	{
+		self::ajax_guard();
+		nocache_headers();
+		header('Content-Type: application/json; charset=UTF-8');
+
+		echo wp_json_encode([
+			'key' => 'post_type',
+			'label' => __('Post type', 'parrotposter'),
+			'options_mode' => 'inline',
+			'options' => WireProtocol::post_type_options(),
+			'requires_child_selection' => false,
+			'children' => null,
+		]);
+		exit;
+	}
+
+	/**
+	 * Bridge: source-descriptor-frame (WP-11). WP's source tree is flat — the
+	 * root's `post_type` step is always a leaf (SPEC-002-02 §3.3.3), unlike
+	 * Bitrix's `iblock_type -> iblock` nesting (§3.3.4 example). The front-app
+	 * should not call this per the §3.3.3 decision tree (root has no `children`
+	 * and `requires_child_selection` is false), but the op is implemented as a
+	 * stub for wire completeness: it always reports "no further step".
+	 */
+	public function bridge_source_descriptor_frame(): void
+	{
+		self::ajax_guard();
+		nocache_headers();
+		header('Content-Type: application/json; charset=UTF-8');
+
+		echo wp_json_encode([
+			'descriptor' => null,
+		]);
+		exit;
+	}
+
+	/**
+	 * Bridge: field-schema (WP-11) — calls the same internal WireProtocol logic
+	 * as REST `/fields` (WP-04) directly, no HTTP loopback onto this site's own
+	 * REST route. Accepts either a full `source_path` (JSON-encoded
+	 * `SourceSelectionStep[]`, matching the wire `field_schema` op payload) or a
+	 * bare `post_type` for convenience. Optional `locale`/`lang` (PP UI language)
+	 * matches `GET /fields?locale=` — labels only.
+	 */
+	public function bridge_field_schema(): void
+	{
+		self::ajax_guard();
+		nocache_headers();
+		header('Content-Type: application/json; charset=UTF-8');
+
+		$post_type = '';
+		if (isset($_POST['source_path'])) {
+			$raw = wp_unslash($_POST['source_path']);
+			$source_path = is_string($raw) ? json_decode($raw, true) : $raw;
+			if (is_array($source_path)) {
+				$post_type = WireProtocol::post_type_from_source_path($source_path);
+			}
+		}
+		if ($post_type === '' && isset($_POST['post_type']) && is_string($_POST['post_type'])) {
+			$post_type = sanitize_key(wp_unslash($_POST['post_type']));
+		}
+
+		$locale = null;
+		if (isset($_POST['locale']) && is_string($_POST['locale'])) {
+			$locale = wp_unslash($_POST['locale']);
+		} elseif (isset($_POST['lang']) && is_string($_POST['lang'])) {
+			$locale = wp_unslash($_POST['lang']);
+		}
+
+		$result = WireProtocol::field_schema_for_post_type($post_type, $locale);
+		if (is_wp_error($result)) {
+			$data = $result->get_error_data();
+			status_header(is_array($data) && isset($data['status']) ? (int) $data['status'] : 400);
+			echo wp_json_encode([
+				'error' => [
+					'code' => $result->get_error_code(),
+					'message' => $result->get_error_message(),
+				],
+			]);
+			exit;
+		}
+
+		echo wp_json_encode($result);
+		exit;
+	}
+
+	/**
+	 * Bridge: latest source items for template preview — same internals as REST
+	 * `GET /items/latest` (WP-05), no HTTP loopback. Used when the embedded
+	 * front-app iframe cannot reach the site through PP backend (DEC-002-06 D3).
+	 *
+	 * POST: `source_path` (JSON SourceSelectionStep[]), optional `post_type`,
+	 * `limit`, `offset`, `filter` (JSON Expression AST — compact domain shape,
+	 * same as REST `?filter=`), `required_fields` (JSON string array).
+	 */
+	public function bridge_list_preview_items(): void
+	{
+		self::ajax_guard();
+		nocache_headers();
+		header('Content-Type: application/json; charset=UTF-8');
+
+		$post_type = '';
+		if (isset($_POST['source_path'])) {
+			$raw = wp_unslash($_POST['source_path']);
+			$source_path = is_string($raw) ? json_decode($raw, true) : $raw;
+			if (is_array($source_path)) {
+				$post_type = WireProtocol::post_type_from_source_path($source_path);
+			}
+		}
+		if ($post_type === '' && isset($_POST['post_type']) && is_string($_POST['post_type'])) {
+			$post_type = sanitize_key(wp_unslash($_POST['post_type']));
+		}
+
+		$limit = isset($_POST['limit']) ? (int) $_POST['limit'] : 5;
+		$offset = isset($_POST['offset']) ? (int) $_POST['offset'] : 0;
+
+		$filter = null;
+		if (isset($_POST['filter'])) {
+			$raw_filter = wp_unslash($_POST['filter']);
+			if (is_string($raw_filter) && $raw_filter !== '') {
+				$decoded = json_decode($raw_filter, true);
+				$filter = is_array($decoded) ? $decoded : null;
+			} elseif (is_array($raw_filter)) {
+				$filter = $raw_filter;
+			}
+		}
+
+		$required_fields = [];
+		if (isset($_POST['required_fields'])) {
+			$raw_fields = wp_unslash($_POST['required_fields']);
+			if (is_string($raw_fields) && $raw_fields !== '') {
+				$decoded = json_decode($raw_fields, true);
+				$required_fields = is_array($decoded) ? $decoded : [];
+			} elseif (is_array($raw_fields)) {
+				$required_fields = $raw_fields;
+			}
+		}
+
+		$pipeline_id = null;
+		if (isset($_POST['pipeline_id']) && is_string($_POST['pipeline_id'])) {
+			$pipeline_id = sanitize_text_field(wp_unslash($_POST['pipeline_id']));
+			if ($pipeline_id === '') {
+				$pipeline_id = null;
+			}
+		}
+
+		$result = WireProtocol::items_latest_for_post_type(
+			$post_type,
+			$limit,
+			$offset,
+			$filter,
+			$required_fields,
+			$pipeline_id
+		);
+		if (is_wp_error($result)) {
+			$data = $result->get_error_data();
+			status_header(is_array($data) && isset($data['status']) ? (int) $data['status'] : 400);
+			echo wp_json_encode([
+				'error' => [
+					'code' => $result->get_error_code(),
+					'message' => $result->get_error_message(),
+				],
+			]);
+			exit;
+		}
+
+		echo wp_json_encode($result);
+		exit;
+	}
+
+	/**
+	 * Bridge: apply a pipeline contract snapshot locally (same as REST notify_contract).
+	 * Used when the embedded front-app iframe cannot rely on PP→site HTTP after save.
+	 *
+	 * POST: `snapshot` (JSON object, camelCase or snake_case keys accepted by
+	 * {@see Settings::apply_pipeline_contract_snapshot()}).
+	 */
+	public function bridge_notify_contract(): void
+	{
+		self::ajax_guard();
+		nocache_headers();
+		header('Content-Type: application/json; charset=UTF-8');
+
+		$raw = isset($_POST['snapshot']) ? wp_unslash($_POST['snapshot']) : '';
+		$snapshot = is_string($raw) ? json_decode($raw, true) : null;
+		if (!is_array($snapshot)) {
+			echo wp_json_encode([
+				'ok' => false,
+				'error' => 'invalid_payload',
+			]);
+			exit;
+		}
+
+		Settings::apply_pipeline_contract_snapshot($snapshot);
+		echo wp_json_encode(['ok' => true]);
+		exit;
+	}
+
+	/**
+	 * Migrate legacy autoposting templates to PP pipelines (GraphQL migratePluginToPipeline).
+	 */
+	public function migrate_to_pipeline(): void
+	{
+		self::ajax_guard();
+		nocache_headers();
+		header('Content-Type: application/json; charset=UTF-8');
+
+		if (Settings::plugin_id() === '') {
+			$bind = PluginConnect::silent_bind();
+			if (!empty($bind['error'])) {
+				$msg = is_string($bind['error']) ? $bind['error'] : 'plugin bind failed';
+				echo wp_json_encode(['success' => false, 'error' => $msg]);
+				exit;
+			}
+		}
+
+		$mode = isset($_POST['mode']) ? sanitize_text_field(wp_unslash((string) $_POST['mode'])) : 'import';
+		$config_ids = null;
+		if ($mode === 'fresh') {
+			$config_ids = [];
+		} elseif (isset($_POST['config_ids']) && is_array($_POST['config_ids'])) {
+			$config_ids = [];
+			$seen = [];
+			foreach ($_POST['config_ids'] as $raw) {
+				$parts = preg_split('/\s*,\s*/', sanitize_text_field(wp_unslash((string) $raw)));
+				if (!is_array($parts)) {
+					continue;
+				}
+				foreach ($parts as $id) {
+					if ($id === '' || isset($seen[$id])) {
+						continue;
+					}
+					$seen[$id] = true;
+					$config_ids[] = $id;
+				}
+			}
+		}
+
+		if ($mode === 'import' && is_array($config_ids) && $config_ids === []) {
+			echo wp_json_encode([
+				'success' => false,
+				'error' => __('Select at least one template to migrate.', 'parrotposter'),
+			]);
+			exit;
+		}
+
+		$result = MigrationService::migrate_to_pipeline($config_ids);
+		echo wp_json_encode($result);
+		exit;
+	}
+
+	/**
+	 * Revert pipeline migration (GraphQL revertPluginToLegacy).
+	 */
+	public function revert_migration(): void
+	{
+		self::ajax_guard();
+		nocache_headers();
+		header('Content-Type: application/json; charset=UTF-8');
+
+		if (Settings::plugin_id() === '') {
+			$bind = PluginConnect::silent_bind();
+			if (!empty($bind['error'])) {
+				$msg = is_string($bind['error']) ? $bind['error'] : 'plugin bind failed';
+				echo wp_json_encode(['success' => false, 'error' => $msg]);
+				exit;
+			}
+		}
+
+		$result = MigrationService::revert_migration();
+		echo wp_json_encode($result);
+		exit;
+	}
+
+	/**
+	 * Hide the pipeline-active migration banner for the current admin.
+	 */
+	public function dismiss_migration_banner(): void
+	{
+		self::ajax_guard();
+		nocache_headers();
+		header('Content-Type: application/json; charset=UTF-8');
+
+		UserPreferences::set_show_migration_banner(false);
+		echo wp_json_encode(['success' => true]);
+		exit;
+	}
+
+	public function save_settings(): void
+	{
+		FormHelpers::must_be_post_nonce();
+		if (!current_user_can('manage_options')) {
+			FormHelpers::post_error('forbidden');
+		}
+		self::init();
+
+		$show = isset($_POST['parrotposter_show_migration_banner'])
+			&& sanitize_text_field(wp_unslash((string) $_POST['parrotposter_show_migration_banner'])) === '1';
+		UserPreferences::set_show_migration_banner($show);
+
+		FormHelpers::post_success('', 'admin.php?page=parrotposter_settings');
 	}
 
 	/**
@@ -145,6 +527,24 @@ class AdminAjaxPost
 		}
 	}
 
+	private static function pipeline_column_back_url(): string
+	{
+		$referer = function_exists('wp_get_referer') ? wp_get_referer() : false;
+		if (!is_string($referer) || $referer === '') {
+			$referer = isset($_SERVER['HTTP_REFERER']) ? (string) $_SERVER['HTTP_REFERER'] : '';
+		}
+		if ($referer === '') {
+			return '/wp-admin/edit.php';
+		}
+		$path = wp_parse_url($referer, PHP_URL_PATH);
+		$query = wp_parse_url($referer, PHP_URL_QUERY);
+		if (!is_string($path) || $path === '') {
+			return '/wp-admin/edit.php';
+		}
+
+		return $query ? $path . '?' . $query : $path;
+	}
+
 	private static function api_error($error)
 	{
 		return json_encode(['error' => $error]);
@@ -195,6 +595,10 @@ class AdminAjaxPost
 		if (!empty($res['error'])) {
 			FormHelpers::post_error($res['error']);
 		}
+		// Force a fresh bind so a site previously disabled on PP gets reactivated on relogin
+		// (silent_bind() would otherwise short-circuit on stale local "connected" state).
+		Settings::disconnect(false);
+		PluginConnect::silent_bind();
 		FormHelpers::post_success('logged');
 	}
 
@@ -235,6 +639,11 @@ class AdminAjaxPost
 			exit;
 		}
 
+		// Force a fresh bind so a site previously disabled on PP gets reactivated on relogin
+		// (silent_bind() would otherwise short-circuit on stale local "connected" state).
+		Settings::disconnect(false);
+		PluginConnect::silent_bind();
+
 		echo 'ok';
 		exit;
 	}
@@ -263,10 +672,11 @@ class AdminAjaxPost
 			FormHelpers::post_error(__('Passwords do not match', 'parrotposter'));
 		}
 
-		$res = Api::signup($name, $username, $password);
+	$res = Api::signup($name, $username, $password);
 		if (!empty($res['error'])) {
 			FormHelpers::post_error($res['error']);
 		}
+		PluginConnect::silent_bind();
 		FormHelpers::post_success('logged');
 	}
 
@@ -333,7 +743,14 @@ class AdminAjaxPost
 		if (!current_user_can('manage_options')) {
 			FormHelpers::post_error('forbidden');
 		}
+
+		$plugin_id = Settings::plugin_id();
+		if ($plugin_id !== '') {
+			Api::disable_plugin($plugin_id);
+		}
+
 		Api::logout();
+		Settings::disconnect();
 		FormHelpers::post_success();
 	}
 
@@ -609,6 +1026,183 @@ class AdminAjaxPost
 		FormHelpers::post_success('true');
 	}
 
+	public function pipeline_publish_modal_data()
+	{
+		self::ajax_guard();
+
+		$wp_post_id = isset($_POST['parrotposter']['wp_post_id']) ? absint($_POST['parrotposter']['wp_post_id']) : 0;
+		$post = get_post($wp_post_id);
+		if (!$post instanceof \WP_Post) {
+			FormHelpers::post_error('not_found');
+		}
+
+		$source_path = PushEventService::source_path_for_post_type((string) $post->post_type);
+		$pipelines_res = Api::list_pipelines_for_publish($source_path);
+		$api_pipelines = [];
+		if (!empty($pipelines_res['response']['pipelines']) && is_array($pipelines_res['response']['pipelines'])) {
+			$api_pipelines = $pipelines_res['response']['pipelines'];
+		}
+
+		$local_by_id = [];
+		foreach (Settings::get_pipelines_for_post($post) as $row) {
+			$local_by_id[$row['pipeline_id']] = $row;
+		}
+
+		$pipelines = [];
+		foreach ($api_pipelines as $pipeline) {
+			$pipeline_id = isset($pipeline['id']) ? (string) $pipeline['id'] : '';
+			if ($pipeline_id === '' || !isset($local_by_id[$pipeline_id])) {
+				continue;
+			}
+			$contract = $local_by_id[$pipeline_id]['contract'];
+			if (!PushEventService::post_passes_scope_filter($post, $contract)) {
+				continue;
+			}
+			$account_ids = isset($pipeline['account_ids']) && is_array($pipeline['account_ids'])
+				? $pipeline['account_ids']
+				: [];
+			$pipelines[] = [
+				'id' => $pipeline_id,
+				'name' => isset($pipeline['name']) ? (string) $pipeline['name'] : '',
+				'account_ids' => $account_ids,
+				'networks' => ApiHelpers::list_social_network_names($account_ids, true),
+				'socials_html' => PublishColumnCache::render_social_icons(
+					ApiHelpers::socials_from_account_ids($account_ids),
+					false
+				),
+			];
+		}
+
+		$existing = [];
+		$posts_res = Api::list_posts_by_cms_source($wp_post_id, (string) $post->post_type);
+		if (!empty($posts_res['response']['posts']) && is_array($posts_res['response']['posts'])) {
+			foreach ($posts_res['response']['posts'] as $ep) {
+				if (!is_array($ep)) {
+					continue;
+				}
+				$status = isset($ep['status']) ? (string) $ep['status'] : '';
+				$from = PublishColumnCache::from_posts([$ep]);
+				$ep['status_text'] = (string) ApiHelpers::get_post_status_text($status);
+				$ep['accounts'] = PublishColumnCache::accounts_for_modal($from['socials']);
+				$existing[] = $ep;
+			}
+		}
+
+		FormHelpers::post_success([
+			'pipelines' => $pipelines,
+			'existing_posts' => $existing,
+		]);
+	}
+
+	public function pipeline_publish_post()
+	{
+		self::ajax_guard();
+
+		$wp_post_id = isset($_POST['parrotposter']['wp_post_id']) ? absint($_POST['parrotposter']['wp_post_id']) : 0;
+		$pipeline_id = isset($_POST['parrotposter']['pipeline_id'])
+			? sanitize_text_field(wp_unslash($_POST['parrotposter']['pipeline_id']))
+			: '';
+
+		$post = get_post($wp_post_id);
+		if (!$post instanceof \WP_Post) {
+			FormHelpers::post_error('not_found');
+		}
+		if ($post->post_status !== 'publish') {
+			FormHelpers::post_error(__('The post must be published before sending it to social networks.', 'parrotposter'));
+		}
+
+		$matched = null;
+		foreach (Settings::get_pipelines_for_post($post) as $row) {
+			if ($row['pipeline_id'] === $pipeline_id) {
+				$matched = $row;
+				break;
+			}
+		}
+		if ($matched === null || !PushEventService::post_passes_scope_filter($post, $matched['contract'])) {
+			status_header(403);
+			FormHelpers::post_error('forbidden');
+		}
+
+		PushEventService::send_created_event($post, $pipeline_id, $matched['contract']);
+		PublishColumnCache::invalidate($wp_post_id);
+
+		FormHelpers::post_success('true');
+	}
+
+	public function pipeline_column_batch()
+	{
+		self::ajax_guard();
+
+		$ids = [];
+		$raw_ids = isset($_POST['parrotposter']['wp_post_ids']) && is_array($_POST['parrotposter']['wp_post_ids'])
+			? $_POST['parrotposter']['wp_post_ids']
+			: [];
+		foreach ($raw_ids as $id) {
+			$id = absint($id);
+			if ($id > 0) {
+				$ids[] = $id;
+			}
+			if (count($ids) >= 100) {
+				break;
+			}
+		}
+		$ids = array_values(array_unique($ids));
+
+		$source_to_wp = [];
+		$source_ids = [];
+		foreach ($ids as $wp_post_id) {
+			$post = get_post($wp_post_id);
+			if (!$post instanceof \WP_Post) {
+				continue;
+			}
+			$source_item_id = PushEventService::source_item_id((string) $post->post_type, $wp_post_id);
+			$source_to_wp[$source_item_id] = $wp_post_id;
+			$source_ids[] = $source_item_id;
+		}
+
+		$items = [];
+		if (empty($source_ids) || Settings::site_to_pp_secret() === '') {
+			FormHelpers::post_success(['cells' => []]);
+		}
+
+		$res = Api::list_posts_by_cms_source_batch($source_ids);
+		if (!empty($res['error'])) {
+			FormHelpers::post_success(['cells' => []]);
+		}
+		if (!empty($res['response']['items']) && is_array($res['response']['items'])) {
+			$items = $res['response']['items'];
+		}
+
+		$posts_by_source = [];
+		foreach ($items as $item) {
+			if (!is_array($item)) {
+				continue;
+			}
+			$source_item_id = isset($item['source_item_id']) ? (string) $item['source_item_id'] : '';
+			$posts_by_source[$source_item_id] = isset($item['posts']) && is_array($item['posts']) ? $item['posts'] : [];
+		}
+
+		$back_url = self::pipeline_column_back_url();
+		$cells = [];
+		foreach ($source_to_wp as $source_item_id => $wp_post_id) {
+			$posts = isset($posts_by_source[$source_item_id]) ? $posts_by_source[$source_item_id] : [];
+			$data = PublishColumnCache::from_posts($posts);
+			PublishColumnCache::set($wp_post_id, $data);
+			$link = sprintf(
+				'admin.php?page=parrotposter_posts&view=publish-post&post_id=%s&back_url=%s',
+				$wp_post_id,
+				$back_url
+			);
+			$cells[(string) $wp_post_id] = [
+				'has_posts' => !empty($data['has_posts']),
+				'socials' => $data['socials'],
+				'html' => PublishColumnCache::render_cell($wp_post_id, $data, $link),
+			];
+		}
+
+		FormHelpers::post_success(['cells' => $cells]);
+	}
+
 	public function get_post_html()
 	{
 		self::ajax_guard();
@@ -656,16 +1250,13 @@ class AdminAjaxPost
 			FormHelpers::post_error('wrong input data');
 		}
 
-		$filter = [
-			'user_id' => Options::user_id(),
-			'fields.extra.wp_post_id' => intval($_POST['parrotposter']['wp_post_id']),
-		];
+		$wp_post_id = isset($_POST['parrotposter']['wp_post_id'])
+			? intval($_POST['parrotposter']['wp_post_id'])
+			: 0;
+		$wp_post = $wp_post_id > 0 ? get_post($wp_post_id) : null;
+		$post_type = ($wp_post && !empty($wp_post->post_type)) ? (string) $wp_post->post_type : 'post';
 
-		$res = Api::list_posts($filter, [], [
-			'page' => 1,
-			'size' => 50,
-			'skip_total' => true,
-		]);
+		$res = Api::list_posts_by_cms_source($wp_post_id, $post_type);
 		if (!empty($res['response']['posts'])) {
 			foreach ($res['response']['posts'] as $i => $post) {
 				$res['response']['posts'][$i]['status_view'] = ApiHelpers::get_post_status_text($post['status']);

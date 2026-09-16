@@ -1,0 +1,73 @@
+.pp-migration-banner {
+	margin: 1em 0;
+	padding: 1em 1.25em;
+	border-left: 4px solid #2271b1;
+	background: #f0f6fc;
+}
+
+.pp-migration-banner__title {
+	font-weight: 600;
+	margin-bottom: 0.5em;
+}
+
+.pp-migration-banner__list {
+	margin: 0.75em 0;
+	padding-left: 0;
+	list-style: none;
+}
+
+.pp-migration-banner__list li {
+	margin: 0.5em 0;
+}
+
+.pp-migration-banner__subtitle {
+	margin: 0.15em 0 0 1.6em;
+	color: #646970;
+	font-size: 12px;
+}
+
+.pp-migration-banner__actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.5em;
+	margin-top: 0.75em;
+}
+
+.pp-migration-banner--compact {
+	padding: 0.65em 1em;
+}
+
+.pp-migration-banner--compact .pp-migration-banner__row {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0.5em 0.75em;
+}
+
+.pp-migration-banner--compact .pp-migration-banner__title {
+	margin-bottom: 0;
+}
+
+.pp-migration-banner--compact .pp-migration-banner__info {
+	color: #2271b1;
+	cursor: help;
+	font-size: 16px;
+	width: 16px;
+	height: 16px;
+}
+
+.pp-migration-banner--compact .pp-migration-banner__actions {
+	margin-top: 0;
+	margin-left: auto;
+}
+
+.pp-migration-banner--compact .pp-migration-dismiss {
+	padding-left: 0.5em;
+	padding-right: 0.5em;
+}
+
+.parrotposter-block__heading {
+	margin: 0 0 0.75em;
+	font-size: 1.1em;
+	font-weight: 600;
+}

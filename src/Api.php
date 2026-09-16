@@ -16,6 +16,9 @@ class Api
 
 	private const PP_DOWN_CIRCUIT_TTL_SEC = 30;
 
+	/** Iframe session-key transient TTL; shorter than Redis idle (30 min). */
+	private const IFRAME_SESSION_KEY_TTL_SEC = 900;
+
 	private const CURL_NETWORK_STYLE_ERRORS = [
 		'http_request_failed',
 	];
@@ -315,9 +318,16 @@ class Api
 				}
 
 				if (!empty($decoded['errors'])) {
-					$msg = $decoded['errors'][0]['message'] ?? 'graphql error';
+					$first = $decoded['errors'][0];
+					$msg = is_array($first) && isset($first['message'])
+						? (string) $first['message']
+						: 'graphql error';
+					$code = null;
+					if (is_array($first) && isset($first['extensions']['code']) && is_string($first['extensions']['code'])) {
+						$code = $first['extensions']['code'];
+					}
 
-					return ['error' => ['msg' => $msg]];
+					return ['error' => array_filter(['msg' => $msg, 'code' => $code])];
 				}
 
 				return ['data' => isset($decoded['data']) && is_array($decoded['data']) ? $decoded['data'] : []];
@@ -335,7 +345,721 @@ class Api
 	}
 
 	/**
-	 * Короткоживущий токен для iframe (GraphQL).
+	 * GraphQL mutation with site_to_pp Bearer + HMAC (machine-path, SPEC-002-09 §4.2).
+	 *
+	 * @param array<string, mixed> $variables Mutation variables (input fields for pluginPipelineEventIngest)
+	 * @param array<string, mixed> $opts      curl_timeout, curl_connect_timeout, _retried_contract
+	 * @return array{data?: array, error?: array{msg: string, code?: int|string, extensions?: array}}
+	 */
+	public static function graphql_mutation(string $operation, array $variables = [], array $opts = []): array
+	{
+		$secret = Settings::site_to_pp_secret();
+		if ($secret === '') {
+			return ['error' => ['msg' => 'site_to_pp secret is empty']];
+		}
+
+		$query = self::build_graphql_mutation_query($operation);
+		if ($query === '') {
+			return ['error' => ['msg' => 'unknown graphql operation']];
+		}
+
+		$gql_variables = self::wrap_graphql_variables($operation, $variables);
+		$res = self::do_graphql_site_request($query, $gql_variables, array_merge($opts, [
+			'bearer_token' => $secret,
+			'sign_with_site_to_pp' => true,
+			'log_label' => $operation,
+		]));
+
+		if (!empty($res['error']) && self::is_contract_version_mismatch_error($res)) {
+			self::apply_contract_version_mismatch($res);
+			if (empty($opts['_retried_contract'])) {
+				$variables = self::refresh_contract_version_in_variables($operation, $variables);
+				$opts['_retried_contract'] = true;
+
+				return self::graphql_mutation($operation, $variables, $opts);
+			}
+		}
+
+		if (!empty($res['data'])) {
+			return self::normalize_graphql_mutation_response($operation, $res);
+		}
+
+		return $res;
+	}
+
+	/**
+	 * GraphQL query with site_to_pp Bearer + HMAC (machine-path).
+	 *
+	 * @param array<string, mixed> $variables
+	 * @param array<string, mixed> $opts      curl_timeout, curl_connect_timeout
+	 * @return array{data?: array, error?: array{msg: string, code?: int|string, extensions?: array}}
+	 */
+	public static function graphql_query(string $operation, array $variables = [], array $opts = []): array
+	{
+		$secret = Settings::site_to_pp_secret();
+		if ($secret === '') {
+			return ['error' => ['msg' => 'site_to_pp secret is empty']];
+		}
+
+		$query = self::build_graphql_query($operation);
+		if ($query === '') {
+			return ['error' => ['msg' => 'unknown graphql operation']];
+		}
+
+		return self::do_graphql_site_request($query, $variables, array_merge($opts, [
+			'bearer_token' => $secret,
+			'sign_with_site_to_pp' => true,
+			'log_label' => $operation,
+		]));
+	}
+
+	/**
+	 * PP posts linked to a WP post: HMAC GraphQL when bound, otherwise REST with site domain.
+	 *
+	 * @return array{response?: array{posts: array}, error?: array}
+	 */
+	public static function list_posts_by_cms_source(int $wp_post_id, string $post_type = 'post'): array
+	{
+		$wp_post_id = (int) $wp_post_id;
+		if ($wp_post_id < 1) {
+			return ['response' => ['posts' => []]];
+		}
+		if ($post_type === '') {
+			$post_type = 'post';
+		}
+
+		$site_domain = WpPostHelpers::get_site_domain();
+		$source_item_id = PushEventService::source_item_id($post_type, $wp_post_id);
+
+		if (Settings::site_to_pp_secret() !== '') {
+			$res = self::graphql_query('pluginWpPostsBySourceItem', [
+				'sourceItemId' => $source_item_id,
+				'wpPostId' => $wp_post_id,
+				'siteDomain' => $site_domain,
+			]);
+			if (!empty($res['error'])) {
+				return $res;
+			}
+			$nodes = [];
+			if (isset($res['data']['pluginWpPostsBySourceItem']) && is_array($res['data']['pluginWpPostsBySourceItem'])) {
+				$nodes = $res['data']['pluginWpPostsBySourceItem'];
+			}
+
+			return ['response' => ['posts' => self::plugin_cms_source_posts_to_wp_list($nodes)]];
+		}
+
+		$filter = [
+			'user_id' => Options::user_id(),
+			'fields.extra.wp_post_id' => $wp_post_id,
+			'fields.extra.wp_site_domain' => $site_domain,
+		];
+
+		$posts = [];
+		$page = 1;
+		$page_size = 100;
+		$max_pages = 50;
+		while ($page <= $max_pages) {
+			$res = self::list_posts($filter, [], [
+				'page' => $page,
+				'size' => $page_size,
+				'skip_total' => true,
+			]);
+			if (!empty($res['error'])) {
+				return $res;
+			}
+			$batch = [];
+			if (!empty($res['response']['posts']) && is_array($res['response']['posts'])) {
+				$batch = $res['response']['posts'];
+			}
+			foreach ($batch as $post) {
+				$posts[] = $post;
+			}
+			if (count($batch) < $page_size) {
+				break;
+			}
+			$page++;
+		}
+
+		return ['response' => ['posts' => $posts]];
+	}
+
+	/**
+	 * Pipelines the HMAC plugin may offer in a publish picker for this source path.
+	 *
+	 * @param list<array{key?: string, label?: string, value?: string}> $source_path
+	 * @return array{response?: array{pipelines: list<array{id: string, name: string, account_ids: list<string>}>}, error?: array}
+	 */
+	public static function list_pipelines_for_publish(array $source_path): array
+	{
+		$steps = [];
+		foreach ($source_path as $step) {
+			if (!is_array($step)) {
+				continue;
+			}
+			$key = isset($step['key']) ? (string) $step['key'] : '';
+			$value = isset($step['value']) ? (string) $step['value'] : '';
+			if ($key === '' || $value === '') {
+				continue;
+			}
+			$steps[] = [
+				'key' => $key,
+				'label' => isset($step['label']) ? (string) $step['label'] : '',
+				'value' => $value,
+			];
+		}
+		if (empty($steps)) {
+			return ['response' => ['pipelines' => []]];
+		}
+
+		$res = self::graphql_query('pluginPipelinesForPublish', [
+			'sourcePath' => $steps,
+		]);
+		if (!empty($res['error'])) {
+			return $res;
+		}
+		$nodes = [];
+		if (isset($res['data']['pluginPipelinesForPublish']) && is_array($res['data']['pluginPipelinesForPublish'])) {
+			$nodes = $res['data']['pluginPipelinesForPublish'];
+		}
+
+		return ['response' => ['pipelines' => self::plugin_pipelines_for_publish_to_wp_list($nodes)]];
+	}
+
+	/**
+	 * Batched CMS lookup of PP posts by `source_item_id` (HMAC GraphQL).
+	 * Passes `siteDomain` so the backend can union the legacy v1 index
+	 * (`extra.wp_post_id`) with v2 provenance — same as `list_posts_by_cms_source`.
+	 *
+	 * @param list<string> $source_item_ids
+	 * @return array{response?: array{items: list<array{source_item_id: string, posts: list<array>}>}, error?: array}
+	 */
+	public static function list_posts_by_cms_source_batch(array $source_item_ids): array
+	{
+		$ids = [];
+		$seen = [];
+		foreach ($source_item_ids as $id) {
+			$id = trim((string) $id);
+			if ($id === '' || isset($seen[$id])) {
+				continue;
+			}
+			$seen[$id] = true;
+			$ids[] = $id;
+			if (count($ids) >= 100) {
+				break;
+			}
+		}
+		if (empty($ids)) {
+			return ['response' => ['items' => []]];
+		}
+
+		$res = self::graphql_query('pluginWpPostsBySourceItemsBatch', [
+			'sourceItemIds' => $ids,
+			'siteDomain' => WpPostHelpers::get_site_domain(),
+		]);
+		if (!empty($res['error'])) {
+			return $res;
+		}
+		$nodes = [];
+		if (isset($res['data']['pluginWpPostsBySourceItemsBatch']) && is_array($res['data']['pluginWpPostsBySourceItemsBatch'])) {
+			$nodes = $res['data']['pluginWpPostsBySourceItemsBatch'];
+		}
+
+		$items = [];
+		foreach ($nodes as $node) {
+			if (!is_array($node)) {
+				continue;
+			}
+			$source_item_id = isset($node['sourceItemId']) ? (string) $node['sourceItemId'] : '';
+			if ($source_item_id === '') {
+				continue;
+			}
+			$posts = [];
+			if (isset($node['posts']) && is_array($node['posts'])) {
+				$posts = self::plugin_cms_source_posts_to_wp_list($node['posts']);
+			}
+			$items[] = [
+				'source_item_id' => $source_item_id,
+				'posts' => $posts,
+			];
+		}
+
+		return ['response' => ['items' => $items]];
+	}
+
+	/**
+	 * Map HMAC `pluginPipelinesForPublish` nodes.
+	 *
+	 * @param list<array<string, mixed>> $nodes
+	 * @return list<array{id: string, name: string, account_ids: list<string>}>
+	 */
+	public static function plugin_pipelines_for_publish_to_wp_list(array $nodes): array
+	{
+		$pipelines = [];
+		foreach ($nodes as $node) {
+			if (!is_array($node)) {
+				continue;
+			}
+			$id = isset($node['id']) ? (string) $node['id'] : '';
+			if ($id === '') {
+				continue;
+			}
+			$account_ids = [];
+			if (!empty($node['accountIds']) && is_array($node['accountIds'])) {
+				foreach ($node['accountIds'] as $account_id) {
+					$account_ids[] = (string) $account_id;
+				}
+			}
+			$pipelines[] = [
+				'id' => $id,
+				'name' => isset($node['name']) ? (string) $node['name'] : '',
+				'account_ids' => $account_ids,
+			];
+		}
+
+		return $pipelines;
+	}
+
+	/**
+	 * Map HMAC `pluginWpPostsBySourceItem` nodes to the REST-like posts list used by the meta-box.
+	 *
+	 * @param list<array<string, mixed>> $nodes
+	 * @return list<array<string, mixed>>
+	 */
+	public static function plugin_cms_source_posts_to_wp_list(array $nodes): array
+	{
+		$posts = [];
+		foreach ($nodes as $node) {
+			if (!is_array($node)) {
+				continue;
+			}
+			$id = isset($node['id']) ? (string) $node['id'] : '';
+			if ($id === '') {
+				continue;
+			}
+			$extra = [];
+			if (array_key_exists('legacyAutopostingId', $node) && $node['legacyAutopostingId'] !== null && $node['legacyAutopostingId'] !== '') {
+				$extra['wp_autoposting_id'] = (int) $node['legacyAutopostingId'];
+			}
+			$posts[] = [
+				'id' => $id,
+				'publish_at' => isset($node['publishAt']) ? (string) $node['publishAt'] : '',
+				'status' => isset($node['status']) ? (string) $node['status'] : '',
+				'fields' => [
+					'extra' => $extra,
+				],
+				'results' => self::plugin_cms_source_post_results_to_wp_list(
+					isset($node['results']) && is_array($node['results']) ? $node['results'] : []
+				),
+			];
+		}
+
+		return $posts;
+	}
+
+	/**
+	 * @param list<mixed> $nodes
+	 * @return list<array{account_id: string, social_type: string, success: mixed, link: string, published_at: string, error: string}>
+	 */
+	public static function plugin_cms_source_post_results_to_wp_list(array $nodes): array
+	{
+		$results = [];
+		foreach ($nodes as $row) {
+			if (!is_array($row)) {
+				continue;
+			}
+			$results[] = [
+				'account_id' => isset($row['accountId']) ? (string) $row['accountId'] : '',
+				'social_type' => isset($row['socialType']) ? (string) $row['socialType'] : '',
+				'success' => array_key_exists('success', $row) ? $row['success'] : null,
+				'link' => isset($row['linkToSocialPost']) ? (string) $row['linkToSocialPost'] : '',
+				'published_at' => isset($row['publishedAt']) ? (string) $row['publishedAt'] : '',
+				'error' => isset($row['errorMessage']) ? (string) $row['errorMessage'] : '',
+			];
+		}
+
+		return $results;
+	}
+
+	/**
+	 * GraphQL mutation with user session Bearer (admin UI path, SPEC-002-17).
+	 *
+	 * @param array<string, mixed> $variables Mutation variables
+	 * @param array<string, mixed> $opts      curl_timeout, curl_connect_timeout
+	 * @return array{data?: array, error?: array{msg: string, code?: int|string, extensions?: array}}
+	 */
+	public static function graphql_user_mutation(string $operation, array $variables = [], array $opts = []): array
+	{
+		$bearer = Options::token();
+		if ($bearer === '') {
+			return ['error' => ['msg' => __('ParrotPoster authorization is required.', 'parrotposter')]];
+		}
+
+		$query = self::build_graphql_mutation_query($operation);
+		if ($query === '') {
+			return ['error' => ['msg' => 'unknown graphql operation']];
+		}
+
+		$gql_variables = self::wrap_graphql_variables($operation, $variables);
+		$res = self::do_graphql_request($query, $gql_variables, array_merge($opts, [
+			'bearer_token' => $bearer,
+			'log_label' => $operation,
+		]));
+
+		return self::normalize_graphql_mutation_response($operation, $res);
+	}
+
+	/**
+	 * @param array{data?: array, error?: array{msg: string, code?: int|string, extensions?: array}} $res
+	 * @return array{data?: array, error?: array{msg: string, code?: int|string, extensions?: array}}
+	 */
+	private static function normalize_graphql_mutation_response(string $operation, array $res): array
+	{
+		if (empty($res['data'])) {
+			return $res;
+		}
+
+		$payload = self::extract_mutation_payload($operation, $res['data']);
+		if (is_array($payload) && array_key_exists('accepted', $payload) && empty($payload['accepted'])) {
+			$msg = 'graphql mutation rejected';
+			if (!empty($payload['errors']) && is_array($payload['errors'])) {
+				$first = $payload['errors'][0] ?? null;
+				if (is_array($first) && !empty($first['message'])) {
+					$msg = (string) $first['message'];
+				}
+			}
+
+			return ['error' => ['msg' => $msg, 'errors' => $payload['errors'] ?? []]];
+		}
+		if (is_array($payload) && !empty($payload['errors']) && is_array($payload['errors'])) {
+			$first = $payload['errors'][0] ?? null;
+			if (is_array($first) && !empty($first['message'])) {
+				return ['error' => ['msg' => (string) $first['message'], 'errors' => $payload['errors']]];
+			}
+		}
+
+		return $res;
+	}
+
+	private static function build_graphql_mutation_query(string $operation): string
+	{
+		switch ($operation) {
+			case 'pluginPipelineEventIngest':
+				return 'mutation PluginPipelineEventIngest($input: PluginPipelineEventInput!) { pluginPipelineEventIngest(input: $input) { accepted triggerRunIds errors { message code } } }';
+			case 'pluginOutboundTasksLease':
+				return 'mutation PluginOutboundTasksLease($input: PluginOutboundTasksLeaseInput!) { pluginOutboundTasksLease(input: $input) { tasks { taskId type payload payloadSignature expiresAt rotationId } primaryHealth recommendedPollIntervalS } }';
+			case 'pluginOutboundTaskReport':
+				return 'mutation PluginOutboundTaskReport($input: PluginOutboundTaskReportInput!) { pluginOutboundTaskReport(input: $input) { ok newSiteToPpSecret } }';
+			case 'migratePluginToPipeline':
+				return 'mutation MigratePluginToPipeline($input: MigratePluginInput!) { migratePluginToPipeline(input: $input) { plugin { id migrationMode pipelineIdsFromMigration } pipelines { id name } warnings errors { message code } } }';
+			case 'revertPluginToLegacy':
+				return 'mutation RevertPluginToLegacy($pluginId: ID!) { revertPluginToLegacy(pluginId: $pluginId) { plugin { id migrationMode pipelineIdsFromMigration } errors { message code } } }';
+			default:
+				return '';
+		}
+	}
+
+	private static function build_graphql_query(string $operation): string
+	{
+		switch ($operation) {
+			case 'pluginWpPostsBySourceItem':
+					return 'query PluginWpPostsBySourceItem($sourceItemId: String!, $wpPostId: Int, $siteDomain: String) { pluginWpPostsBySourceItem(sourceItemId: $sourceItemId, wpPostId: $wpPostId, siteDomain: $siteDomain) { id publishAt status legacyAutopostingId results { accountId socialType success linkToSocialPost publishedAt errorMessage } } }';
+			case 'pluginPipelinesForPublish':
+				return 'query PluginPipelinesForPublish($sourcePath: [SourceSelectionStepInput!]!) { pluginPipelinesForPublish(sourcePath: $sourcePath) { id name accountIds } }';
+			case 'pluginWpPostsBySourceItemsBatch':
+					return 'query PluginWpPostsBySourceItemsBatch($sourceItemIds: [String!]!, $siteDomain: String) { pluginWpPostsBySourceItemsBatch(sourceItemIds: $sourceItemIds, siteDomain: $siteDomain) { sourceItemId posts { id publishAt status legacyAutopostingId results { accountId socialType success linkToSocialPost publishedAt errorMessage } } } }';
+			default:
+				return '';
+		}
+	}
+
+	/**
+	 * @param array<string, mixed> $variables
+	 * @return array<string, mixed>
+	 */
+	private static function wrap_graphql_variables(string $operation, array $variables): array
+	{
+		switch ($operation) {
+			case 'pluginPipelineEventIngest':
+				return ['input' => $variables];
+			case 'pluginOutboundTasksLease':
+				return ['input' => $variables];
+			case 'pluginOutboundTaskReport':
+				return ['input' => $variables];
+			case 'migratePluginToPipeline':
+				return ['input' => $variables];
+			case 'revertPluginToLegacy':
+				return $variables;
+			default:
+				return $variables;
+		}
+	}
+
+	/**
+	 * @param array<string, mixed> $data
+	 * @return array<string, mixed>|null
+	 */
+	private static function extract_mutation_payload(string $operation, array $data): ?array
+	{
+		switch ($operation) {
+			case 'pluginPipelineEventIngest':
+				return isset($data['pluginPipelineEventIngest']) && is_array($data['pluginPipelineEventIngest'])
+					? $data['pluginPipelineEventIngest']
+					: null;
+			case 'pluginOutboundTasksLease':
+				return isset($data['pluginOutboundTasksLease']) && is_array($data['pluginOutboundTasksLease'])
+					? $data['pluginOutboundTasksLease']
+					: null;
+			case 'pluginOutboundTaskReport':
+				return isset($data['pluginOutboundTaskReport']) && is_array($data['pluginOutboundTaskReport'])
+					? $data['pluginOutboundTaskReport']
+					: null;
+			case 'migratePluginToPipeline':
+				return isset($data['migratePluginToPipeline']) && is_array($data['migratePluginToPipeline'])
+					? $data['migratePluginToPipeline']
+					: null;
+			case 'revertPluginToLegacy':
+				return isset($data['revertPluginToLegacy']) && is_array($data['revertPluginToLegacy'])
+					? $data['revertPluginToLegacy']
+					: null;
+			default:
+				return null;
+		}
+	}
+
+	/**
+	 * @param array{error: array{msg?: string, code?: string, extensions?: array}} $res
+	 */
+	private static function is_contract_version_mismatch_error(array $res): bool
+	{
+		$code = $res['error']['code'] ?? '';
+		if ($code === 'contract_version_mismatch') {
+			return true;
+		}
+		$msg = strtolower((string) ($res['error']['msg'] ?? ''));
+
+		return strpos($msg, 'contract_version_mismatch') !== false;
+	}
+
+	/**
+	 * @param array{error: array{extensions?: array}} $res
+	 */
+	private static function apply_contract_version_mismatch(array $res): void
+	{
+		$extensions = $res['error']['extensions'] ?? null;
+		if (!is_array($extensions)) {
+			return;
+		}
+		$contract = $extensions['pipelineContract'] ?? $extensions['pipeline_contract'] ?? null;
+		if (!is_array($contract)) {
+			return;
+		}
+		Settings::apply_pipeline_contract_snapshot($contract);
+	}
+
+	/**
+	 * @param array<string, mixed> $variables
+	 * @return array<string, mixed>
+	 */
+	private static function refresh_contract_version_in_variables(string $operation, array $variables): array
+	{
+		if ($operation !== 'pluginPipelineEventIngest') {
+			return $variables;
+		}
+		$pipeline_id = isset($variables['pipelineId']) ? (string) $variables['pipelineId'] : '';
+		if ($pipeline_id === '') {
+			return $variables;
+		}
+		$contract = Settings::get_pipeline_contract($pipeline_id);
+		if (!is_array($contract)) {
+			return $variables;
+		}
+		$variables['contractVersion'] = (int) ($contract['contract_version'] ?? 0);
+
+		return $variables;
+	}
+
+	/**
+	 * @param array<string, mixed> $variables
+	 * @param array<string, mixed> $opts
+	 * @return array{data?: array, error?: array{msg: string, code?: int|string, extensions?: array}}
+	 */
+	private static function do_graphql_site_request(string $query, array $variables = [], array $opts = []): array
+	{
+		if (self::is_pp_down_circuit_open()) {
+			return [
+				'error' => [
+					'msg' => 'server is unavailable',
+					'code' => self::SERVER_UNAVAILABLE,
+				],
+			];
+		}
+
+		$bearer_token = isset($opts['bearer_token']) ? (string) $opts['bearer_token'] : '';
+		$sign_with_site_to_pp = !empty($opts['sign_with_site_to_pp']);
+		$curl_timeout = isset($opts['curl_timeout']) ? (int) $opts['curl_timeout'] : 15;
+		$curl_connect_timeout = isset($opts['curl_connect_timeout']) ? (int) $opts['curl_connect_timeout'] : 5;
+		$log_label = isset($opts['log_label']) ? (string) $opts['log_label'] : 'graphql';
+
+		$payload = ['query' => $query];
+		if ($variables !== []) {
+			$payload['variables'] = $variables;
+		}
+		$body_json = wp_json_encode($payload, JSON_UNESCAPED_UNICODE);
+		if ($body_json === false) {
+			return ['error' => ['msg' => 'json encode error']];
+		}
+
+		$passes = [
+			['force_refresh' => false],
+			['force_refresh' => true],
+		];
+
+		foreach ($passes as $pass) {
+			$domains = DomainSelector::get_priority_domains($pass['force_refresh']);
+			if (empty($domains)) {
+				$best = DomainSelector::get_best_domain();
+				if (!empty($best)) {
+					$domains = [$best];
+				}
+			}
+
+			foreach ($domains as $domain) {
+				$gql_url = rtrim($domain, '/') . Env::graphql_api_uri();
+
+				$headers = [
+					'Content-Type' => 'application/json',
+					'X-PP-WordPress-Version' => defined('PARROTPOSTER_VERSION') ? (string) PARROTPOSTER_VERSION : '',
+				];
+				if ($bearer_token !== '') {
+					$headers['Authorization'] = 'Bearer ' . $bearer_token;
+				}
+				if ($sign_with_site_to_pp && $bearer_token !== '') {
+					$headers = array_merge($headers, self::build_site_to_pp_hmac_headers(
+						'POST',
+						Env::graphql_signing_path(),
+						$body_json,
+						$bearer_token
+					));
+				}
+
+				$response = wp_remote_post($gql_url, [
+					'timeout' => $curl_timeout,
+					'connect_timeout' => $curl_connect_timeout,
+					'redirection' => 3,
+					'user-agent' => self::USER_AGENT,
+					'sslverify' => true,
+					'headers' => $headers,
+					'body' => $body_json,
+				]);
+
+				if (is_wp_error($response)) {
+					if (self::is_network_wp_error($response)) {
+						DomainSelector::mark_domain_error($domain);
+					}
+					PP::log([$log_label . '_network', $domain, $response->get_error_message()]);
+					continue;
+				}
+
+				self::clear_pp_down_circuit();
+
+				$code = (int) wp_remote_retrieve_response_code($response);
+				$body = wp_remote_retrieve_body($response);
+
+				if ($code >= 500) {
+					$decoded = json_decode((string) $body, true);
+					if (is_array($decoded) && !empty($decoded['errors'])) {
+						$parsed = self::parse_graphql_error($decoded['errors'][0] ?? null);
+
+						return ['error' => $parsed];
+					}
+
+					return [
+						'error' => [
+							'msg' => 'server is unavailable',
+							'code' => self::SERVER_UNAVAILABLE,
+						],
+					];
+				}
+
+				$decoded = json_decode((string) $body, true);
+				if (!is_array($decoded)) {
+					continue;
+				}
+
+				if (!empty($decoded['errors'])) {
+					$parsed = self::parse_graphql_error($decoded['errors'][0] ?? null);
+
+					return ['error' => $parsed];
+				}
+
+				Settings::touch_last_site_to_pp_call();
+
+				return ['data' => isset($decoded['data']) && is_array($decoded['data']) ? $decoded['data'] : []];
+			}
+		}
+
+		self::mark_pp_unavailable_for_circuit();
+
+		return [
+			'error' => [
+				'msg' => 'server is unavailable',
+				'code' => self::SERVER_UNAVAILABLE,
+			],
+		];
+	}
+
+	/**
+	 * @param mixed $error
+	 * @return array{msg: string, code?: string, extensions?: array}
+	 */
+	private static function parse_graphql_error($error): array
+	{
+		if (!is_array($error)) {
+			return ['msg' => 'graphql error'];
+		}
+		$msg = isset($error['message']) ? (string) $error['message'] : 'graphql error';
+		$extensions = isset($error['extensions']) && is_array($error['extensions']) ? $error['extensions'] : [];
+		$code = '';
+		if (isset($extensions['code']) && is_string($extensions['code'])) {
+			$code = $extensions['code'];
+		}
+
+		return [
+			'msg' => $msg,
+			'code' => $code !== '' ? $code : null,
+			'extensions' => $extensions,
+		];
+	}
+
+	/**
+	 * @return array<string, string>
+	 */
+	private static function build_site_to_pp_hmac_headers(
+		string $method,
+		string $path,
+		string $raw_body,
+		string $site_to_pp_secret
+	): array {
+		$timestamp = (string) time();
+		$nonce = function_exists('wp_generate_uuid4') ? wp_generate_uuid4() : uniqid('pp_', true);
+		$body_hash = hash('sha256', $raw_body);
+		$signing_input = strtoupper($method) . "\n" . $path . "\n" . $timestamp . "\n" . $nonce . "\n" . $body_hash;
+		$signature = self::base64url_encode(hash_hmac('sha256', $signing_input, $site_to_pp_secret, true));
+
+		return [
+			'X-PP-Timestamp' => $timestamp,
+			'X-PP-Nonce' => $nonce,
+			'X-PP-Signature' => $signature,
+		];
+	}
+
+	private static function base64url_encode(string $data): string
+	{
+		return rtrim(strtr(base64_encode($data), '+/', '-_'), '=');
+	}
+
+	/**
+	 * Короткоживущий токен для iframe (GraphQL). Always mints a new key.
 	 *
 	 * @return array{token: string}|array{error: array{msg: string, code?: int}}
 	 */
@@ -365,6 +1089,75 @@ class Api
 		}
 
 		return ['token' => (string) $session_token];
+	}
+
+	/**
+	 * Session key for iframe embed: reuse a 15-minute transient, otherwise mint.
+	 *
+	 * @return array{token: string}|array{error: array{msg: string, code?: int}}
+	 */
+	public static function iframe_session_key(): array
+	{
+		$cached = self::read_iframe_session_key_cache();
+		if ($cached !== null) {
+			return ['token' => $cached];
+		}
+
+		$res = self::issue_session_key();
+		if (!empty($res['token'])) {
+			self::store_iframe_session_key((string) $res['token']);
+		}
+
+		return $res;
+	}
+
+	/**
+	 * Persist a freshly minted session key for the next iframe embed (not for SSO).
+	 */
+	public static function store_iframe_session_key(string $token): void
+	{
+		$key = self::iframe_session_key_cache_key();
+		if ($key === null || $token === '') {
+			return;
+		}
+
+		$ttl = defined('MINUTE_IN_SECONDS')
+			? 15 * MINUTE_IN_SECONDS
+			: self::IFRAME_SESSION_KEY_TTL_SEC;
+		set_transient($key, $token, (int) $ttl);
+	}
+
+	public static function invalidate_iframe_session_key_cache(): void
+	{
+		$key = self::iframe_session_key_cache_key();
+		if ($key !== null) {
+			delete_transient($key);
+		}
+	}
+
+	private static function iframe_session_key_cache_key(): ?string
+	{
+		$bearer = Options::token();
+		if ($bearer === '') {
+			return null;
+		}
+
+		return 'pp_session_key_v1_' . hash('sha256', $bearer) . '_ro0';
+	}
+
+	private static function read_iframe_session_key_cache(): ?string
+	{
+		$key = self::iframe_session_key_cache_key();
+		if ($key === null) {
+			return null;
+		}
+
+		$cached = get_transient($key);
+		if (!is_string($cached) || $cached === '') {
+			return null;
+		}
+
+		return $cached;
 	}
 
 	/**
@@ -401,6 +1194,274 @@ class Api
 		}
 
 		return ['token' => (string) $token];
+	}
+
+	/**
+	 * Issue one-time auth code for plugin binding (user session Bearer).
+	 *
+	 * @return array{code: string, expires_at?: string}|array{error: array{msg: string, code?: int}}
+	 */
+	public static function create_plugin_auth_code(
+		string $domain,
+		string $callback_url,
+		?string $plugin_version = null
+	): array {
+		$bearer = Options::token();
+		if ($bearer === '') {
+			return ['error' => ['msg' => __('ParrotPoster authorization is required.', 'parrotposter')]];
+		}
+
+		$domain = trim($domain);
+		$callback_url = trim($callback_url);
+		if ($domain === '' || $callback_url === '') {
+			return ['error' => ['msg' => __('Invalid connection parameters.', 'parrotposter')]];
+		}
+
+		$variables = [
+			'domain' => $domain,
+			'platform' => 'WORDPRESS',
+			'callbackUrl' => $callback_url,
+		];
+		if ($plugin_version !== null && trim($plugin_version) !== '') {
+			$variables['pluginVersion'] = trim($plugin_version);
+		}
+
+		$q = 'mutation CreatePluginAuthCode($domain: String!, $platform: PluginPlatform!, $callbackUrl: String!, $pluginVersion: String) {
+			createPluginAuthCode(domain: $domain, platform: $platform, callbackUrl: $callbackUrl, pluginVersion: $pluginVersion) {
+				code expiresAt
+			}
+		}';
+		$res = self::do_graphql_request($q, $variables, [
+			'bearer_token' => $bearer,
+			'log_label' => 'createPluginAuthCode',
+		]);
+
+		if (!empty($res['error'])) {
+			return $res;
+		}
+
+		$payload = $res['data']['createPluginAuthCode'] ?? null;
+		if (!is_array($payload)) {
+			return ['error' => ['msg' => __('Invalid server response.', 'parrotposter')]];
+		}
+
+		$code = isset($payload['code']) ? (string) $payload['code'] : '';
+		if ($code === '') {
+			return ['error' => ['msg' => __('Connection code was not received.', 'parrotposter')]];
+		}
+
+		$result = ['code' => $code];
+		if (!empty($payload['expiresAt'])) {
+			$result['expires_at'] = (string) $payload['expiresAt'];
+		}
+
+		return $result;
+	}
+
+	/**
+	 * Build SSO URL for opening the main web app in a new tab.
+	 *
+	 * @return array{url: string}|array{error: array{msg: string}}
+	 */
+	public static function build_sso_url(?string $return_to = null): array
+	{
+		$session = self::issue_session_key();
+		if (!empty($session['error'])) {
+			return $session;
+		}
+
+		$token = (string) $session['token'];
+		$domains = Env::domains();
+		$pp_base = !empty($domains) ? rtrim((string) $domains[0], '/') : 'https://parrotposter.com';
+		$params = [
+			'token' => $token,
+			'lang' => substr(get_user_locale(), 0, 2),
+		];
+		if ($return_to !== null && $return_to !== '') {
+			$params['returnTo'] = $return_to;
+		}
+
+		return [
+			'url' => add_query_arg($params, $pp_base . '/auth/enter-with-token'),
+		];
+	}
+
+	/**
+	 * Plugin binding: exchange one-time auth code for machine secrets (no HMAC).
+	 *
+	 * @return array{plugin_id: string, site_to_pp_secret: string, pp_to_site_secret: string, migration_mode?: string, outbound_task_signing_public_key?: string, pipeline_ids_from_migration?: list<string>}|array{error: array{msg: string, code?: string}}
+	 */
+	public static function complete_plugin_binding(
+		string $code,
+		string $domain,
+		string $callback_url,
+		?string $plugin_version = null
+	): array {
+		$code = trim($code);
+		if ($code === '') {
+			return ['error' => ['msg' => __('Connection code is missing.', 'parrotposter')]];
+		}
+		if (strlen($code) > 8192) {
+			return ['error' => ['msg' => __('Connection code is too long.', 'parrotposter')]];
+		}
+
+		$domain = trim($domain);
+		$callback_url = trim($callback_url);
+		if ($domain === '' || $callback_url === '') {
+			return ['error' => ['msg' => __('Invalid connection parameters.', 'parrotposter')]];
+		}
+
+		$variables = [
+			'code' => $code,
+			'platform' => 'WORDPRESS',
+			'domain' => $domain,
+			'callbackUrl' => $callback_url,
+		];
+		if ($plugin_version !== null && trim($plugin_version) !== '') {
+			$variables['pluginVersion'] = trim($plugin_version);
+		}
+
+		// outboundTaskSigningPublicKey (TASK-002-BE-52): the plugin's only channel for learning
+		// its *initial* Ed25519 signing public key — before this, nothing ever populated it
+		// (see Settings::set_outbound_task_signing_public_key()'s doc comment; the only other
+		// writer is a rotate_secrets fallback task, and back-app had no path that ever created
+		// one either until the same task).
+		$q = 'mutation CompletePluginBinding($code: String!, $platform: PluginPlatform!, $domain: String!, $callbackUrl: String!, $pluginVersion: String) {
+			completePluginBinding(code: $code, platform: $platform, domain: $domain, callbackUrl: $callbackUrl, pluginVersion: $pluginVersion) {
+				pluginId siteToPpSecret ppToSiteSecret migrationMode outboundTaskSigningPublicKey pipelineIdsFromMigration
+			}
+		}';
+		$res = self::do_graphql_request($q, $variables, [
+			'log_label' => 'completePluginBinding',
+		]);
+
+		if (!empty($res['error'])) {
+			$mapped = self::map_plugin_binding_error($res['error']);
+
+			return ['error' => $mapped];
+		}
+
+		$payload = $res['data']['completePluginBinding'] ?? null;
+		if (!is_array($payload)) {
+			return ['error' => ['msg' => __('Invalid server response.', 'parrotposter')]];
+		}
+
+		$plugin_id = isset($payload['pluginId']) ? (string) $payload['pluginId'] : '';
+		$site_to_pp = isset($payload['siteToPpSecret']) ? (string) $payload['siteToPpSecret'] : '';
+		$pp_to_site = isset($payload['ppToSiteSecret']) ? (string) $payload['ppToSiteSecret'] : '';
+		if ($plugin_id === '' || $site_to_pp === '' || $pp_to_site === '') {
+			return ['error' => ['msg' => __('The server did not return connection data.', 'parrotposter')]];
+		}
+
+		$result = [
+			'plugin_id' => $plugin_id,
+			'site_to_pp_secret' => $site_to_pp,
+			'pp_to_site_secret' => $pp_to_site,
+		];
+		if (isset($payload['migrationMode']) && is_string($payload['migrationMode'])) {
+			$result['migration_mode'] = $payload['migrationMode'];
+		}
+		if (isset($payload['outboundTaskSigningPublicKey']) && is_string($payload['outboundTaskSigningPublicKey'])) {
+			$result['outbound_task_signing_public_key'] = $payload['outboundTaskSigningPublicKey'];
+		}
+		if (isset($payload['pipelineIdsFromMigration']) && is_array($payload['pipelineIdsFromMigration'])) {
+			$ids = [];
+			foreach ($payload['pipelineIdsFromMigration'] as $id) {
+				if (!is_string($id) && !is_numeric($id)) {
+					continue;
+				}
+				$trimmed = trim((string) $id);
+				if ($trimmed !== '') {
+					$ids[] = $trimmed;
+				}
+			}
+			$result['pipeline_ids_from_migration'] = $ids;
+		}
+
+		return $result;
+	}
+
+	/**
+	 * Disable plugin binding on PP (user session; MustAuth on server).
+	 *
+	 * @return array{ok: true}|array{error: array{msg: string, code?: string}}
+	 */
+	public static function disable_plugin(string $plugin_id): array
+	{
+		$plugin_id = trim($plugin_id);
+		if ($plugin_id === '') {
+			return ['error' => ['msg' => 'plugin_id is empty']];
+		}
+
+		$bearer = Options::token();
+		if ($bearer === '') {
+			return ['error' => ['msg' => 'token is empty']];
+		}
+
+		$q = 'mutation DisablePlugin($id: ID!) { disablePlugin(id: $id) { ok siteNotified } }';
+		$res = self::do_graphql_request($q, ['id' => $plugin_id], [
+			'bearer_token' => $bearer,
+			'log_label' => 'disablePlugin',
+		]);
+
+		if (!empty($res['error'])) {
+			return $res;
+		}
+
+		$payload = $res['data']['disablePlugin'] ?? null;
+		$ok = is_array($payload) ? ($payload['ok'] ?? null) : $payload;
+		if ($ok !== true) {
+			return ['error' => ['msg' => 'disablePlugin failed']];
+		}
+
+		return ['ok' => true];
+	}
+
+	/**
+	 * User-session plugin row for this site (settings-page remote status sync).
+	 *
+	 * @return array{data?: array{plugin?: array{id?: string, status?: string, callbackUrl?: string}|null}, error?: array{msg: string, code?: int|string}}
+	 */
+	public static function plugin_status(string $plugin_id): array
+	{
+		$plugin_id = trim($plugin_id);
+		if ($plugin_id === '') {
+			return ['error' => ['msg' => 'plugin_id is empty']];
+		}
+
+		$bearer = Options::token();
+		if ($bearer === '') {
+			return ['error' => ['msg' => 'token is empty']];
+		}
+
+		$q = 'query PluginStatus($id: ID!) { plugin(id: $id) { id status callbackUrl } }';
+
+		return self::do_graphql_request($q, ['id' => $plugin_id], [
+			'bearer_token' => $bearer,
+			'log_label' => 'pluginStatus',
+		]);
+	}
+
+	/**
+	 * @param array{msg?: string, code?: string} $error
+	 * @return array{msg: string, code?: string}
+	 */
+	private static function map_plugin_binding_error(array $error): array
+	{
+		$code = isset($error['code']) ? (string) $error['code'] : '';
+		$messages = [
+			'auth_code_invalid_or_expired' => __('The connection code is invalid or expired. Start the connection again.', 'parrotposter'),
+			'binding_mismatch' => __('Connection data does not match. Check the domain and callback URL.', 'parrotposter'),
+			'callback_url_must_be_https' => __('The callback URL must use HTTPS.', 'parrotposter'),
+			'callback_url_invalid' => __('Invalid callback URL. Make sure the site is reachable over HTTPS and is not using a local address.', 'parrotposter'),
+		];
+		if ($code !== '' && isset($messages[$code])) {
+			return ['msg' => $messages[$code], 'code' => $code];
+		}
+
+		$msg = isset($error['msg']) ? (string) $error['msg'] : __('Could not complete the connection.', 'parrotposter');
+
+		return array_filter(['msg' => $msg, 'code' => $code !== '' ? $code : null]);
 	}
 
 	public static function ping()

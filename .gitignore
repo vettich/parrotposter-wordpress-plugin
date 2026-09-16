@@ -1,5 +1,7 @@
 .php-cs-fixer.cache
 .php_cs.cache
 /*.log
+/logs
 /vendor
 parrotposter.zip
+docker/.env

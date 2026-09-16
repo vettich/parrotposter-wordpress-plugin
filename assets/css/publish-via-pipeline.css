@@ -1,0 +1,323 @@
+.parrotposter-modal--pipeline .parrotposter-modal__container {
+	width: 480px;
+	gap: 1.25em;
+}
+
+.parrotposter-modal--pipeline [hidden] {
+	display: none !important;
+}
+
+.parrotposter-pipeline-modal__section-title {
+	font-weight: 600;
+	margin: 0 0 8px;
+}
+
+.parrotposter-pipeline-modal__loading {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	min-height: 3em;
+	padding: 0.5em 0;
+}
+
+.parrotposter-pipeline-modal__tabs {
+	display: flex;
+	gap: 4px;
+	border-bottom: 1px solid #dcdcde;
+	margin: 0;
+}
+
+.parrotposter-pipeline-modal__tab {
+	appearance: none;
+	background: none;
+	border: none;
+	border-bottom: 2px solid transparent;
+	margin: 0 0 -1px;
+	padding: 8px 12px;
+	font-size: 13px;
+	font-weight: 600;
+	line-height: 1.4;
+	color: #646970;
+	cursor: pointer;
+}
+
+.parrotposter-pipeline-modal__tab:hover,
+.parrotposter-pipeline-modal__tab:focus {
+	color: #2271b1;
+}
+
+.parrotposter-pipeline-modal__tab.is-active,
+.parrotposter-pipeline-modal__tab[aria-selected="true"] {
+	color: #2271b1;
+	border-bottom-color: #2271b1;
+}
+
+.parrotposter-pipeline-modal__panel {
+	max-height: 50vh;
+	overflow: auto;
+}
+
+.parrotposter-modal--pipeline-tabs .parrotposter-pipeline-modal__section-title {
+	display: none;
+}
+
+.parrotposter-pipeline-modal__existing-list {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.parrotposter-pipeline-modal__card {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	padding: 12px 14px;
+	border: 1px solid #dcdcde;
+	border-radius: 6px;
+	background: #fff;
+}
+
+.parrotposter-pipeline-modal__card-head {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	flex-wrap: wrap;
+}
+
+.parrotposter-pipeline-modal__dot {
+	width: 8px;
+	height: 8px;
+	border-radius: 50%;
+	background: #646970;
+	flex-shrink: 0;
+}
+
+.parrotposter-pipeline-modal__card.is-success .parrotposter-pipeline-modal__dot {
+	background: #00a32a;
+}
+
+.parrotposter-pipeline-modal__card.is-fail .parrotposter-pipeline-modal__dot {
+	background: #d63638;
+}
+
+.parrotposter-pipeline-modal__status {
+	font-size: 13px;
+	font-weight: 600;
+}
+
+.parrotposter-pipeline-modal__when {
+	margin-left: auto;
+	font-size: 12px;
+	color: #646970;
+}
+
+.parrotposter-pipeline-modal__accounts {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+}
+
+.parrotposter-pipeline-modal__account {
+	display: flex;
+	align-items: flex-start;
+	gap: 10px;
+	min-width: 0;
+}
+
+.parrotposter-pipeline-modal__account-photo {
+	position: relative;
+	width: 32px;
+	height: 32px;
+	flex-shrink: 0;
+}
+
+.parrotposter-pipeline-modal__account-photo img {
+	display: block;
+	width: 32px;
+	height: 32px;
+	object-fit: cover;
+	border-radius: 50%;
+	background: #f0f0f1;
+}
+
+.parrotposter-pipeline-modal__account-type {
+	position: absolute;
+	right: -2px;
+	bottom: -2px;
+	width: 16px;
+	height: 16px;
+	background-color: transparent;
+	background-size: 100%;
+	background-repeat: no-repeat;
+	background-position: center;
+}
+
+.parrotposter-pipeline-modal__account-type.vk {
+	background-image: url(../images/vk.svg);
+}
+
+.parrotposter-pipeline-modal__account-type.fb {
+	background-image: url(../images/fb.svg);
+}
+
+.parrotposter-pipeline-modal__account-type.ok {
+	background-image: url(../images/ok.svg);
+}
+
+.parrotposter-pipeline-modal__account-type.tg {
+	background-image: url(../images/tg.svg);
+}
+
+.parrotposter-pipeline-modal__account-type.insta {
+	background-image: url(../images/insta.svg);
+}
+
+.parrotposter-pipeline-modal__account-type.max {
+	background-color: #1a1a1a;
+	background-image: url(../images/max-white.svg);
+	border-radius: 50%;
+}
+
+.parrotposter-pipeline-modal__account-body {
+	min-width: 0;
+	flex: 1;
+}
+
+.parrotposter-pipeline-modal__account-name {
+	font-size: 13px;
+	font-weight: 600;
+	line-height: 1.35;
+	color: #1d2327;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.parrotposter-pipeline-modal__account-link {
+	display: inline-block;
+	margin-top: 2px;
+	font-size: 12px;
+	line-height: 1.4;
+	text-decoration: none;
+}
+
+.parrotposter-pipeline-modal__account-error {
+	margin-top: 2px;
+	font-size: 12px;
+	line-height: 1.4;
+	color: #d63638;
+	display: -webkit-box;
+	-webkit-line-clamp: 2;
+	-webkit-box-orient: vertical;
+	overflow: hidden;
+}
+
+.parrotposter-pipeline-modal__account-hint {
+	margin-top: 2px;
+	font-size: 12px;
+	line-height: 1.4;
+	color: #646970;
+}
+
+.parrotposter-pipeline-modal__empty p {
+	margin: 0 0 0.5em;
+}
+
+.parrotposter-pipeline-modal__list {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.parrotposter-pipeline-modal__row {
+	display: flex;
+	align-items: flex-start;
+	gap: 10px;
+	width: 100%;
+	box-sizing: border-box;
+	margin: 0;
+	padding: 12px 14px;
+	border: 1px solid #dcdcde;
+	border-radius: 6px;
+	cursor: pointer;
+}
+
+.parrotposter-pipeline-modal__row.is-selected {
+	border-color: #2271b1;
+	box-shadow: 0 0 0 1px #2271b1;
+}
+
+.parrotposter-pipeline-modal__row input {
+	margin: 3px 0 0;
+}
+
+.parrotposter-pipeline-modal__row-body {
+	min-width: 0;
+	flex: 1;
+}
+
+.parrotposter-pipeline-modal__row-name {
+	font-weight: 600;
+	font-size: 13px;
+	line-height: 1.4;
+	margin-bottom: 6px;
+}
+
+.parrotposter-pipeline-modal__row-networks {
+	font-size: 12px;
+	color: #646970;
+}
+
+.parrotposter-pipeline-modal__hint {
+	margin: 8px 0 0;
+	font-size: 12px;
+	line-height: 1.45;
+	color: #646970;
+}
+
+.parrotposter-pipeline-modal__footer {
+	display: flex;
+	justify-content: flex-end;
+	gap: 8px;
+}
+
+.parrotposter-modal--pipeline .parrotposter-col-socials {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 6px;
+	align-items: center;
+}
+
+.parrotposter-modal--pipeline .parrotposter-col-social-chip {
+	position: relative;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 28px;
+	height: 28px;
+	border-radius: 6px;
+	background: #f0f0f1;
+	text-decoration: none;
+}
+
+.parrotposter-modal--pipeline .parrotposter-col-social {
+	display: block;
+	width: 16px;
+	height: 16px;
+}
+
+.parrotposter-modal--pipeline .parrotposter-col-social-chip.is-pending .parrotposter-col-social {
+	opacity: 0.4;
+}
+
+.parrotposter-modal--pipeline .parrotposter-col-social-chip.is-fail:after {
+	content: "";
+	position: absolute;
+	top: 2px;
+	right: 2px;
+	width: 6px;
+	height: 6px;
+	border-radius: 50%;
+	background: #d63638;
+	box-shadow: 0 0 0 1px #fff;
+}

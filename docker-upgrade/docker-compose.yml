@@ -1,0 +1,75 @@
+# Scratch WordPress for plugin upgrade tests.
+# Intentionally does NOT bind-mount the plugin-wordpress working tree.
+# Plugin ZIPs are installed into the named volume only (see meta/local-dev/upgrade/).
+#
+# Usage (from this directory):
+#   docker compose --env-file .env up -d
+# Or via meta/local-dev/upgrade/up.sh
+
+name: pp-wp-upgrade
+
+services:
+  wordpress:
+    image: wordpress:${WORDPRESS_IMAGE_TAG:-php8.1-apache}
+    restart: unless-stopped
+    depends_on:
+      - db
+    ports:
+      - "127.0.0.1:${WP_HTTP_PORT:-10122}:80"
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_NAME: ${DB_NAME:-wordpress}
+      WORDPRESS_DB_USER: ${DB_USER:-wordpress}
+      WORDPRESS_DB_PASSWORD: ${DB_PASSWORD:-wordpress}
+      PARROTPOSTER_DOMAINS: ${PARROTPOSTER_DOMAINS:-https://pp.l2.vettich.ru}
+      PARROTPOSTER_LOG_ENABLED: ${PARROTPOSTER_LOG_ENABLED:-true}
+      WORDPRESS_CONFIG_EXTRA: |
+        define('PARROTPOSTER_DOMAINS', getenv('PARROTPOSTER_DOMAINS'));
+        define('PARROTPOSTER_LOG_ENABLED', getenv('PARROTPOSTER_LOG_ENABLED'));
+    volumes:
+      - wp_upgrade_data:/var/www/html
+    extra_hosts:
+      - "pp.l2.vettich.ru:82.146.42.244"
+    networks:
+      - pp-upgrade
+
+  db:
+    image: mariadb:10.11
+    restart: unless-stopped
+    environment:
+      MARIADB_DATABASE: ${DB_NAME:-wordpress}
+      MARIADB_USER: ${DB_USER:-wordpress}
+      MARIADB_PASSWORD: ${DB_PASSWORD:-wordpress}
+      MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-root}
+    volumes:
+      - db_upgrade_data:/var/lib/mysql
+    networks:
+      - pp-upgrade
+
+  # One-shot helper: docker compose run --rm wpcli <args>
+  wpcli:
+    image: wordpress:cli-php8.1
+    depends_on:
+      - wordpress
+      - db
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_NAME: ${DB_NAME:-wordpress}
+      WORDPRESS_DB_USER: ${DB_USER:-wordpress}
+      WORDPRESS_DB_PASSWORD: ${DB_PASSWORD:-wordpress}
+    volumes:
+      - wp_upgrade_data:/var/www/html
+    networks:
+      - pp-upgrade
+    user: "33:33"
+    entrypoint: ["wp", "--path=/var/www/html"]
+    profiles:
+      - cli
+
+volumes:
+  wp_upgrade_data:
+  db_upgrade_data:
+
+networks:
+  pp-upgrade:
+    name: pp-wp-upgrade

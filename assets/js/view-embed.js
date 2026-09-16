@@ -126,6 +126,12 @@
 	var ppViewportBroadcastOn = false;
 	var ppViewportTimer = null;
 	var ppViewportRaf = 0;
+	var ppModalSavedScrollY = null;
+
+	function pp_admin_bar_height() {
+		var adminBar = document.getElementById('wpadminbar');
+		return adminBar ? adminBar.offsetHeight : 0;
+	}
 
 	function pp_collect_viewport_for_iframe() {
 		var iframe = document.getElementById('pp-iframe');
@@ -134,15 +140,18 @@
 		}
 		var rect = iframe.getBoundingClientRect();
 		var iframeAbsTop = rect.top + window.scrollY;
-		var adminBar = document.getElementById('wpadminbar');
-		var adminBarHeight = adminBar ? adminBar.offsetHeight : 0;
+		var chrome = pp_admin_bar_height();
+		var visibleTop = Math.max(rect.top, chrome);
+		var visibleBottom = Math.min(rect.bottom, window.innerHeight);
+		var visibleHeight = Math.max(0, visibleBottom - visibleTop);
 		return {
 			scrollY: window.scrollY,
-			viewportHeight: window.innerHeight,
+			viewportHeight: visibleHeight,
 			viewportWidth: window.innerWidth,
 			iframeAbsTop: iframeAbsTop,
 			iframeLeft: rect.left,
-			adminBarHeight: adminBarHeight,
+			adminBarHeight: chrome,
+			vpTop: visibleTop - rect.top,
 		};
 	}
 
@@ -225,6 +234,229 @@
 					});
 				});
 		},
+		reconnect_plugin: function () {
+			var ajaxUrl = typeof ajaxurl !== 'undefined' ? ajaxurl : '/wp-admin/admin-ajax.php';
+			var nonce = PP_AUTH2_NONCE || '';
+			fetch(ajaxUrl, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+				body: new URLSearchParams([
+					['action', 'parrotposter_reconnect_plugin'],
+					['parrotposter[nonce]', nonce],
+				]).toString(),
+				credentials: 'same-origin',
+			})
+				.then(function (r) {
+					return r.json();
+				})
+				.then(function (res) {
+					pp_send_message('reconnect_plugin_result', {
+						ok: !!(res && res.success),
+						error: res && res.error ? res.error : null,
+					});
+				})
+				.catch(function () {
+					pp_send_message('reconnect_plugin_result', {
+						ok: false,
+						error: 'network',
+					});
+				});
+		},
+		// WP-11: source-descriptor-root / -frame / field-schema over this bridge —
+		// PP backend is unreachable from the site, so the embedded front-app iframe
+		// asks the parent admin page to fetch them locally instead (DEC-002-06 D3).
+		// Same request/response pattern as request_token_refresh above.
+		source_descriptor_root: function () {
+			var ajaxUrl = typeof ajaxurl !== 'undefined' ? ajaxurl : '/wp-admin/admin-ajax.php';
+			var nonce = PP_AUTH2_NONCE || '';
+			fetch(ajaxUrl, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+				body: new URLSearchParams([
+					['action', 'parrotposter_bridge_source_descriptor_root'],
+					['parrotposter[nonce]', nonce],
+				]).toString(),
+				credentials: 'same-origin',
+			})
+				.then(function (r) {
+					return r.json();
+				})
+				.then(function (res) {
+					pp_send_message('source_descriptor_root_result', {
+						descriptor: res && !res.error ? res : null,
+						error: res && res.error ? res.error : null,
+					});
+				})
+				.catch(function () {
+					pp_send_message('source_descriptor_root_result', {
+						descriptor: null,
+						error: 'network',
+					});
+				});
+		},
+		source_descriptor_frame: function (data) {
+			var ajaxUrl = typeof ajaxurl !== 'undefined' ? ajaxurl : '/wp-admin/admin-ajax.php';
+			var nonce = PP_AUTH2_NONCE || '';
+			fetch(ajaxUrl, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+				body: new URLSearchParams([
+					['action', 'parrotposter_bridge_source_descriptor_frame'],
+					['parrotposter[nonce]', nonce],
+					['selections_prefix', JSON.stringify((data && data.selections_prefix) || [])],
+				]).toString(),
+				credentials: 'same-origin',
+			})
+				.then(function (r) {
+					return r.json();
+				})
+				.then(function (res) {
+					pp_send_message('source_descriptor_frame_result', {
+						descriptor: res && res.descriptor ? res.descriptor : null,
+						error: res && res.error ? res.error : null,
+					});
+				})
+				.catch(function () {
+					pp_send_message('source_descriptor_frame_result', {
+						descriptor: null,
+						error: 'network',
+					});
+				});
+		},
+		field_schema: function (data) {
+			var ajaxUrl = typeof ajaxurl !== 'undefined' ? ajaxurl : '/wp-admin/admin-ajax.php';
+			var nonce = PP_AUTH2_NONCE || '';
+			var params = [
+				['action', 'parrotposter_bridge_field_schema'],
+				['parrotposter[nonce]', nonce],
+				['source_path', JSON.stringify((data && data.source_path) || [])],
+			];
+			// Optional PP UI locale — labels only (same as GET /fields?locale=).
+			var locale = (data && (data.locale || data.lang)) || '';
+			if (locale) {
+				params.push(['locale', String(locale)]);
+			}
+			fetch(ajaxUrl, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+				body: new URLSearchParams(params).toString(),
+				credentials: 'same-origin',
+			})
+				.then(function (r) {
+					return r.json();
+				})
+				.then(function (res) {
+					pp_send_message('field_schema_result', {
+						fields: res && res.fields ? res.fields : [],
+						sections: res && res.sections ? res.sections : [],
+						filter_capabilities: res && res.filter_capabilities ? res.filter_capabilities : null,
+						error: res && res.error ? res.error : null,
+					});
+				})
+				.catch(function () {
+					pp_send_message('field_schema_result', {
+						fields: [],
+						sections: [],
+						filter_capabilities: null,
+						error: 'network',
+					});
+				});
+		},
+		notify_contract: function (data) {
+			var ajaxUrl = typeof ajaxurl !== 'undefined' ? ajaxurl : '/wp-admin/admin-ajax.php';
+			var nonce = PP_AUTH2_NONCE || '';
+			var snapshot = {};
+			if (data && typeof data === 'object') {
+				Object.keys(data).forEach(function (key) {
+					if (key !== 'type') {
+						snapshot[key] = data[key];
+					}
+				});
+			}
+			fetch(ajaxUrl, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+				body: new URLSearchParams([
+					['action', 'parrotposter_bridge_notify_contract'],
+					['parrotposter[nonce]', nonce],
+					['snapshot', JSON.stringify(snapshot)],
+				]).toString(),
+				credentials: 'same-origin',
+			})
+				.then(function (r) {
+					return r.json();
+				})
+				.then(function (res) {
+					pp_send_message('notify_contract_result', {
+						ok: !!(res && res.ok),
+						error: res && res.error ? res.error : null,
+					});
+				})
+				.catch(function () {
+					pp_send_message('notify_contract_result', {
+						ok: false,
+						error: 'network',
+					});
+				});
+		},
+		// Latest published items for the template-preview picker. Same reason as
+		// field_schema: PP backend often cannot reach callback_url, so the iframe
+		// asks the parent admin page to run WP_Query locally (DEC-002-06 D3).
+		list_preview_items: function (data) {
+			var ajaxUrl = typeof ajaxurl !== 'undefined' ? ajaxurl : '/wp-admin/admin-ajax.php';
+			var nonce = PP_AUTH2_NONCE || '';
+			var params = [
+				['action', 'parrotposter_bridge_list_preview_items'],
+				['parrotposter[nonce]', nonce],
+				['source_path', JSON.stringify((data && data.source_path) || [])],
+			];
+			if (data && data.limit != null) {
+				params.push(['limit', String(data.limit)]);
+			}
+			if (data && data.offset != null) {
+				params.push(['offset', String(data.offset)]);
+			}
+			if (data && data.filter) {
+				params.push([
+					'filter',
+					typeof data.filter === 'string' ? data.filter : JSON.stringify(data.filter),
+				]);
+			}
+			if (data && data.required_fields) {
+				params.push([
+					'required_fields',
+					typeof data.required_fields === 'string'
+						? data.required_fields
+						: JSON.stringify(data.required_fields),
+				]);
+			}
+			if (data && data.pipeline_id) {
+				params.push(['pipeline_id', String(data.pipeline_id)]);
+			}
+			fetch(ajaxUrl, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+				body: new URLSearchParams(params).toString(),
+				credentials: 'same-origin',
+			})
+				.then(function (r) {
+					return r.json();
+				})
+				.then(function (res) {
+					pp_send_message('list_preview_items_result', {
+						items: res && res.items ? res.items : [],
+						next_offset: res && res.next_offset != null ? res.next_offset : null,
+						error: res && res.error ? res.error : null,
+					});
+				})
+				.catch(function () {
+					pp_send_message('list_preview_items_result', {
+						items: [],
+						next_offset: null,
+						error: 'network',
+					});
+				});
+		},
 		resize: function (data) {
 			var iframe = document.getElementById('pp-iframe');
 			if (iframe) {
@@ -236,6 +468,15 @@
 		modal_open: function () {
 			pp_show_parent_backdrop();
 			pp_start_viewport_broadcast();
+			ppModalSavedScrollY = window.scrollY;
+			var iframe = document.getElementById('pp-iframe');
+			if (iframe) {
+				var rect = iframe.getBoundingClientRect();
+				var targetTop = pp_admin_bar_height() + 16;
+				if (rect.top > targetTop) {
+					window.scrollBy(0, rect.top - targetTop);
+				}
+			}
 			document.documentElement.style.overflow = 'hidden';
 			var payload = pp_collect_viewport_for_iframe();
 			if (!payload) {
@@ -246,6 +487,7 @@
 					iframeAbsTop: window.scrollY,
 					iframeLeft: 0,
 					adminBarHeight: 0,
+					vpTop: 0,
 				});
 				return;
 			}
@@ -254,6 +496,10 @@
 		modal_close: function () {
 			pp_hide_parent_backdrop();
 			document.documentElement.style.overflow = '';
+			if (ppModalSavedScrollY !== null) {
+				window.scrollTo(0, ppModalSavedScrollY);
+				ppModalSavedScrollY = null;
+			}
 			pp_send_message('modal_close_result', {});
 		},
 		prepare_callback: function () {
@@ -287,7 +533,7 @@
 				.then(function (resp) {
 					return resp.text().then(function (txt) {
 						if (txt === 'ok') {
-							location.href = cfg.profilePageUrl || '';
+							location.href = cfg.accountsPageUrl || '';
 						} else {
 							pp_send_message('login_error');
 						}

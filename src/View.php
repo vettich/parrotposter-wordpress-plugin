@@ -37,7 +37,7 @@ class View
 	 */
 	private static function iframe_config(string $endpoint): string
 	{
-		$session = Api::issue_session_key();
+		$session = Api::iframe_session_key();
 		$token = '';
 		if (empty($session['error']) && !empty($session['token'])) {
 			$token = $session['token'];
@@ -57,6 +57,7 @@ class View
 			'token' => $token,
 			'lang' => $lang,
 			'sitePage' => $site_page,
+			'pluginId' => Settings::plugin_id(),
 			'moduleReadOnly' => 0,
 			'pp_unavailable' => $pp_unavailable,
 			'debug' => Env::iframe_debug(),
@@ -96,7 +97,7 @@ class View
 				'authNonce' => wp_create_nonce('parrotposter_nonce'),
 				'menuItems' => Menu::get_items(),
 				'adminPostUrl' => admin_url('admin-post.php'),
-				'profilePageUrl' => admin_url('admin.php?page=parrotposter_profile'),
+				'accountsPageUrl' => admin_url('admin.php?page=parrotposter_accounts'),
 				'iframeInit' => $iframe_init,
 			]
 		);

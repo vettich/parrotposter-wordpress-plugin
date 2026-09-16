@@ -21,6 +21,8 @@ class LocalQueue
 
 	public const OP_DELETE = 'delete';
 
+	public const OP_PIPELINE_EVENT_PREFIX = 'pe_';
+
 	private const LOCK_LEASE_SECONDS = 120;
 
 	private const MAX_ATTEMPTS = 4;
@@ -109,6 +111,119 @@ class LocalQueue
 		self::schedule_wake_on_shutdown();
 	}
 
+	/**
+	 * Deferred pipeline push event (pluginPipelineEventIngest variables).
+	 *
+	 * CREATED/DELETED: coalesce only pending rows of the same event type (never touch
+	 * processing). UPDATED: coalesce pending UPDATED for this post+pipeline, then insert.
+	 * Each new logical delivery must already carry idempotencyKey in $variables.
+	 *
+	 * @param array<string, mixed> $variables
+	 */
+	public static function enqueue(string $operation, array $variables, int $wp_post_id = 0): void
+	{
+		if ($operation !== 'pipeline_event' || !is_array($variables)) {
+			return;
+		}
+
+		$pipeline_id = isset($variables['pipelineId']) ? (string) $variables['pipelineId'] : '';
+		if ($pipeline_id === '') {
+			return;
+		}
+
+		$event_type = isset($variables['eventType']) ? (string) $variables['eventType'] : '';
+		$op = self::pipeline_event_operation($pipeline_id, $event_type);
+		if ($op === '') {
+			return;
+		}
+
+		if ($wp_post_id <= 0 && !empty($variables['sourceItemId']) && is_string($variables['sourceItemId'])) {
+			$parts = explode(':', $variables['sourceItemId'], 2);
+			if (count($parts) === 2) {
+				$wp_post_id = (int) $parts[1];
+			}
+		}
+
+		if (empty($variables['idempotencyKey']) || !is_string($variables['idempotencyKey'])) {
+			$variables['idempotencyKey'] = self::new_pipeline_idempotency_key();
+		}
+
+		PP::log([
+			'LocalQueue::enqueue_pipeline_event',
+			'wp_post_id' => $wp_post_id,
+			'pipeline_id' => $pipeline_id,
+			'event_type' => $event_type,
+			'operation' => $op,
+			'idempotency_key' => $variables['idempotencyKey'],
+		]);
+
+		$json = wp_json_encode($variables, JSON_UNESCAPED_UNICODE);
+		if ($json === false) {
+			$json = '{}';
+		}
+
+		// Drop pending/failed same-type rows only — never mutate a processing delivery.
+		self::remove_op_unless_processing($op, $wp_post_id);
+		if (self::has_active_op($wp_post_id, $op)) {
+			// processing row still holds UNIQUE(wp_post_id, operation) — uniquify.
+			$op = $op . 'x' . substr(md5(uniqid((string) mt_rand(), true)), 0, 6);
+		}
+		self::insert_pending($wp_post_id, $op, $json);
+		self::schedule_wake_on_shutdown();
+	}
+
+	/**
+	 * @return string empty if event_type unknown
+	 */
+	private static function pipeline_event_operation(string $pipeline_id, string $event_type): string
+	{
+		$suffix = self::pipeline_event_suffix($event_type);
+		if ($suffix === '') {
+			return '';
+		}
+		$compact = str_replace('-', '', $pipeline_id);
+
+		return self::OP_PIPELINE_EVENT_PREFIX . substr($compact, 0, 17) . '_' . $suffix;
+	}
+
+	private static function pipeline_event_suffix(string $event_type): string
+	{
+		switch (strtoupper($event_type)) {
+			case 'CREATED':
+				return 'C';
+			case 'UPDATED':
+				return 'U';
+			case 'DELETED':
+				return 'D';
+			default:
+				return '';
+		}
+	}
+
+	private static function new_pipeline_idempotency_key(): string
+	{
+		if (function_exists('wp_generate_uuid4')) {
+			return wp_generate_uuid4();
+		}
+
+		return sprintf(
+			'%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
+			mt_rand(0, 0xffff),
+			mt_rand(0, 0xffff),
+			mt_rand(0, 0xffff),
+			mt_rand(0, 0x0fff) | 0x4000,
+			mt_rand(0, 0x3fff) | 0x8000,
+			mt_rand(0, 0xffff),
+			mt_rand(0, 0xffff),
+			mt_rand(0, 0xffff)
+		);
+	}
+
+	public static function is_pipeline_event_operation(string $operation): bool
+	{
+		return strncmp($operation, self::OP_PIPELINE_EVENT_PREFIX, strlen(self::OP_PIPELINE_EVENT_PREFIX)) === 0;
+	}
+
 	private static function has_pending_create(int $wp_post_id): bool
 	{
 		global $wpdb;
@@ -140,6 +255,41 @@ class LocalQueue
 			],
 			['%d', '%s', '%s']
 		);
+	}
+
+	/**
+	 * Remove pending/failed rows for an operation; leave processing alone.
+	 */
+	private static function remove_op_unless_processing(string $op, int $wp_post_id): void
+	{
+		global $wpdb;
+
+		$t = self::table();
+		$wpdb->query(
+			$wpdb->prepare(
+				"DELETE FROM {$t} WHERE wp_post_id = %d AND operation = %s AND status IN (%s, %s)",
+				$wp_post_id,
+				$op,
+				self::STATUS_PENDING,
+				self::STATUS_FAILED
+			)
+		);
+	}
+
+	private static function has_active_op(int $wp_post_id, string $op): bool
+	{
+		global $wpdb;
+
+		$t = self::table();
+		$id = $wpdb->get_var(
+			$wpdb->prepare(
+				"SELECT id FROM {$t} WHERE wp_post_id = %d AND operation = %s LIMIT 1",
+				$wp_post_id,
+				$op
+			)
+		);
+
+		return (int) $id > 0;
 	}
 
 	private static function recover_stale_processing(): void
@@ -235,6 +385,30 @@ class LocalQueue
 				self::STATUS_FAILED,
 				self::STATUS_FAILED,
 				self::STATUS_PENDING
+			)
+		);
+	}
+
+	/**
+	 * Plain INSERT for pipeline events (caller must free the unique slot first).
+	 * Never updates an existing processing row.
+	 */
+	private static function insert_pending(int $wp_post_id, string $operation, string $payload): void
+	{
+		global $wpdb;
+
+		$t = self::table();
+		$now = self::now_utc_for_db();
+		$wpdb->query(
+			$wpdb->prepare(
+				"INSERT INTO {$t} (wp_post_id, operation, payload, status, attempts, next_attempt_at, created_at, locked_until)
+				VALUES (%d, %s, %s, %s, 0, %s, %s, NULL)",
+				$wp_post_id,
+				$operation,
+				$payload,
+				self::STATUS_PENDING,
+				$now,
+				$now
 			)
 		);
 	}
@@ -501,6 +675,8 @@ class LocalQueue
 				self::run_delete($wp_post_id);
 			} elseif ($op === self::OP_CREATE) {
 				self::run_create($wp_post_id);
+			} elseif (self::is_pipeline_event_operation($op)) {
+				self::run_pipeline_event((string) ($row['payload'] ?? '{}'), $wp_post_id);
 			} else {
 				$wpdb->update(
 					$t,
@@ -579,6 +755,90 @@ class LocalQueue
 		Scheduler::update_pp_posts_for_wp_post($wp_post);
 	}
 
+	private static function run_pipeline_event(string $payload_json, int $wp_post_id = 0): void
+	{
+		$variables = json_decode($payload_json, true);
+		if (!is_array($variables)) {
+			throw new \RuntimeException('invalid pipeline event payload');
+		}
+
+		if ($wp_post_id <= 0) {
+			$wp_post_id = self::wp_post_id_from_pipeline_event_variables($variables);
+		}
+
+		$res = Api::graphql_mutation('pluginPipelineEventIngest', $variables, [
+			'curl_timeout' => 3,
+			'curl_connect_timeout' => 2,
+		]);
+		if (!empty($res['error'])) {
+			if (self::is_pipeline_not_found_error($res)) {
+				$pipeline_id = isset($variables['pipelineId']) ? (string) $variables['pipelineId'] : '';
+				if ($pipeline_id !== '') {
+					Settings::remove_pipeline_id($pipeline_id);
+				}
+				PP::log([
+					'LocalQueue::run_pipeline_event',
+					'pipeline_not_found_dropped',
+					'pipeline_id' => $pipeline_id,
+					'wp_post_id' => $wp_post_id,
+				]);
+
+				// Treat as success: drop the queue row (caller deletes) and stop enqueueing
+				// this ghost pipeline on future saves.
+				return;
+			}
+
+			throw new \RuntimeException((string) ($res['error']['msg'] ?? 'pipeline event failed'));
+		}
+
+		PushEventService::apply_side_effects_after_ingest($wp_post_id, $variables, $res);
+	}
+
+	/**
+	 * PP soft-deleted / missing pipeline → ingest returns accepted=false with pipeline.not_found.
+	 *
+	 * @param array{error?: array{msg?: string, errors?: list<array{message?: string, code?: string}>}} $res
+	 */
+	private static function is_pipeline_not_found_error(array $res): bool
+	{
+		$msg = strtolower((string) ($res['error']['msg'] ?? ''));
+		if ($msg === 'pipeline.not_found' || strpos($msg, 'pipeline.not_found') !== false) {
+			return true;
+		}
+
+		$errors = $res['error']['errors'] ?? null;
+		if (!is_array($errors)) {
+			return false;
+		}
+
+		foreach ($errors as $err) {
+			if (!is_array($err)) {
+				continue;
+			}
+			$err_msg = strtolower((string) ($err['message'] ?? ''));
+			if ($err_msg === 'pipeline.not_found' || strpos($err_msg, 'pipeline.not_found') !== false) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * @param array<string, mixed> $variables
+	 */
+	private static function wp_post_id_from_pipeline_event_variables(array $variables): int
+	{
+		if (!empty($variables['sourceItemId']) && is_string($variables['sourceItemId'])) {
+			$parts = explode(':', $variables['sourceItemId'], 2);
+			if (count($parts) === 2) {
+				return (int) $parts[1];
+			}
+		}
+
+		return 0;
+	}
+
 	private static function purge_old_failed_records(): void
 	{
 		global $wpdb;
@@ -614,6 +874,17 @@ class LocalQueue
 		$need_wake = self::is_wake_pending() || self::has_pending_ready();
 		if (!$need_wake) {
 			return;
+		}
+
+		// Pipeline push events use site_to_pp HMAC — flush locally instead of relying on
+		// post-queue callback (admin-ajax may be behind nginx auth-request on dev stacks).
+		if (Settings::site_to_pp_secret() !== '') {
+			self::handle_http_process(true);
+			if (!self::has_pending_ready()) {
+				self::set_wake_pending(false);
+
+				return;
+			}
 		}
 
 		if (empty(Options::token())) {
@@ -718,7 +989,11 @@ class LocalQueue
 		}
 
 		$payload_display = '';
-		if ($operation === self::OP_UPDATE && $payload !== '' && $payload !== '{}') {
+		if (
+			($operation === self::OP_UPDATE || self::is_pipeline_event_operation($operation))
+			&& $payload !== ''
+			&& $payload !== '{}'
+		) {
 			$payload_display = $payload;
 			if (strlen($payload_display) > 200) {
 				$payload_display = substr($payload_display, 0, 200) . '…';
@@ -755,6 +1030,10 @@ class LocalQueue
 			case self::OP_DELETE:
 				return _x('Delete', 'local queue operation', 'parrotposter');
 			default:
+				if (self::is_pipeline_event_operation($operation)) {
+					return _x('Pipeline event', 'local queue operation', 'parrotposter');
+				}
+
 				return $operation;
 		}
 	}
@@ -940,6 +1219,34 @@ class LocalQueue
 
 	public static function run_wake_on_shutdown(): void
 	{
+		if (function_exists('fastcgi_finish_request')) {
+			@fastcgi_finish_request();
+
+			if (Settings::site_to_pp_secret() !== '' || !empty(Options::token())) {
+				$result = self::handle_http_process(true);
+				PP::log([
+					'LocalQueue::run_self_flush_on_shutdown',
+					'processed' => $result['processed'] ?? 0,
+					'has_more' => $result['has_more'] ?? false,
+				]);
+			}
+
+			return;
+		}
+
+		// Apache/mod_php (no fastcgi_finish_request): pipeline mode can flush via site_to_pp
+		// GraphQL without post-queue callback (often blocked by edge auth on admin-ajax).
+		if (Settings::site_to_pp_secret() !== '') {
+			$result = self::handle_http_process(true);
+			PP::log([
+				'LocalQueue::run_self_flush_on_shutdown_no_fpm',
+				'processed' => $result['processed'] ?? 0,
+				'has_more' => $result['has_more'] ?? false,
+			]);
+
+			return;
+		}
+
 		if (empty(Options::token())) {
 			return;
 		}

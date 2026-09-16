@@ -33,19 +33,26 @@ class PP
 			return;
 		}
 
+		$log_dir = PARROTPOSTER_PLUGIN_DIR . 'logs';
+		if (!is_dir($log_dir)) {
+			mkdir($log_dir, 0777, true);
+		}
+
 		$log = [
 			'at' => date(DATE_ATOM),
 			'data' => $data,
 		];
 		$s = print_r($log, true);
-		error_log($s, 3, PARROTPOSTER_PLUGIN_DIR . 'var.log');
+		error_log($s, 3, $log_dir . '/var.log');
 	}
 
 	public function register()
 	{
 		add_filter('cron_schedules', [__CLASS__, 'add_cron_schedules']);
+		add_filter('cron_schedules', [OutboundTaskWorker::class, 'register_cron_schedule']);
 		add_action('parrotposter_retry_local_queue', [LocalQueue::class, 'retry_via_cron']);
 		add_action('parrotposter_refresh_domains', [DomainSelector::class, 'cron_refresh_domains']);
+		add_action(OutboundTaskWorker::CRON_HOOK, [OutboundTaskWorker::class, 'run_cron_tick']);
 
 		add_action('plugins_loaded', [$this, 'load_textdomain']);
 		add_action('admin_enqueue_scripts', [$this, 'register_scripts']);
@@ -57,8 +64,16 @@ class PP
 		add_action('add_meta_boxes', [$this, 'post_meta_box']);
 
 		AdminAjaxPost::init(false);
+		PluginConnect::init();
 		Install::init();
 		Scheduler::init();
+		PipelineHooks::init();
+		OutboundTaskDispatch::init();
+
+		// Drop legacy heartbeat cron if present (last_seen is updated on real machine auth only).
+		wp_clear_scheduled_hook('parrotposter_plugin_heartbeat');
+
+		add_action('rest_api_init', [WireProtocol::class, 'register_rest_routes']);
 
 		register_activation_hook(PARROTPOSTER_PLUGIN_FILE, [$this, 'activation']);
 		register_deactivation_hook(PARROTPOSTER_PLUGIN_FILE, [$this, 'deactivation']);
@@ -67,6 +82,7 @@ class PP
 	public static function activation()
 	{
 		add_filter('cron_schedules', [__CLASS__, 'add_cron_schedules']);
+		add_filter('cron_schedules', [OutboundTaskWorker::class, 'register_cron_schedule']);
 		Install::install();
 		if (!wp_next_scheduled('parrotposter_retry_local_queue')) {
 			wp_schedule_event(time() + 60, 'parrotposter_every_minute', 'parrotposter_retry_local_queue');
@@ -74,12 +90,21 @@ class PP
 		if (!wp_next_scheduled('parrotposter_refresh_domains')) {
 			wp_schedule_event(time() + 120, 'hourly', 'parrotposter_refresh_domains');
 		}
+		OutboundTaskWorker::ensure_scheduled();
+
+		// Our REST routes are registered on rest_api_init, which has already
+		// fired by this point in the activation request — safe to flush now
+		// so /wp-json/* is routable immediately, without waiting on the admin
+		// to re-save Settings > Permalinks.
+		flush_rewrite_rules();
 	}
 
 	public static function deactivation()
 	{
 		wp_clear_scheduled_hook('parrotposter_retry_local_queue');
 		wp_clear_scheduled_hook('parrotposter_refresh_domains');
+		wp_clear_scheduled_hook('parrotposter_plugin_heartbeat');
+		OutboundTaskWorker::clear_scheduled();
 	}
 
 	/**
@@ -196,6 +221,11 @@ class PP
 							} else {
 								Options::set_user_data($uid, $token);
 								$is_authorized = true;
+								// Force a fresh bind so a site previously disabled on PP gets reactivated
+								// on relogin (silent_bind() would otherwise short-circuit on stale local
+								// "connected" state).
+								Settings::disconnect(false);
+								PluginConnect::silent_bind();
 								wp_safe_redirect(
 									remove_query_arg(
 										['code', 'state', 'error', 'error_description'],
@@ -244,6 +274,10 @@ class PP
 	public function admin_page()
 	{
 		$page = isset($_GET['page']) ? sanitize_text_field(wp_unslash($_GET['page'])) : 'parrotposter';
+		if ($page === 'parrotposter_profile') {
+			wp_safe_redirect(admin_url('admin.php?page=parrotposter_settings'));
+			exit;
+		}
 		$view = isset($_GET['view']) ? sanitize_text_field(wp_unslash($_GET['view'])) : 'index';
 		$prefix = 'parrotposter_';
 		if (substr($page, 0, strlen($prefix)) == $prefix) {

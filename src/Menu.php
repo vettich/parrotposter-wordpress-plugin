@@ -14,26 +14,34 @@ class Menu
 			self::$items = [];
 			return;
 		}
+
+		$scheduler_or_pipelines = Settings::get_migration_mode() === Settings::MIGRATION_MODE_PIPELINE
+			? [
+				'id' => 'parrotposter_pipelines',
+				'label' => _x('Automation', 'menu', 'parrotposter'),
+			]
+			: [
+				'id' => 'parrotposter_scheduler',
+				'label' => _x('Scheduler', 'menu', 'parrotposter'),
+			];
+
 		self::$items = [
 			[
 				'id' => 'parrotposter_posts',
 				'label' => _x('Posts', 'menu', 'parrotposter'),
 			],
+			$scheduler_or_pipelines,
 			[
 				'id' => 'parrotposter_accounts',
 				'label' => _x('Accounts', 'menu', 'parrotposter'),
-			],
-			[
-				'id' => 'parrotposter_scheduler',
-				'label' => _x('Scheduler', 'menu', 'parrotposter'),
 			],
 			[
 				'id' => 'parrotposter_tariffs',
 				'label' => _x('Tariffs', 'menu', 'parrotposter'),
 			],
 			[
-				'id' => 'parrotposter_profile',
-				'label' => _x('Profile', 'menu', 'parrotposter'),
+				'id' => 'parrotposter_settings',
+				'label' => _x('Settings', 'menu', 'parrotposter'),
 			],
 			[
 				'id' => 'parrotposter_help',

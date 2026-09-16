@@ -54,6 +54,9 @@ class Install
 			do_action('parrotposter_updated');
 		}
 
+		PluginConnect::maybe_auto_bind();
+		PluginConnect::maybe_sync_remote_status();
+
 		if (!$ver) {
 			add_option(self::VERSION_OPTION, PARROTPOSTER_DB_VERSION);
 		}
@@ -81,6 +84,8 @@ class Install
 		if (!wp_next_scheduled('parrotposter_refresh_domains')) {
 			wp_schedule_event(time() + 120, 'hourly', 'parrotposter_refresh_domains');
 		}
+
+		OutboundTaskWorker::ensure_scheduled();
 
 		delete_transient('parrotposter_installing');
 
@@ -152,7 +157,7 @@ class Install
 			CREATE TABLE {$wpdb->prefix}parrotposter_local_queue (
 				id bigint(20) unsigned NOT NULL auto_increment,
 				wp_post_id bigint(20) unsigned NOT NULL,
-				operation varchar(20) NOT NULL,
+				operation varchar(32) NOT NULL,
 				payload longtext NOT NULL,
 				status varchar(20) NOT NULL default 'pending',
 				attempts int NOT NULL default 0,
@@ -164,7 +169,16 @@ class Install
 				KEY idx_lq_processing (status, locked_until),
 				UNIQUE KEY idx_lq_dedup (wp_post_id, operation)
 			) $charset_collate;
+
+			CREATE TABLE {$wpdb->prefix}parrotposter_exclude_ids (
+				pipeline_id varchar(64) NOT NULL,
+				source_item_id varchar(191) NOT NULL,
+				PRIMARY KEY (pipeline_id, source_item_id),
+				KEY idx_exclude_pipeline (pipeline_id)
+			) $charset_collate;
 		";
+
+		$tables .= OutboundTaskQueue::schema_sql();
 
 		return $tables;
 	}
@@ -177,6 +191,8 @@ class Install
 			"{$wpdb->prefix}parrotposter_autoposting",
 			"{$wpdb->prefix}parrotposter_posts",
 			"{$wpdb->prefix}parrotposter_local_queue",
+			"{$wpdb->prefix}parrotposter_exclude_ids",
+			OutboundTaskQueue::table(),
 		];
 	}
 
