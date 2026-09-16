@@ -54,9 +54,8 @@ class Install
 			do_action('parrotposter_updated');
 		}
 
-		if ($requires_update && Options::user_id() !== '') {
-			PluginConnect::silent_bind();
-		}
+		PluginConnect::maybe_auto_bind();
+		PluginConnect::maybe_sync_remote_status();
 
 		if (!$ver) {
 			add_option(self::VERSION_OPTION, PARROTPOSTER_DB_VERSION);

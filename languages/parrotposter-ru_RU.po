@@ -1925,6 +1925,10 @@ msgstr "Подключено"
 msgid "This site is linked to your ParrotPoster account and can exchange publishing data with the service."
 msgstr "Этот сайт привязан к вашему аккаунту ParrotPoster и может обмениваться данными для публикации с сервисом."
 
+#: views/settings/index.php:40
+msgid "This site is using HTTP. ParrotPoster will not call the site directly; publishing data is exchanged when WordPress polls the service. Enable HTTPS, then connect (or reconnect) the site so ParrotPoster can store the HTTPS address."
+msgstr "Сайт работает по HTTP. ParrotPoster не будет сам обращаться к сайту — обмен данными идёт, когда WordPress опрашивает сервис. Включите HTTPS и подключите сайт заново, чтобы в ParrotPoster сохранился HTTPS-адрес."
+
 #: views/settings/index.php:192
 msgid "WordPress to ParrotPoster"
 msgstr "Запросы с сайта"
@@ -2029,6 +2033,243 @@ msgstr "Начать с нуля"
 #: views/scheduler/migration-banner.php:89
 msgid "Switch to Pipelines"
 msgstr "Перейти на Pipelines"
+
+#: src/Api.php:694 src/Api.php:1211
+msgid "ParrotPoster authorization is required."
+msgstr "Требуется авторизация в ParrotPoster."
+
+#: src/Api.php:1217 src/Api.php:1311
+msgid "Invalid connection parameters."
+msgstr "Некорректные параметры подключения."
+
+#: src/Api.php:1250
+msgid "Connection code was not received."
+msgstr "Код подключения не получен."
+
+#: src/Api.php:1302
+msgid "Connection code is missing."
+msgstr "Код подключения не указан."
+
+#: src/Api.php:1305
+msgid "Connection code is too long."
+msgstr "Код подключения слишком длинный."
+
+#: src/Api.php:1353
+msgid "The server did not return connection data."
+msgstr "Сервер не вернул данные подключения."
+
+#: src/Api.php:1440
+msgid "The connection code is invalid or expired. Start the connection again."
+msgstr "Код подключения недействителен или истёк. Начните подключение заново."
+
+#: src/Api.php:1441
+msgid "Connection data does not match. Check the domain and callback URL."
+msgstr "Данные подключения не совпадают. Проверьте домен и callback URL."
+
+#: src/Api.php:1442
+msgid "The callback URL must use HTTPS."
+msgstr "Callback URL должен использовать HTTPS."
+
+#: src/Api.php:1443
+msgid "Invalid callback URL. Make sure the site is reachable over HTTPS and is not using a local address."
+msgstr "Некорректный callback URL. Убедитесь, что сайт доступен по HTTPS и не использует локальный адрес."
+
+#: src/Api.php:1449
+msgid "Could not complete the connection."
+msgstr "Не удалось завершить подключение."
+
+#: src/PluginConnect.php:205
+msgid "The site has been disconnected from ParrotPoster automation."
+msgstr "Сайт отключён от автоматизации ParrotPoster."
+
+#: src/PluginConnect.php:224
+msgid "Could not connect the site to ParrotPoster automation."
+msgstr "Не удалось подключить сайт к автоматизации ParrotPoster."
+
+#: src/PluginConnect.php:231
+msgid "The site is connected to ParrotPoster automation."
+msgstr "Сайт подключён к автоматизации ParrotPoster."
+
+#: assets/js/pipeline-migration.js
+msgid "Migration failed"
+msgstr "Миграция не удалась"
+
+#: assets/js/pipeline-migration.js
+msgid "Migration request failed"
+msgstr "Запрос миграции не выполнен"
+
+#: assets/js/pipeline-migration.js
+msgid "Revert failed"
+msgstr "Откат не удался"
+
+#: assets/js/pipeline-migration.js
+msgid "Revert request failed"
+msgstr "Запрос отката не выполнен"
+
+#: assets/js/pipeline-migration.js
+msgid "Request failed"
+msgstr "Запрос не выполнен"
+
+#: assets/js/pipeline-migration.js views/partials/migration-banner-pipeline-active.php:27
+msgid "You can restore this notice in Settings → Pipelines."
+msgstr "Вы можете снова показать это уведомление в Настройки → Pipelines."
+
+#: views/settings/index.php:228
+msgid "Not connected"
+msgstr "Не подключено"
+
+#: views/settings/index.php:233
+msgid "This site is not linked to ParrotPoster automation. Connect it to exchange publishing data with the service."
+msgstr "Этот сайт не привязан к автоматизации ParrotPoster. Подключите его, чтобы обмениваться данными для публикации с сервисом."
+
+#: views/settings/index.php:240
+msgid "Connect site"
+msgstr "Подключить сайт"
+
+#: views/scheduler/migration-banner.php:60
+#, php-format
+msgid "from %s"
+msgstr "из %s"
+
+#: src/AdminAjaxPost.php:408 src/MigrationService.php:34
+msgid "Select at least one template to migrate."
+msgstr "Выберите хотя бы один шаблон для миграции."
+
+#: views/partials/migration-banner-pipeline-active.php:36
+msgid "Pipeline mode is active"
+msgstr "Режим Pipeline активен"
+
+#: views/partials/migration-banner-pipeline-active.php:19
+msgid "You can revert to the legacy scheduler if the new pipelines do not work for you."
+msgstr "Вы можете вернуться к старому планировщику, если новые pipelines вам не подходят."
+
+#: src/View.php:65
+msgid "Loading…"
+msgstr "Загрузка…"
+
+#: src/View.php:66
+msgid "Reload"
+msgstr "Перезагрузить"
+
+#: src/View.php:69
+msgid "ParrotPoster is temporarily unavailable."
+msgstr "ParrotPoster временно недоступен."
+
+#: src/View.php:71
+msgid "Please try again later."
+msgstr "Попробуйте позже."
+
+#: src/ApiHelpers.php:114
+msgid "Max"
+msgstr "Max"
+
+#: src/ApiHelpers.php:226
+msgid "Preparing"
+msgstr "Подготовка"
+
+#: src/ApiHelpers.php:228
+msgid "Updating"
+msgstr "Обновление"
+
+#: src/ApiHelpers.php:230
+msgid "Deleting"
+msgstr "Удаление"
+
+#: src/fields/CommonType.php:89
+msgctxt "wp_post_field"
+msgid "Featured video"
+msgstr "Главное видео"
+
+#: src/fields/CommonType.php:93
+msgctxt "wp_post_field"
+msgid "Videos in content"
+msgstr "Видео в контенте"
+
+#: src/fields/CommonType.php:97
+msgctxt "wp_post_field"
+msgid "Attached videos"
+msgstr "Прикреплённые видео"
+
+#: src/fields/CommonType.php:101
+msgctxt "wp_post_field"
+msgid "GIFs in content"
+msgstr "GIF в контенте"
+
+#: src/fields/CommonType.php:105
+msgctxt "wp_post_field"
+msgid "Attached audio"
+msgstr "Прикреплённое аудио"
+
+#: src/fields/CommonType.php:109
+msgctxt "wp_post_field"
+msgid "Attached documents"
+msgstr "Прикреплённые документы"
+
+#: views/posts/publish-via-template.php:96
+msgid "You can publish via the auto-publish templates you have already created"
+msgstr "Вы можете опубликовать через уже созданные шаблоны автопубликации"
+
+#: views/posts/publish-via-template.php:110
+msgid "Warning"
+msgstr "Предупреждение"
+
+#: views/posts/publish-via-template.php:111
+msgid "The post has already been previously published via this template at :time:"
+msgstr "Пост уже был ранее опубликован через этот шаблон в :time:"
+
+#: views/posts/publish-via-template.php:118
+msgid "Publish via selected templates"
+msgstr "Опубликовать через выбранные шаблоны"
+
+#: views/posts/publish-via-template.php:127
+msgid "Or you can publish manually"
+msgstr "Или вы можете опубликовать вручную"
+
+#: views/posts/publish-via-template.php:130
+msgid "Publish manually"
+msgstr "Опубликовать вручную"
+
+#: views/posts/publish-via-template.php:142
+msgid "The post was created in ParrotPoster"
+msgstr "Пост создан в ParrotPoster"
+
+#: views/posts/publish-via-template.php:143
+msgid "You can check the post publication status in social networks in the ParrotPoster - Posts section."
+msgstr "Вы можете проверить статус публикации поста в социальных сетях в разделе ParrotPoster — Посты."
+
+#: views/posts/publish-via-template.php:150
+msgid "Something went wrong"
+msgstr "Что-то пошло не так"
+
+#: src/AdminAjaxPost.php:128
+msgid "Failed to open the web application."
+msgstr "Не удалось открыть веб-приложение."
+
+#: src/AdminAjaxPost.php:174
+msgid "Post type"
+msgstr "Тип записи"
+
+#: src/AdminAjaxPost.php:1111
+msgid "The post must be published before sending it to social networks."
+msgstr "Запись должна быть опубликована перед отправкой в социальные сети."
+
+#: src/Profile.php:36
+msgctxt "tariff time left"
+msgid "(left less than a day)"
+msgstr "(осталось менее суток)"
+
+#: views/outbound-poll-notice.php:24
+msgid "ParrotPoster outbound polling has not leased tasks recently. DISABLE_WP_CRON is on — WordPress will not run plugin cron by itself. Add a system cron that hits wp-cron.php at least every 5 minutes, for example:"
+msgstr "Исходящий опрос ParrotPoster давно не получал задачи. DISABLE_WP_CRON включён — WordPress не будет запускать cron плагина сам. Добавьте системный cron, который обращается к wp-cron.php не реже чем раз в 5 минут, например:"
+
+#: views/outbound-poll-notice.php:25
+msgid "ParrotPoster outbound polling has not leased tasks recently. Scheduled publishing via the plugin poll will stall until a lease succeeds."
+msgstr "Исходящий опрос ParrotPoster давно не получал задачи. Запланированная публикация через опрос плагина остановится, пока не удастся получить задачи."
+
+#: views/outbound-poll-notice.php:38
+#, php-format
+msgid "Last lease error: %s"
+msgstr "Последняя ошибка при получении задач: %s"
 
 #~ msgid ""
 #~ "For security reasons, Instagram may reset your password. Before "

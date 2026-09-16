@@ -55,6 +55,17 @@ class Settings
 	/** Last successful machine-path GraphQL response for site→PP traffic, stored in UTC. */
 	private const LAST_SITE_TO_PP_CALL_AT_KEY = 'parrotposter_last_site_to_pp_call_at';
 
+	/**
+	 * Set by {@see disconnect()} when `$prevent_auto_bind` is true (settings Disconnect,
+	 * PP disable, wire disconnect, logout) so {@see PluginConnect::maybe_auto_bind()} does
+	 * not undo an intentional unbind. Wipe-before-rebind passes false and clears it.
+	 * Cleared on a successful {@see PluginConnect::silent_bind()}.
+	 */
+	private const SKIP_AUTO_BIND_KEY = 'parrotposter_skip_auto_bind';
+
+	/** Callback URL last handed to completePluginBinding (`rest_url('parrotposter/v1')`). */
+	private const CALLBACK_URL_KEY = 'parrotposter_callback_url';
+
 	private const SECRET_CIPHER_PREFIX = 'PP1:';
 
 	public static function get_migration_mode(): string
@@ -137,9 +148,15 @@ class Settings
 	}
 
 	/**
-	 * Clear plugin binding secrets and pipeline cache (local disconnect).
+	 * Clear plugin binding secrets (local disconnect).
+	 *
+	 * @param bool $prevent_auto_bind When true (intentional unbind / PP disable), also drop
+	 *     pipeline cache (`migration_mode`, `pipeline_ids`, contracts) and mark the site so
+	 *     {@see PluginConnect::maybe_auto_bind()} will not reconnect it. When false
+	 *     (wipe before relogin/reconnect), keep pipeline cache and clear that mark so hourly
+	 *     retry can run.
 	 */
-	public static function disconnect(): void
+	public static function disconnect(bool $prevent_auto_bind = true): void
 	{
 		delete_option(self::PLUGIN_ID_KEY);
 		delete_option(self::SITE_TO_PP_KEY);
@@ -147,9 +164,59 @@ class Settings
 		delete_option(self::PP_TO_SITE_PREV_HASH_KEY);
 		delete_option(self::LAST_PRIMARY_CALL_AT_KEY);
 		delete_option(self::LAST_SITE_TO_PP_CALL_AT_KEY);
-		self::set_migration_mode(self::MIGRATION_MODE_LEGACY);
-		self::set_pipeline_ids([]);
-		delete_option(self::PIPELINE_CONTRACTS_KEY);
+		delete_option(self::CALLBACK_URL_KEY);
+		if ($prevent_auto_bind) {
+			self::set_migration_mode(self::MIGRATION_MODE_LEGACY);
+			self::set_pipeline_ids([]);
+			delete_option(self::PIPELINE_CONTRACTS_KEY);
+			update_option(self::SKIP_AUTO_BIND_KEY, 1);
+		} else {
+			self::clear_skip_auto_bind();
+		}
+	}
+
+	public static function skip_auto_bind(): bool
+	{
+		return (bool) get_option(self::SKIP_AUTO_BIND_KEY, false);
+	}
+
+	public static function clear_skip_auto_bind(): void
+	{
+		delete_option(self::SKIP_AUTO_BIND_KEY);
+	}
+
+	public static function callback_url(): string
+	{
+		$url = get_option(self::CALLBACK_URL_KEY, '');
+
+		return is_string($url) ? $url : '';
+	}
+
+	public static function set_callback_url(string $url): void
+	{
+		update_option(self::CALLBACK_URL_KEY, trim($url));
+	}
+
+	/** Current REST callback WordPress would send on a new bind. */
+	public static function current_callback_url(): string
+	{
+		if (!function_exists('rest_url')) {
+			return '';
+		}
+
+		return (string) rest_url('parrotposter/v1');
+	}
+
+	/**
+	 * Stored bind URL differs from the live `rest_url` (HTTPS enable, domain/path change).
+	 * Empty stored URL is not a mismatch — older binds never persisted it.
+	 */
+	public static function callback_url_is_stale(): bool
+	{
+		$stored = self::callback_url();
+		$current = self::current_callback_url();
+
+		return $stored !== '' && $current !== '' && $stored !== $current;
 	}
 
 	public static function site_to_pp_secret(): string

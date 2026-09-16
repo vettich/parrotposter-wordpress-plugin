@@ -32,6 +32,22 @@ if (!empty($profile['left'])) {
 PluginConnect::sync_remote_status();
 $migration_mode = Settings::get_migration_mode();
 $is_connected = Settings::is_connected();
+$callback_url = Settings::current_callback_url();
+$callback_scheme = function_exists('wp_parse_url')
+	? wp_parse_url($callback_url, PHP_URL_SCHEME)
+	: parse_url($callback_url, PHP_URL_SCHEME);
+$callback_is_http = $callback_scheme === 'http';
+$callback_url_stale = Settings::callback_url_is_stale();
+$show_callback_warning = $callback_is_http || $callback_url_stale;
+$http_callback_warning = __(
+	'This site is using HTTP. ParrotPoster will not call the site directly; publishing data is exchanged when WordPress polls the service. Enable HTTPS, then connect (or reconnect) the site so ParrotPoster can store the HTTPS address.',
+	'parrotposter'
+);
+$stale_callback_warning = __(
+	'The site address ParrotPoster has stored no longer matches this WordPress install. Direct calls from ParrotPoster to the site can fail until you reconnect.',
+	'parrotposter'
+);
+$callback_warning = $callback_url_stale ? $stale_callback_warning : $http_callback_warning;
 $format_connection_activity = static function (?string $utc_value): array {
 	if ($utc_value === null || $utc_value === '') {
 		return [
@@ -190,6 +206,12 @@ $revert_confirm = __(
 				<?php _e('This site is linked to your ParrotPoster account and can exchange publishing data with the service.', 'parrotposter') ?>
 			</p>
 
+			<?php if ($show_callback_warning): ?>
+				<div class="notice notice-warning parrotposter-settings-http-notice">
+					<p><?php echo esc_html($callback_warning) ?></p>
+				</div>
+			<?php endif ?>
+
 			<div class="parrotposter-settings-activity">
 				<div class="parrotposter-settings-activity-card">
 					<div class="parrotposter-block__label"><?php _e('WordPress to ParrotPoster', 'parrotposter') ?></div>
@@ -217,6 +239,16 @@ $revert_confirm = __(
 					<?php _e('Disconnect site', 'parrotposter') ?>
 				</a>
 			</div>
+
+			<?php if ($callback_url_stale): ?>
+				<form action="<?php echo esc_url(admin_url('admin-post.php')) ?>" method="post">
+					<?php FormHelpers::the_nonce() ?>
+					<input type="hidden" name="action" value="parrotposter_connect_reconnect">
+					<button type="submit" class="button button-primary">
+						<?php _e('Connect site', 'parrotposter') ?>
+					</button>
+				</form>
+			<?php endif ?>
 		</section>
 	<?php else: ?>
 		<section class="parrotposter-block parrotposter-settings-card">
@@ -232,6 +264,12 @@ $revert_confirm = __(
 			<p class="parrotposter-settings-card__description">
 				<?php _e('This site is not linked to ParrotPoster automation. Connect it to exchange publishing data with the service.', 'parrotposter') ?>
 			</p>
+
+			<?php if ($show_callback_warning): ?>
+				<div class="notice notice-warning parrotposter-settings-http-notice">
+					<p><?php echo esc_html($callback_warning) ?></p>
+				</div>
+			<?php endif ?>
 
 			<form action="<?php echo esc_url(admin_url('admin-post.php')) ?>" method="post">
 				<?php FormHelpers::the_nonce() ?>

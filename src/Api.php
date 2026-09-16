@@ -691,7 +691,7 @@ class Api
 	{
 		$bearer = Options::token();
 		if ($bearer === '') {
-			return ['error' => ['msg' => __('Требуется авторизация в ParrotPoster.', 'parrotposter')]];
+			return ['error' => ['msg' => __('ParrotPoster authorization is required.', 'parrotposter')]];
 		}
 
 		$query = self::build_graphql_mutation_query($operation);
@@ -1208,13 +1208,13 @@ class Api
 	): array {
 		$bearer = Options::token();
 		if ($bearer === '') {
-			return ['error' => ['msg' => __('Требуется авторизация в ParrotPoster.', 'parrotposter')]];
+			return ['error' => ['msg' => __('ParrotPoster authorization is required.', 'parrotposter')]];
 		}
 
 		$domain = trim($domain);
 		$callback_url = trim($callback_url);
 		if ($domain === '' || $callback_url === '') {
-			return ['error' => ['msg' => __('Некорректные параметры подключения.', 'parrotposter')]];
+			return ['error' => ['msg' => __('Invalid connection parameters.', 'parrotposter')]];
 		}
 
 		$variables = [
@@ -1242,12 +1242,12 @@ class Api
 
 		$payload = $res['data']['createPluginAuthCode'] ?? null;
 		if (!is_array($payload)) {
-			return ['error' => ['msg' => __('Некорректный ответ сервера.', 'parrotposter')]];
+			return ['error' => ['msg' => __('Invalid server response.', 'parrotposter')]];
 		}
 
 		$code = isset($payload['code']) ? (string) $payload['code'] : '';
 		if ($code === '') {
-			return ['error' => ['msg' => __('Код подключения не получен.', 'parrotposter')]];
+			return ['error' => ['msg' => __('Connection code was not received.', 'parrotposter')]];
 		}
 
 		$result = ['code' => $code];
@@ -1289,7 +1289,7 @@ class Api
 	/**
 	 * Plugin binding: exchange one-time auth code for machine secrets (no HMAC).
 	 *
-	 * @return array{plugin_id: string, site_to_pp_secret: string, pp_to_site_secret: string, migration_mode?: string, outbound_task_signing_public_key?: string}|array{error: array{msg: string, code?: string}}
+	 * @return array{plugin_id: string, site_to_pp_secret: string, pp_to_site_secret: string, migration_mode?: string, outbound_task_signing_public_key?: string, pipeline_ids_from_migration?: list<string>}|array{error: array{msg: string, code?: string}}
 	 */
 	public static function complete_plugin_binding(
 		string $code,
@@ -1299,16 +1299,16 @@ class Api
 	): array {
 		$code = trim($code);
 		if ($code === '') {
-			return ['error' => ['msg' => __('Код подключения не указан.', 'parrotposter')]];
+			return ['error' => ['msg' => __('Connection code is missing.', 'parrotposter')]];
 		}
 		if (strlen($code) > 8192) {
-			return ['error' => ['msg' => __('Код подключения слишком длинный.', 'parrotposter')]];
+			return ['error' => ['msg' => __('Connection code is too long.', 'parrotposter')]];
 		}
 
 		$domain = trim($domain);
 		$callback_url = trim($callback_url);
 		if ($domain === '' || $callback_url === '') {
-			return ['error' => ['msg' => __('Некорректные параметры подключения.', 'parrotposter')]];
+			return ['error' => ['msg' => __('Invalid connection parameters.', 'parrotposter')]];
 		}
 
 		$variables = [
@@ -1328,7 +1328,7 @@ class Api
 		// one either until the same task).
 		$q = 'mutation CompletePluginBinding($code: String!, $platform: PluginPlatform!, $domain: String!, $callbackUrl: String!, $pluginVersion: String) {
 			completePluginBinding(code: $code, platform: $platform, domain: $domain, callbackUrl: $callbackUrl, pluginVersion: $pluginVersion) {
-				pluginId siteToPpSecret ppToSiteSecret migrationMode outboundTaskSigningPublicKey
+				pluginId siteToPpSecret ppToSiteSecret migrationMode outboundTaskSigningPublicKey pipelineIdsFromMigration
 			}
 		}';
 		$res = self::do_graphql_request($q, $variables, [
@@ -1343,14 +1343,14 @@ class Api
 
 		$payload = $res['data']['completePluginBinding'] ?? null;
 		if (!is_array($payload)) {
-			return ['error' => ['msg' => __('Некорректный ответ сервера.', 'parrotposter')]];
+			return ['error' => ['msg' => __('Invalid server response.', 'parrotposter')]];
 		}
 
 		$plugin_id = isset($payload['pluginId']) ? (string) $payload['pluginId'] : '';
 		$site_to_pp = isset($payload['siteToPpSecret']) ? (string) $payload['siteToPpSecret'] : '';
 		$pp_to_site = isset($payload['ppToSiteSecret']) ? (string) $payload['ppToSiteSecret'] : '';
 		if ($plugin_id === '' || $site_to_pp === '' || $pp_to_site === '') {
-			return ['error' => ['msg' => __('Сервер не вернул данные подключения.', 'parrotposter')]];
+			return ['error' => ['msg' => __('The server did not return connection data.', 'parrotposter')]];
 		}
 
 		$result = [
@@ -1363,6 +1363,19 @@ class Api
 		}
 		if (isset($payload['outboundTaskSigningPublicKey']) && is_string($payload['outboundTaskSigningPublicKey'])) {
 			$result['outbound_task_signing_public_key'] = $payload['outboundTaskSigningPublicKey'];
+		}
+		if (isset($payload['pipelineIdsFromMigration']) && is_array($payload['pipelineIdsFromMigration'])) {
+			$ids = [];
+			foreach ($payload['pipelineIdsFromMigration'] as $id) {
+				if (!is_string($id) && !is_numeric($id)) {
+					continue;
+				}
+				$trimmed = trim((string) $id);
+				if ($trimmed !== '') {
+					$ids[] = $trimmed;
+				}
+			}
+			$result['pipeline_ids_from_migration'] = $ids;
 		}
 
 		return $result;
@@ -1407,7 +1420,7 @@ class Api
 	/**
 	 * User-session plugin row for this site (settings-page remote status sync).
 	 *
-	 * @return array{data?: array{plugin?: array{id?: string, status?: string}|null}, error?: array{msg: string, code?: int|string}}
+	 * @return array{data?: array{plugin?: array{id?: string, status?: string, callbackUrl?: string}|null}, error?: array{msg: string, code?: int|string}}
 	 */
 	public static function plugin_status(string $plugin_id): array
 	{
@@ -1421,7 +1434,7 @@ class Api
 			return ['error' => ['msg' => 'token is empty']];
 		}
 
-		$q = 'query PluginStatus($id: ID!) { plugin(id: $id) { id status } }';
+		$q = 'query PluginStatus($id: ID!) { plugin(id: $id) { id status callbackUrl } }';
 
 		return self::do_graphql_request($q, ['id' => $plugin_id], [
 			'bearer_token' => $bearer,
@@ -1437,16 +1450,16 @@ class Api
 	{
 		$code = isset($error['code']) ? (string) $error['code'] : '';
 		$messages = [
-			'auth_code_invalid_or_expired' => __('Код подключения недействителен или истёк. Начните подключение заново.', 'parrotposter'),
-			'binding_mismatch' => __('Данные подключения не совпадают. Проверьте домен и callback URL.', 'parrotposter'),
-			'callback_url_must_be_https' => __('Callback URL должен использовать HTTPS.', 'parrotposter'),
-			'callback_url_invalid' => __('Некорректный callback URL. Убедитесь, что сайт доступен по HTTPS и не использует локальный адрес.', 'parrotposter'),
+			'auth_code_invalid_or_expired' => __('The connection code is invalid or expired. Start the connection again.', 'parrotposter'),
+			'binding_mismatch' => __('Connection data does not match. Check the domain and callback URL.', 'parrotposter'),
+			'callback_url_must_be_https' => __('The callback URL must use HTTPS.', 'parrotposter'),
+			'callback_url_invalid' => __('Invalid callback URL. Make sure the site is reachable over HTTPS and is not using a local address.', 'parrotposter'),
 		];
 		if ($code !== '' && isset($messages[$code])) {
 			return ['msg' => $messages[$code], 'code' => $code];
 		}
 
-		$msg = isset($error['msg']) ? (string) $error['msg'] : __('Не удалось завершить подключение.', 'parrotposter');
+		$msg = isset($error['msg']) ? (string) $error['msg'] : __('Could not complete the connection.', 'parrotposter');
 
 		return array_filter(['msg' => $msg, 'code' => $code !== '' ? $code : null]);
 	}

@@ -75,19 +75,33 @@ assert_true('wire disconnect handler path is no longer connected', Settings::is_
 
 reset_options();
 seed_local_bind();
+Settings::set_migration_mode(Settings::MIGRATION_MODE_PIPELINE);
+Settings::set_pipeline_ids(['pipe-a']);
 $cleared = PluginConnect::apply_remote_status_result([
 	'data' => ['plugin' => ['id' => 'plugin-test-id', 'status' => 'DISABLED']],
 ]);
 assert_true('DISABLED remote status clears local bind', $cleared === true);
 assert_true('DISABLED remote status empties plugin_id', Settings::plugin_id() === '');
+assert_true('DISABLED remote status resets pipeline mode', Settings::get_migration_mode() === Settings::MIGRATION_MODE_LEGACY);
+assert_true('DISABLED remote status clears pipeline ids', Settings::get_pipeline_ids() === []);
 
 reset_options();
 seed_local_bind();
 $cleared = PluginConnect::apply_remote_status_result([
-	'data' => ['plugin' => ['id' => 'plugin-test-id', 'status' => 'ACTIVE']],
+	'data' => [
+		'plugin' => [
+			'id' => 'plugin-test-id',
+			'status' => 'ACTIVE',
+			'callbackUrl' => 'https://example.test/wp-json/parrotposter/v1',
+		],
+	],
 ]);
 assert_true('ACTIVE remote status keeps local bind', $cleared === false);
 assert_true('ACTIVE remote status keeps plugin_id', Settings::plugin_id() === 'plugin-test-id');
+assert_true(
+	'ACTIVE remote status backfills callback url',
+	Settings::callback_url() === 'https://example.test/wp-json/parrotposter/v1'
+);
 
 reset_options();
 seed_local_bind();

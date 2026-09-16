@@ -4,7 +4,7 @@
 
 ZIP_FILE=${1:-parrotposter.zip}
 
-rm "${ZIP_FILE}"
+rm -f "${ZIP_FILE}"
 
 zip -r "${ZIP_FILE}" \
 	assets/ \

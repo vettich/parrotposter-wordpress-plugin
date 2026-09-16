@@ -1,6 +1,13 @@
 (function ($) {
 	'use strict';
 
+	function parrotposter_pm__(text, fallback) {
+		if (typeof wp !== 'undefined' && wp.i18n && typeof wp.i18n.__ === 'function') {
+			return wp.i18n.__(text, 'parrotposter');
+		}
+		return fallback || text;
+	}
+
 	function ajaxPost(action, data) {
 		data = data || {};
 		data.action = action;
@@ -42,19 +49,19 @@
 					window.location.href = 'admin.php?page=parrotposter_pipelines';
 					return;
 				}
-				var msg = (res && res.error) ? res.error : 'Migration failed';
+				var msg = (res && res.error) ? res.error : parrotposter_pm__('Migration failed', 'Migration failed');
 				showNotice(msg, true);
 				$buttons.prop('disabled', false);
 			})
 			.fail(function () {
-				showNotice('Migration request failed', true);
+				showNotice(parrotposter_pm__('Migration request failed', 'Migration request failed'), true);
 				$buttons.prop('disabled', false);
 			});
 	});
 
 	$(document).on('click', '.pp-migration-revert', function (e) {
 		e.preventDefault();
-		if (!window.confirm($(this).data('confirm') || 'Revert to legacy scheduler?')) {
+		if (!window.confirm($(this).data('confirm') || parrotposter_pm__('Revert to legacy scheduler?', 'Revert to legacy scheduler?'))) {
 			return;
 		}
 		var $btn = $(this);
@@ -65,19 +72,19 @@
 					window.location.href = 'admin.php?page=parrotposter_scheduler';
 					return;
 				}
-				var msg = (res && res.error) ? res.error : 'Revert failed';
+				var msg = (res && res.error) ? res.error : parrotposter_pm__('Revert failed', 'Revert failed');
 				showNotice(msg, true);
 				$btn.prop('disabled', false);
 			})
 			.fail(function () {
-				showNotice('Revert request failed', true);
+				showNotice(parrotposter_pm__('Revert request failed', 'Revert request failed'), true);
 				$btn.prop('disabled', false);
 			});
 	});
 
 	$(document).on('click', '.pp-migration-dismiss', function (e) {
 		e.preventDefault();
-		if (!window.confirm($(this).data('confirm') || 'You can restore this notice in Settings → Pipelines.')) {
+		if (!window.confirm($(this).data('confirm') || parrotposter_pm__('You can restore this notice in Settings → Pipelines.', 'You can restore this notice in Settings → Pipelines.'))) {
 			return;
 		}
 		var $btn = $(this);
@@ -89,12 +96,12 @@
 					$banner.remove();
 					return;
 				}
-				var msg = (res && res.error) ? res.error : 'Request failed';
+				var msg = (res && res.error) ? res.error : parrotposter_pm__('Request failed', 'Request failed');
 				showNotice(msg, true);
 				$btn.prop('disabled', false);
 			})
 			.fail(function () {
-				showNotice('Request failed', true);
+				showNotice(parrotposter_pm__('Request failed', 'Request failed'), true);
 				$btn.prop('disabled', false);
 			});
 	});

@@ -145,6 +145,7 @@ class AssetModules
 			}
 			if ($module === 'pipeline-migration') {
 				$deps[] = 'jquery';
+				$deps[] = 'wp-i18n';
 			}
 			wp_register_script("parrotposter-$module", PP::asset($js), $deps, PARROTPOSTER_VERSION, true);
 			self::$registered[$module]['js'] = true;

@@ -136,10 +136,10 @@ class AdminAjaxPost
 	/**
 	 * Re-binds the site after a remote (PP-side) disable.
 	 *
-	 * `Settings::disconnect()` clears the stale local plugin_id/secrets first — otherwise
-	 * `PluginConnect::silent_bind()` would short-circuit on `Settings::is_connected()` still
-	 * being true (it only checks local state, not whether PP still honors those secrets) and
-	 * never actually re-bind.
+	 * `Settings::disconnect(false)` clears the stale local plugin_id/secrets first (without
+	 * skipping auto-bind) — otherwise `PluginConnect::silent_bind()` would short-circuit on
+	 * `Settings::is_connected()` still being true (it only checks local state, not whether PP
+	 * still honors those secrets) and never actually re-bind.
 	 */
 	public function reconnect_plugin(): void
 	{
@@ -147,7 +147,7 @@ class AdminAjaxPost
 		nocache_headers();
 		header('Content-Type: application/json; charset=UTF-8');
 
-		Settings::disconnect();
+		Settings::disconnect(false);
 		$bind = PluginConnect::silent_bind();
 
 		echo wp_json_encode([
@@ -597,7 +597,7 @@ class AdminAjaxPost
 		}
 		// Force a fresh bind so a site previously disabled on PP gets reactivated on relogin
 		// (silent_bind() would otherwise short-circuit on stale local "connected" state).
-		Settings::disconnect();
+		Settings::disconnect(false);
 		PluginConnect::silent_bind();
 		FormHelpers::post_success('logged');
 	}
@@ -641,7 +641,7 @@ class AdminAjaxPost
 
 		// Force a fresh bind so a site previously disabled on PP gets reactivated on relogin
 		// (silent_bind() would otherwise short-circuit on stale local "connected" state).
-		Settings::disconnect();
+		Settings::disconnect(false);
 		PluginConnect::silent_bind();
 
 		echo 'ok';

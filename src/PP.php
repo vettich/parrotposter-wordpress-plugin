@@ -224,7 +224,7 @@ class PP
 								// Force a fresh bind so a site previously disabled on PP gets reactivated
 								// on relogin (silent_bind() would otherwise short-circuit on stale local
 								// "connected" state).
-								Settings::disconnect();
+								Settings::disconnect(false);
 								PluginConnect::silent_bind();
 								wp_safe_redirect(
 									remove_query_arg(
